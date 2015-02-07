@@ -12,7 +12,7 @@ object build extends Build {
     id = "root",
     base = file("."),
     settings = standardSettings,
-    aggregate = Seq(pideCore, examples)
+    aggregate = Seq(pideCore, libisabelle, examples)
   )
 
   lazy val pideCore = Project(
@@ -27,13 +27,23 @@ object build extends Build {
     )
   )
 
+  lazy val libisabelle = Project(
+    id = "libisabelle",
+    base = file("libisabelle"),
+    settings = standardSettings ++ Seq(
+      name := "libisabelle"
+    ),
+    dependencies = Seq(pideCore)
+  )
+
+
   lazy val examples = Project(
     id = "examples",
     base = file("examples"),
     settings = standardSettings ++ Seq(
       name := "examples"
     ),
-    dependencies = Seq(pideCore)
+    dependencies = Seq(libisabelle)
   )
 
 }
