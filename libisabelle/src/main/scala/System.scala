@@ -30,32 +30,33 @@ object System {
 
   class Handler extends Session.Protocol_Handler { // public, because PIDE is going to reflectively instantiate this
 
-     private val SysID = new Properties.Long("sys_id")
-     private val ReqID = new Properties.Long("req_id")
+    private val SysID = new Properties.Long("sys_id")
+    private val ReqID = new Properties.Long("req_id")
 
-     private val decode: XML.Decode.T[Try[XML.Body]] =
-       XML.Decode.variant(List(
-         { case (List(), a) => Success(a) },
-         { case (List(), exn) => Failure(ProverException(XML.content(exn))) }
-       ))
+    private val decode: XML.Decode.T[Try[XML.Body]] =
+      XML.Decode.variant(List(
+        { case (List(), a) => Success(a) },
+        { case (List(), exn) => Failure(ProverException(XML.content(exn))) }
+      ))
 
-     private def response(prover: Prover, msg: Prover.Protocol_Output): Boolean = synchronized {
-       (msg.properties, msg.properties) match {
-         case (SysID(sysID), ReqID(reqID)) =>
-           instances(sysID) foreach { instance =>
-             val decoded = decode(YXML.parse_body(msg.text))
-             instance.synchronized {
-               instance.pending(reqID).tryComplete(decoded)
-               instance.pending -= reqID
-             }
-           }
-           true
-         case _ =>
-           false
-       }
-     }
+    private def response(prover: Prover, msg: Prover.Protocol_Output): Boolean = synchronized {
+      (msg.properties, msg.properties) match {
+        case (SysID(sysID), ReqID(reqID)) =>
+          instances(sysID) foreach { instance =>
+            val decoded = decode(YXML.parse_body(msg.text))
+            instance.synchronized {
+              instance.pending(reqID).tryComplete(decoded)
+              instance.pending -= reqID
+            }
+          }
+          true
+        case _ =>
+          false
+      }
+    }
 
-     val functions = Map("libisabelle_response" -> response _)
+    // FIXME make name configurable
+    val functions = Map("libisabelle_response" -> response _)
 
   }
 
@@ -119,12 +120,17 @@ class System private(id: Long, options: Options, session: Session) {
   @volatile private var count = 0L
   @volatile private var pending = Map.empty[Long, Promise[XML.Body]]
 
-  def dispose(): Unit = {
+  def dispose(): Future[Unit] = {
     // FIXME kill pending executions
-    System.synchronized { System.instances -= id }
+    val future = System.mkPhaseListener(session, Session.Inactive)
+    future foreach { _ =>
+      System.synchronized { System.instances -= id }
+    }
+    session.stop()
+    future
   }
 
-  private def sendCommand(command: String, args: XML.Body*): Future[XML.Body] = synchronized {
+  def sendCommand(command: String, args: XML.Body*): Future[XML.Body] = synchronized {
     val promise = Promise[XML.Body]
     pending += (count -> promise)
 
