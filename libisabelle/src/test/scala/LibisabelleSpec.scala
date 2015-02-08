@@ -18,7 +18,7 @@ class LibisabelleSpec extends Specification with NoTimeConversions { def is = s2
     can be torn down      $stop"""
 
 
-  val system = System.instance(Some(new java.io.File("examples/src/main/isabelle/Hello_PIDE")), "Hello_PIDE")
+  val system = System.instance(Some(new java.io.File(".")), "Hello_PIDE")
   val response = system.flatMap(_.sendCommand("hello", XML.Encode.string("world"))).map(XML.Decode.string)
   val teardown = for { s <- system; _ <- response /* wait for response */; _ <- s.dispose() } yield ()
 
