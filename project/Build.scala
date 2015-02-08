@@ -1,6 +1,8 @@
 import sbt._
 import Keys._
 
+import sbtassembly._
+
 object build extends Build {
 
   lazy val standardSettings = Seq(
@@ -47,6 +49,15 @@ object build extends Build {
       name := "examples"
     ),
     dependencies = Seq(libisabelle)
+  )
+
+  lazy val full = Project(
+    id = "full",
+    base = file("full"),
+    settings = standardSettings ++ Seq(
+      AssemblyKeys.assemblyJarName in AssemblyKeys.assembly := "libisabelle-full.jar"
+    ),
+    dependencies = Seq(examples)
   )
 
 }
