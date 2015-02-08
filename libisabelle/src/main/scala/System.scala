@@ -70,7 +70,7 @@ object System {
   private def mkListener[T, U](outlet: Session.Outlet[T], name: String)(f: T => Option[U])(implicit ec: ExecutionContext): Future[U] = {
     val promise = Promise[U]
     val consumer = Session.Consumer[T](name) { msg =>
-      f(msg).foreach(u => promise.tryComplete(Success(u)))
+      f(msg).foreach(u => promise.trySuccess(u))
     }
     outlet += consumer
 
