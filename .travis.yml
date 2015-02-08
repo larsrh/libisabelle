@@ -1,0 +1,10 @@
+language: scala
+scala:
+  - 2.11.5
+env:
+  - ISABELLE_HOME=./Isabelle2014
+before_install:
+  - wget http://isabelle.in.tum.de/dist/Isabelle2014_linux.tar.gz -O /tmp/Isabelle.tar.gz
+  - tar xzf /tmp/Isabelle.tar.gz
+install:
+  - $ISABELLE_HOME/bin/isabelle build -d . -bv Protocol
