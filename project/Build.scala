@@ -31,7 +31,10 @@ object build extends Build {
     id = "libisabelle",
     base = file("libisabelle"),
     settings = standardSettings ++ Seq(
-      name := "libisabelle"
+      name := "libisabelle",
+      libraryDependencies ++= Seq(
+        "org.specs2" %% "specs2-core" % "2.4.15" % "test"
+      )
     ),
     dependencies = Seq(pideCore)
   )
