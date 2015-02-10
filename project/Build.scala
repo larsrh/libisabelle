@@ -23,8 +23,7 @@ object build extends Build {
     settings = standardSettings ++ Seq(
       name := "pide-core",
       libraryDependencies ++= Seq(
-        "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.2",
-        "org.tukaani" % "xz" % "1.2"
+        "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.2"
       )
     )
   )
