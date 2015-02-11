@@ -30,7 +30,7 @@ class JSystem private(system: System, timeout: Duration) {
     Await.result(future, timeout)
 
   def dispose(): Unit =
-    await(system.dispose())
+    await(system.dispose)
 
   def sendCommand(command: String, args: java.util.List[String]): String =
     XML.Decode.string(await(system.sendCommand(command, args.asScala.map(XML.Encode.string): _*)))

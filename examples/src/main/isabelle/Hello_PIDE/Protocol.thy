@@ -26,10 +26,9 @@ ML{*
 
 local
 
-fun response sys_id req_id: Properties.T =
+fun response id: Properties.T =
   [(Markup.functionN, "libisabelle_response"),
-   ("sys_id", Markup.print_int sys_id),
-   ("req_id", Markup.print_int req_id)];
+   ("id", Markup.print_int id)]
 
 val encode_result = XML.Encode.variant
   [fn Exn.Res a => ([], a),
@@ -37,21 +36,17 @@ val encode_result = XML.Encode.variant
 
 in
 
-val _ = Session.protocol_handler "edu.tum.cs.isabelle.System$Handler"
-
 val _ = Isabelle_Process.protocol_command "libisabelle"
-  (fn sys_id :: req_id :: cmd :: args =>
+  (fn id :: cmd :: args =>
     let
-      val sys_id = Markup.parse_int sys_id
-      val req_id = Markup.parse_int req_id
-      val id = (sys_id, req_id)
+      val id = Markup.parse_int id
       fun exec f x =
         (Future.fork (fn () =>
           let
             val res = Exn.interruptible_capture f x
             val yxml = YXML.string_of_body (encode_result res)
           in
-            Output.protocol_message (response sys_id req_id) [yxml]
+            Output.protocol_message (response id) [yxml]
           end);
         ())
       val args = map YXML.parse_body args
