@@ -1,0 +1,563 @@
+protocol for Lars' mail:
+
+1) Build an image of "Hello_PIDE"
+   libisabelle$ $ISABELLE_HOME/bin/isabelle build -d . -bv Hello_PIDE
+2) Build the JAR file
+   libisabelle$ ./sbt full/assembly
+3) Make Isabelle home known to Linux
+	export ISABELLE_HOME=/usr/local/Isabelle2014
+4) Execute the example
+   $ java -cp full/target/scala-2.11/libisabelle-full.jar Hello_PIDE
+
+#######################################################################
+
+
+wneuper@ProBook:~/proto4/libisabelle$ /usr/local/Isabelle2014/bin/isabelle build -d . -bv Hello_PIDE
+Started at Wed Feb 11 16:54:10 CET 2015 (polyml-5.5.2_x86-linux on ProBook)
+ISABELLE_BUILD_OPTIONS=""
+
+ML_PLATFORM="x86-linux"
+ML_HOME="/usr/local/Isabelle2014/contrib/polyml-5.5.2-1/x86-linux"
+ML_SYSTEM="polyml-5.5.2"
+ML_OPTIONS="-H 500"
+
+Session Pure/Pure
+Session HOL/HOL (main)
+Session Unsorted/Hello_PIDE
+Building Hello_PIDE ...
+Hello_PIDE: theory Protocol
+Timing Hello_PIDE (2 threads, 0.663s elapsed time, 0.704s cpu time, 0.008s GC time, factor 1.06)
+Finished Hello_PIDE (0:00:22 elapsed time, 0:00:21 cpu time, factor 0.95)
+Finished at Wed Feb 11 16:54:40 CET 2015
+0:00:30 elapsed time, 0:00:39 cpu time, factor 1.30
+wneuper@ProBook:~/proto4/libisabelle$ 
+
+#######################################################################
+
+wneuper@ProBook:~/proto4/libisabelle$ ./sbt full/assembly
+Downloading sbt launcher for 0.13.7:
+  From  http://typesafe.artifactoryonline.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.7/sbt-launch.jar
+    To  /home/wneuper/.sbt/launchers/0.13.7/sbt-launch.jar
+Getting org.scala-sbt sbt 0.13.7 ...
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt/0.13.7/jars/sbt.jar ...
+	[SUCCESSFUL ] org.scala-sbt#sbt;0.13.7!sbt.jar (705ms)
+downloading https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.10.4/scala-library-2.10.4.jar ...
+	[SUCCESSFUL ] org.scala-lang#scala-library;2.10.4!scala-library.jar (1089ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/main/0.13.7/jars/main.jar ...
+	[SUCCESSFUL ] org.scala-sbt#main;0.13.7!main.jar (1883ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/compiler-interface/0.13.7/jars/compiler-interface-src.jar ...
+	[SUCCESSFUL ] org.scala-sbt#compiler-interface;0.13.7!compiler-interface-src.jar (589ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/compiler-interface/0.13.7/jars/compiler-interface-bin.jar ...
+	[SUCCESSFUL ] org.scala-sbt#compiler-interface;0.13.7!compiler-interface-bin.jar (611ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/precompiled-2_8_2/0.13.7/jars/compiler-interface-bin.jar ...
+	[SUCCESSFUL ] org.scala-sbt#precompiled-2_8_2;0.13.7!compiler-interface-bin.jar (610ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/precompiled-2_9_2/0.13.7/jars/compiler-interface-bin.jar ...
+	[SUCCESSFUL ] org.scala-sbt#precompiled-2_9_2;0.13.7!compiler-interface-bin.jar (609ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/precompiled-2_9_3/0.13.7/jars/compiler-interface-bin.jar ...
+	[SUCCESSFUL ] org.scala-sbt#precompiled-2_9_3;0.13.7!compiler-interface-bin.jar (606ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/actions/0.13.7/jars/actions.jar ...
+	[SUCCESSFUL ] org.scala-sbt#actions;0.13.7!actions.jar (631ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/main-settings/0.13.7/jars/main-settings.jar ...
+	[SUCCESSFUL ] org.scala-sbt#main-settings;0.13.7!main-settings.jar (648ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/interface/0.13.7/jars/interface.jar ...
+	[SUCCESSFUL ] org.scala-sbt#interface;0.13.7!interface.jar (589ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/io/0.13.7/jars/io.jar ...
+	[SUCCESSFUL ] org.scala-sbt#io;0.13.7!io.jar (614ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/ivy/0.13.7/jars/ivy.jar ...
+	[SUCCESSFUL ] org.scala-sbt#ivy;0.13.7!ivy.jar (734ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/launcher-interface/0.13.7/jars/launcher-interface.jar ...
+	[SUCCESSFUL ] org.scala-sbt#launcher-interface;0.13.7!launcher-interface.jar (584ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/logging/0.13.7/jars/logging.jar ...
+	[SUCCESSFUL ] org.scala-sbt#logging;0.13.7!logging.jar (598ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/logic/0.13.7/jars/logic.jar ...
+	[SUCCESSFUL ] org.scala-sbt#logic;0.13.7!logic.jar (592ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/process/0.13.7/jars/process.jar ...
+	[SUCCESSFUL ] org.scala-sbt#process;0.13.7!process.jar (599ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/run/0.13.7/jars/run.jar ...
+	[SUCCESSFUL ] org.scala-sbt#run;0.13.7!run.jar (602ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/command/0.13.7/jars/command.jar ...
+	[SUCCESSFUL ] org.scala-sbt#command;0.13.7!command.jar (612ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/classpath/0.13.7/jars/classpath.jar ...
+	[SUCCESSFUL ] org.scala-sbt#classpath;0.13.7!classpath.jar (595ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/completion/0.13.7/jars/completion.jar ...
+	[SUCCESSFUL ] org.scala-sbt#completion;0.13.7!completion.jar (620ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/api/0.13.7/jars/api.jar ...
+	[SUCCESSFUL ] org.scala-sbt#api;0.13.7!api.jar (618ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/compiler-integration/0.13.7/jars/compiler-integration.jar ...
+	[SUCCESSFUL ] org.scala-sbt#compiler-integration;0.13.7!compiler-integration.jar (594ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/compiler-ivy-integration/0.13.7/jars/compiler-ivy-integration.jar ...
+	[SUCCESSFUL ] org.scala-sbt#compiler-ivy-integration;0.13.7!compiler-ivy-integration.jar (585ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/relation/0.13.7/jars/relation.jar ...
+	[SUCCESSFUL ] org.scala-sbt#relation;0.13.7!relation.jar (590ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/task-system/0.13.7/jars/task-system.jar ...
+	[SUCCESSFUL ] org.scala-sbt#task-system;0.13.7!task-system.jar (598ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/tasks/0.13.7/jars/tasks.jar ...
+	[SUCCESSFUL ] org.scala-sbt#tasks;0.13.7!tasks.jar (598ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/tracking/0.13.7/jars/tracking.jar ...
+	[SUCCESSFUL ] org.scala-sbt#tracking;0.13.7!tracking.jar (588ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/testing/0.13.7/jars/testing.jar ...
+	[SUCCESSFUL ] org.scala-sbt#testing;0.13.7!testing.jar (599ms)
+downloading https://repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.10.4/scala-compiler-2.10.4.jar ...
+	[SUCCESSFUL ] org.scala-lang#scala-compiler;2.10.4!scala-compiler.jar (1787ms)
+downloading https://repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.10.4/scala-reflect-2.10.4.jar ...
+	[SUCCESSFUL ] org.scala-lang#scala-reflect;2.10.4!scala-reflect.jar (587ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/control/0.13.7/jars/control.jar ...
+	[SUCCESSFUL ] org.scala-sbt#control;0.13.7!control.jar (685ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/collections/0.13.7/jars/collections.jar ...
+	[SUCCESSFUL ] org.scala-sbt#collections;0.13.7!collections.jar (1220ms)
+downloading https://repo1.maven.org/maven2/jline/jline/2.11/jline-2.11.jar ...
+	[SUCCESSFUL ] jline#jline;2.11!jline.jar (348ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/incremental-compiler/0.13.7/jars/incremental-compiler.jar ...
+	[SUCCESSFUL ] org.scala-sbt#incremental-compiler;0.13.7!incremental-compiler.jar (1021ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/compile/0.13.7/jars/compile.jar ...
+	[SUCCESSFUL ] org.scala-sbt#compile;0.13.7!compile.jar (598ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/persist/0.13.7/jars/persist.jar ...
+	[SUCCESSFUL ] org.scala-sbt#persist;0.13.7!persist.jar (602ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/classfile/0.13.7/jars/classfile.jar ...
+	[SUCCESSFUL ] org.scala-sbt#classfile;0.13.7!classfile.jar (594ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-tools.sbinary/sbinary_2.10/0.4.2/jars/sbinary_2.10.jar ...
+	[SUCCESSFUL ] org.scala-tools.sbinary#sbinary_2.10;0.4.2!sbinary_2.10.jar (604ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/cross/0.13.7/jars/cross.jar ...
+	[SUCCESSFUL ] org.scala-sbt#cross;0.13.7!cross.jar (586ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt.ivy/ivy/2.3.0-sbt-fccfbd44c9f64523b61398a0155784dcbaeae28f/jars/ivy.jar ...
+	[SUCCESSFUL ] org.scala-sbt.ivy#ivy;2.3.0-sbt-fccfbd44c9f64523b61398a0155784dcbaeae28f!ivy.jar (1447ms)
+downloading https://repo1.maven.org/maven2/com/jcraft/jsch/0.1.46/jsch-0.1.46.jar ...
+	[SUCCESSFUL ] com.jcraft#jsch;0.1.46!jsch.jar (321ms)
+downloading https://repo1.maven.org/maven2/org/json4s/json4s-native_2.10/3.2.10/json4s-native_2.10-3.2.10.jar ...
+	[SUCCESSFUL ] org.json4s#json4s-native_2.10;3.2.10!json4s-native_2.10.jar (305ms)
+downloading https://repo1.maven.org/maven2/org/spire-math/jawn-parser_2.10/0.6.0/jawn-parser_2.10-0.6.0.jar ...
+	[SUCCESSFUL ] org.spire-math#jawn-parser_2.10;0.6.0!jawn-parser_2.10.jar (302ms)
+downloading https://repo1.maven.org/maven2/org/spire-math/json4s-support_2.10/0.6.0/json4s-support_2.10-0.6.0.jar ...
+	[SUCCESSFUL ] org.spire-math#json4s-support_2.10;0.6.0!json4s-support_2.10.jar (296ms)
+downloading https://repo1.maven.org/maven2/org/json4s/json4s-core_2.10/3.2.10/json4s-core_2.10-3.2.10.jar ...
+	[SUCCESSFUL ] org.json4s#json4s-core_2.10;3.2.10!json4s-core_2.10.jar (361ms)
+downloading https://repo1.maven.org/maven2/org/json4s/json4s-ast_2.10/3.2.10/json4s-ast_2.10-3.2.10.jar ...
+	[SUCCESSFUL ] org.json4s#json4s-ast_2.10;3.2.10!json4s-ast_2.10.jar (304ms)
+downloading https://repo1.maven.org/maven2/com/thoughtworks/paranamer/paranamer/2.6/paranamer-2.6.jar ...
+	[SUCCESSFUL ] com.thoughtworks.paranamer#paranamer;2.6!paranamer.jar (298ms)
+downloading https://repo1.maven.org/maven2/org/scala-lang/scalap/2.10.0/scalap-2.10.0.jar ...
+	[SUCCESSFUL ] org.scala-lang#scalap;2.10.0!scalap.jar (405ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/cache/0.13.7/jars/cache.jar ...
+	[SUCCESSFUL ] org.scala-sbt#cache;0.13.7!cache.jar (982ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/test-agent/0.13.7/jars/test-agent.jar ...
+	[SUCCESSFUL ] org.scala-sbt#test-agent;0.13.7!test-agent.jar (584ms)
+downloading https://repo1.maven.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar ...
+	[SUCCESSFUL ] org.scala-sbt#test-interface;1.0!test-interface.jar (294ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/apply-macro/0.13.7/jars/apply-macro.jar ...
+	[SUCCESSFUL ] org.scala-sbt#apply-macro;0.13.7!apply-macro.jar (795ms)
+:: retrieving :: org.scala-sbt#boot-app
+	confs: [default]
+	51 artifacts copied, 0 already retrieved (15709kB/54ms)
+Getting Scala 2.10.4 (for sbt)...
+downloading https://repo1.maven.org/maven2/org/scala-lang/jline/2.10.4/jline-2.10.4.jar ...
+	[SUCCESSFUL ] org.scala-lang#jline;2.10.4!jline.jar (469ms)
+downloading https://repo1.maven.org/maven2/org/fusesource/jansi/jansi/1.4/jansi-1.4.jar ...
+	[SUCCESSFUL ] org.fusesource.jansi#jansi;1.4!jansi.jar (368ms)
+:: retrieving :: org.scala-sbt#boot-scala
+	confs: [default]
+	5 artifacts copied, 0 already retrieved (24459kB/37ms)
+[info] Loading project definition from /home/wneuper/proto4/libisabelle/project
+[info] Updating {file:/home/wneuper/proto4/libisabelle/project/}libisabelle-build...
+[info] Resolving org.fusesource.jansi#jansi;1.4 ...
+[info] downloading https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/com.eed3si9n/sbt-assembly/scala_2.10/sbt_0.13/0.12.0/jars/sbt-assembly.jar ...
+[info] 	[SUCCESSFUL ] com.eed3si9n#sbt-assembly;0.12.0!sbt-assembly.jar (2384ms)
+[info] Done updating.
+[info] Compiling 1 Scala source to /home/wneuper/proto4/libisabelle/project/target/scala-2.10/sbt-0.13/classes...
+[info] Set current project to root (in build file:/home/wneuper/proto4/libisabelle/)
+[info] Updating {file:/home/wneuper/proto4/libisabelle/}pide-core...
+[info] Resolving org.sonatype.oss#oss-parent;7 ...
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.11.5/scala-library-2.11.5.jar ...
+[info] 	[SUCCESSFUL ] org.scala-lang#scala-library;2.11.5!scala-library.jar (1099ms)
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/modules/scala-parser-combinators_2.11/1.0.2/scala-parser-combinators_2.11-1.0.2.jar ...
+[info] 	[SUCCESSFUL ] org.scala-lang.modules#scala-parser-combinators_2.11;1.0.2!scala-parser-combinators_2.11.jar(bundle) (417ms)
+[info] downloading https://repo1.maven.org/maven2/org/tukaani/xz/1.2/xz-1.2.jar ...
+[info] 	[SUCCESSFUL ] org.tukaani#xz;1.2!xz.jar (326ms)
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.11.5/scala-compiler-2.11.5.jar ...
+[info] 	[SUCCESSFUL ] org.scala-lang#scala-compiler;2.11.5!scala-compiler.jar (1674ms)
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.11.5/scala-reflect-2.11.5.jar ...
+[info] 	[SUCCESSFUL ] org.scala-lang#scala-reflect;2.11.5!scala-reflect.jar (746ms)
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.11/1.0.3/scala-xml_2.11-1.0.3.jar ...
+[info] 	[SUCCESSFUL ] org.scala-lang.modules#scala-xml_2.11;1.0.3!scala-xml_2.11.jar(bundle) (504ms)
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/modules/scala-parser-combinators_2.11/1.0.3/scala-parser-combinators_2.11-1.0.3.jar ...
+[info] 	[SUCCESSFUL ] org.scala-lang.modules#scala-parser-combinators_2.11;1.0.3!scala-parser-combinators_2.11.jar(bundle) (350ms)
+[info] downloading https://repo1.maven.org/maven2/jline/jline/2.12/jline-2.12.jar ...
+[info] 	[SUCCESSFUL ] jline#jline;2.12!jline.jar (319ms)
+[info] Done updating.
+[info] Updating {file:/home/wneuper/proto4/libisabelle/}libisabelle...
+[info] Resolving jline#jline;2.12 ...
+[info] downloading https://repo1.maven.org/maven2/org/specs2/specs2-core_2.11/2.4.15/specs2-core_2.11-2.4.15.jar ...
+[info] 	[SUCCESSFUL ] org.specs2#specs2-core_2.11;2.4.15!specs2-core_2.11.jar (587ms)
+[info] downloading https://repo1.maven.org/maven2/org/specs2/specs2-matcher_2.11/2.4.15/specs2-matcher_2.11-2.4.15.jar ...
+[info] 	[SUCCESSFUL ] org.specs2#specs2-matcher_2.11;2.4.15!specs2-matcher_2.11.jar (1171ms)
+[info] downloading https://repo1.maven.org/maven2/org/specs2/specs2-common_2.11/2.4.15/specs2-common_2.11-2.4.15.jar ...
+[info] 	[SUCCESSFUL ] org.specs2#specs2-common_2.11;2.4.15!specs2-common_2.11.jar (441ms)
+[info] downloading https://repo1.maven.org/maven2/org/scalaz/scalaz-core_2.11/7.1.0/scalaz-core_2.11-7.1.0.jar ...
+[info] 	[SUCCESSFUL ] org.scalaz#scalaz-core_2.11;7.1.0!scalaz-core_2.11.jar(bundle) (1202ms)
+[info] downloading https://repo1.maven.org/maven2/org/scalaz/scalaz-concurrent_2.11/7.1.0/scalaz-concurrent_2.11-7.1.0.jar ...
+[info] 	[SUCCESSFUL ] org.scalaz#scalaz-concurrent_2.11;7.1.0!scalaz-concurrent_2.11.jar(bundle) (329ms)
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.11.4/scala-reflect-2.11.4.jar ...
+[info] 	[SUCCESSFUL ] org.scala-lang#scala-reflect;2.11.4!scala-reflect.jar (771ms)
+[info] downloading https://repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.11/1.0.2/scala-xml_2.11-1.0.2.jar ...
+[info] 	[SUCCESSFUL ] org.scala-lang.modules#scala-xml_2.11;1.0.2!scala-xml_2.11.jar(bundle) (458ms)
+[info] downloading https://repo1.maven.org/maven2/org/scalaz/scalaz-effect_2.11/7.1.0/scalaz-effect_2.11-7.1.0.jar ...
+[info] 	[SUCCESSFUL ] org.scalaz#scalaz-effect_2.11;7.1.0!scalaz-effect_2.11.jar(bundle) (451ms)
+[info] Done updating.
+[info] Updating {file:/home/wneuper/proto4/libisabelle/}examples...
+[info] Resolving jline#jline;2.12 ...
+[info] Done updating.
+[info] Updating {file:/home/wneuper/proto4/libisabelle/}full...
+[info] Resolving jline#jline;2.12 ...
+[info] Done updating.
+[info] Compiling 75 Scala sources to /home/wneuper/proto4/libisabelle/pide-core/target/scala-2.11/classes...
+[info] 'compiler-interface' not yet compiled for Scala 2.11.5. Compiling...
+[info]   Compilation completed in 16.808 s
+[warn] /home/wneuper/proto4/libisabelle/pide-core/src/main/scala/term_xml.scala:55: match may not be exhaustive.
+[warn] It would fail on the following input: (List(_), _)
+[warn]         { case (Nil, a) => val (b, c) = pair(term, term)(a); App(b, c) }))
+[warn]         ^
+[warn] one warning found
+[info] Compiling 3 Scala sources to /home/wneuper/proto4/libisabelle/libisabelle/target/scala-2.11/classes...
+[warn] /home/wneuper/proto4/libisabelle/libisabelle/src/main/scala/System.scala:147: match may not be exhaustive.
+[warn] It would fail on the following input: (List(_), _)
+[warn]       { case (List(), a) => Success(a) },
+[warn]       ^
+[warn] /home/wneuper/proto4/libisabelle/libisabelle/src/main/scala/System.scala:148: match may not be exhaustive.
+[warn] It would fail on the following input: (List(_), _)
+[warn]       { case (List(), exn) => Failure(System.ProverException(XML.content(exn))) }
+[warn]       ^
+[warn] two warnings found
+[info] Compiling 1 Java source to /home/wneuper/proto4/libisabelle/examples/target/scala-2.11/classes...
+[warn] No main class detected
+[info] Including: scala-parser-combinators_2.11-1.0.2.jar
+[info] Including: xz-1.2.jar
+[info] Including: scala-library-2.11.5.jar
+[info] Checking every *.class/*.jar file's SHA-1.
+[info] Merging files...
+[warn] Merging 'META-INF/MANIFEST.MF' with strategy 'discard'
+[warn] Strategy 'discard' was applied to a file
+[info] SHA-1: c7c80e19d638f187bee9b07e89e4596670d2ac8e
+[info] Packaging /home/wneuper/proto4/libisabelle/full/target/scala-2.11/libisabelle-full.jar ...
+[info] Done packaging.
+[success] Total time: 88 s, completed 11-Feb-2015 4:59:40 PM
+
+####################################################################
+
+wneuper@ProBook:~/proto4/libisabelle$ java -cp full/target/scala-2.11/libisabelle-full.jar Hello_PIDE
+Exception in thread "main" java.lang.RuntimeException: Unknown Isabelle home directory
+	at isabelle.Library$ERROR$.apply(library.scala:20)
+	at isabelle.Library$.error(library.scala:24)
+	at isabelle.Basic_Library$$anonfun$2.apply(library.scala:172)
+	at isabelle.Basic_Library$$anonfun$2.apply(library.scala:172)
+	at isabelle.Isabelle_System$.init(isabelle_system.scala:101)
+	at isabelle.Isabelle_System$.settings(isabelle_system.scala:56)
+	at isabelle.Isabelle_System$.getenv(isabelle_system.scala:137)
+	at isabelle.Isabelle_System$.getenv_strict(isabelle_system.scala:141)
+	at isabelle.Isabelle_System$.components(isabelle_system.scala:540)
+	at isabelle.Options$.init_defaults(options.scala:126)
+	at isabelle.Options$.init(options.scala:132)
+	at edu.tum.cs.isabelle.System$.startSession(System.scala:99)
+	at edu.tum.cs.isabelle.System$.instance(System.scala:16)
+	at edu.tum.cs.isabelle.japi.JSystem$.instance(System.scala:15)
+	at edu.tum.cs.isabelle.japi.JSystem$.instance(System.scala:18)
+	at edu.tum.cs.isabelle.japi.JSystem.instance(System.scala)
+	at Hello_PIDE.main(Hello_PIDE.java:8)
+wneuper@ProBook:~/proto4/libisabelle$ 
+
+####################################################################
+
+wneuper@ProBook:~/proto4/libisabelle$ find -name *.jar
+./full/target/scala-2.11/libisabelle-full.jar
+wneuper@ProBook:~/proto4/libisabelle$ 
+
+####################################################################
+
+wneuper@ProBook:~/proto4/libisabelle$ /usr/local/Isabelle2014/bin/isabelle env
+ISABELLE_TMP_PREFIX=/tmp/isabelle-wneuper
+CVC3_REMOTE_SOLVER=cvc3
+SSH_AGENT_PID=2094
+ISABELLE_ATP=/usr/local/Isabelle2014/src/HOL/Tools/ATP
+ML_IDENTIFIER=polyml-5.5.2_x86-linux
+ISABELLE_FONTS=/usr/local/Isabelle2014/lib/fonts/IsabelleText.ttf:/usr/local/Isabelle2014/lib/fonts/IsabelleTextBold.ttf
+JEDIT_HOME=/usr/local/Isabelle2014/src/Tools/jEdit
+Z3_NEW_SOLVER=/usr/local/Isabelle2014/contrib/z3-4.3.2pre-1/x86_64-linux/z3
+GPG_AGENT_INFO=/tmp/keyring-ebHhPQ/gpg:0:1
+JEDIT_SYSTEM_OPTIONS=-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dapple.laf.useScreenMenuBar=true -Dapple.awt.application.name=Isabelle
+MIRABELLE_THEORY=Main
+EXEC_PROCESS=/usr/local/Isabelle2014/contrib/exec_process-1.0.3/x86_64-linux/exec_process
+KODKODI_PLATFORM=x86-linux
+TERM=xterm
+SHELL=/bin/bash
+ISABELLE_BUILD_JAVA_OPTIONS=-Xmx1024m -Xss1m
+XDG_SESSION_COOKIE=fa462dfd4c84a91ca1d27b3000000005-1422517806.611849-532442599
+ISABELLE_IDENTIFIER=Isabelle2014
+ISABELLE_COMPONENTS_MISSING=
+ISABELLE_JDK_HOME=/usr/local/Isabelle2014/contrib/jdk/x86_64-linux
+ISABELLE_MAKEINDEX=makeindex
+Z3_NEW_HOME=/usr/local/Isabelle2014/contrib/z3-4.3.2pre-1/x86_64-linux
+ISABELLE_PROCESS=/usr/local/Isabelle2014/bin/isabelle_process
+Z3_NEW_INSTALLED=yes
+ISABELLE_JAVA_EXT=/usr/local/Isabelle2014/contrib/jdk/x86_64-linux/jre/lib/ext
+WINDOWID=60949486
+ISABELLE_DOCS_RELEASE_NOTES=ANNOUNCE:README:NEWS:COPYRIGHT:CONTRIBUTORS:contrib/README:src/Tools/jEdit/README:README_REPOSITORY
+MIRABELLE_TIMEOUT=30
+GNOME_KEYRING_CONTROL=/tmp/keyring-ebHhPQ
+ISABELLE_BIBTEX=bibtex
+DVI_VIEWER=xdg-open
+Z3_REMOTE_SOLVER=z3
+REPLY=
+ISABELLE_SETTINGS_PRESENT=true
+ISABELLE_BUILD_OPTIONS=
+MUTABELLE_IMPORT_THEORY=Complex_Main
+POLYML_HOME=/usr/local/Isabelle2014/contrib/polyml-5.5.2-1
+Z3_COMPONENT=/usr/local/Isabelle2014/contrib/z3-3.2-1
+ISABELLE_PLATFORM_FAMILY=linux
+ISABELLE_PATH=/home/wneuper/.isabelle/Isabelle2014/heaps:/usr/local/Isabelle2014/heaps
+USER=wneuper
+ML_SYSTEM=polyml-5.5.2
+LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lz=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.axa=00;36:*.oga=00;36:*.spx=00;36:*.xspf=00;36:
+LIBGL_DRIVERS_PATH=/usr/lib/fglrx/dri:/usr/lib/x86_64-linux-gnu/dri:/usr/lib/dri:/usr/lib32/fglrx/dri:/usr/lib/i386-linux-gnu/dri
+ISABELLE_OPEN=xdg-open
+Z3_NEW_COMPONENT=/usr/local/Isabelle2014/contrib/z3-4.3.2pre-1
+NO_GAIL=1
+ISABELLE_EPSTOPDF=epstopdf
+XDG_SESSION_PATH=/org/freedesktop/DisplayManager/Session0
+HASKABELLE_HOME_USER=/home/wneuper/.isabelle/Isabelle2014/Haskabelle-2014
+XDG_SEAT_PATH=/org/freedesktop/DisplayManager/Seat0
+ISABELLE_SITE_SETTINGS_PRESENT=true
+Z3_HOME=/usr/local/Isabelle2014/contrib/z3-3.2-1/x86-linux
+SSH_AUTH_SOCK=/tmp/keyring-ebHhPQ/ssh
+ISABELLE_COMPONENTS=/usr/local/Isabelle2014:/usr/local/Isabelle2014/src/Tools/Code:/usr/local/Isabelle2014/src/Tools/jEdit:/usr/local/Isabelle2014/src/Tools/Graphview:/usr/local/Isabelle2014/src/HOL/Mirabelle:/usr/local/Isabelle2014/src/HOL/Mutabelle:/usr/local/Isabelle2014/src/HOL/Library/Sum_of_Squares:/usr/local/Isabelle2014/src/HOL/Tools:/usr/local/Isabelle2014/src/HOL/Tools/ATP:/usr/local/Isabelle2014/src/HOL/TPTP:/usr/local/Isabelle2014/contrib/cvc3-2.4.1:/usr/local/Isabelle2014/contrib/e-1.8:/usr/local/Isabelle2014/contrib/exec_process-1.0.3:/usr/local/Isabelle2014/contrib/Haskabelle-2014:/usr/local/Isabelle2014/contrib/jdk:/usr/local/Isabelle2014/contrib/jfreechart-1.0.14-1:/usr/local/Isabelle2014/contrib/jortho-1.0-2:/usr/local/Isabelle2014/contrib/kodkodi-1.5.2:/usr/local/Isabelle2014/contrib/polyml-5.5.2-1:/usr/local/Isabelle2014/contrib/scala-2.11.2:/usr/local/Isabelle2014/contrib/spass-3.8ds:/usr/local/Isabelle2014/contrib/z3-3.2-1:/usr/local/Isabelle2014/contrib/z3-4.3.2pre-1:/usr/local/Isabelle2014/contrib/xz-java-1.2-1:/home/wneuper/.isabelle/Isabelle2014
+JFREECHART_HOME=/usr/local/Isabelle2014/contrib/jfreechart-1.0.14-1
+KODKODI_JAVA_LIBRARY_PATH=/usr/local/Isabelle2014/contrib/kodkodi-1.5.2/jni/x86-linux
+ISABELLE_HOME_USER=/home/wneuper/.isabelle/Isabelle2014
+Z3_NEW_VERSION=4.3.2pre-1
+SESSION_MANAGER=local/ProBook:@/tmp/.ICE-unix/2047,unix/ProBook:/tmp/.ICE-unix/2047
+DEFAULTS_PATH=/usr/share/gconf/ubuntu-2d.default.path
+X=/usr/local/Isabelle2014/contrib/Haskabelle-2014/lib/Tools
+MUTABELLE_NUMBER_OF_MUTANTS=4
+MUTABELLE_NUMBER_OF_MUTATIONS=1
+ISABELLE_BROWSER_INFO=/home/wneuper/.isabelle/Isabelle2014/browser_info
+JORTHO_HOME=/usr/local/Isabelle2014/contrib/jortho-1.0-2
+XDG_CONFIG_DIRS=/etc/xdg/xdg-ubuntu-2d:/etc/xdg
+ML_PLATFORM=x86-linux
+MIRABELLE_LOGIC=HOL
+ML_OPTIONS=-H 500
+PATH=/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+DESKTOP_SESSION=ubuntu-2d
+ISABELLE_TOOL=/usr/local/Isabelle2014/bin/isabelle
+ISABELLE_PLATFORM32=x86-linux
+ISABELLE_SUM_OF_SQUARES=/usr/local/Isabelle2014/src/HOL/Library/Sum_of_Squares
+PWD=/home/wneuper/proto4/libisabelle
+USER_HOME=/home/wneuper
+JEDIT_OPTIONS=-reuseview -noserver -nobackground -log=9
+KODKODI_CLASSPATH=/usr/local/Isabelle2014/contrib/kodkodi-1.5.2/jar/antlr-runtime-3.1.1.jar:/usr/local/Isabelle2014/contrib/kodkodi-1.5.2/jar/kodkod-1.5.jar:/usr/local/Isabelle2014/contrib/kodkodi-1.5.2/jar/kodkodi-1.5.2.jar:/usr/local/Isabelle2014/contrib/kodkodi-1.5.2/jar/sat4j-2.3.jar
+TPTP_HOME=/usr/local/Isabelle2014/src/HOL/TPTP
+CVC3_INSTALLED=yes
+JAVA_HOME=/usr/local/Isabelle2014/contrib/jdk/x86_64-linux
+ISABELLE_HOME=/usr/local/Isabelle2014
+ISABELLE_POLYML=true
+GNOME_KEYRING_PID=2034
+LANG=en_CA.UTF-8
+ISABELLE_LINE_EDITOR=rlwrap
+E_VERSION=1.8
+MANDATORY_PATH=/usr/share/gconf/ubuntu-2d.mandatory.path
+ISABELLE_OUTPUT=/home/wneuper/.isabelle/Isabelle2014/heaps/polyml-5.5.2_x86-linux
+MUTABELLE_HOME=/usr/local/Isabelle2014/src/HOL/Mutabelle
+CVC3_SOLVER=/usr/local/Isabelle2014/contrib/cvc3-2.4.1/x86_64-linux/cvc3
+UBUNTU_MENUPROXY=libappmenu.so
+ISABELLE_DOCS_EXAMPLES=src/HOL/ex/Seq.thy:src/HOL/ex/ML.thy:src/HOL/Unix/Unix.thy:src/HOL/Isar_Examples/Drinker.thy:src/Tools/SML/Examples.thy
+ML_HOME=/usr/local/Isabelle2014/contrib/polyml-5.5.2-1/x86-linux
+ISABELLE_ID=8f4a332500e4
+ISABELLE_JAVA_SYSTEM_OPTIONS=-Dfile.encoding=UTF-8 -server
+CVC3_HOME=/usr/local/Isabelle2014/contrib/cvc3-2.4.1/x86_64-linux
+KODKODI=/usr/local/Isabelle2014/contrib/kodkodi-1.5.2
+GDMSESSION=ubuntu-2d
+ISABELLE_COMPONENT_REPOSITORY=http://isabelle.in.tum.de/components
+KODKODI_JAVA_OPT=-Dkodkod.minisat=_32 -Dkodkod.cryptominisat=_32 -Dkodkod.lingeling=_32
+PDF_VIEWER=xdg-open
+KODKODI_JAR=/usr/local/Isabelle2014/contrib/kodkodi-1.5.2/jar
+ISABELLE_LOGIC=HOL
+SHLVL=1
+HOME=/home/wneuper
+ISABELLE_PLATFORM64=x86_64-linux
+E_HOME=/usr/local/Isabelle2014/contrib/e-1.8/x86_64-linux
+KODKODI_JNI=/usr/local/Isabelle2014/contrib/kodkodi-1.5.2/jni
+LANGUAGE=en_CA:
+HASKABELLE_HOME=/usr/local/Isabelle2014/contrib/Haskabelle-2014
+SPASS_HOME=/usr/local/Isabelle2014/contrib/spass-3.8ds/x86_64-linux
+ISABELLE_CLASSPATH=/usr/local/Isabelle2014/lib/classes/Pure.jar:/usr/local/Isabelle2014/contrib/jfreechart-1.0.14-1/lib/iText-2.1.5.jar:/usr/local/Isabelle2014/contrib/jfreechart-1.0.14-1/lib/jcommon-1.0.18.jar:/usr/local/Isabelle2014/contrib/jfreechart-1.0.14-1/lib/jfreechart-1.0.14.jar:/usr/local/Isabelle2014/contrib/jortho-1.0-2/jortho.jar:/usr/local/Isabelle2014/contrib/scala-2.11.2/lib/akka-actor_2.11-2.3.4.jar:/usr/local/Isabelle2014/contrib/scala-2.11.2/lib/config-1.2.1.jar:/usr/local/Isabelle2014/contrib/scala-2.11.2/lib/jline-2.12.jar:/usr/local/Isabelle2014/contrib/scala-2.11.2/lib/scala-actors-2.11.0.jar:/usr/local/Isabelle2014/contrib/scala-2.11.2/lib/scala-actors-migration_2.11-1.1.0.jar:/usr/local/Isabelle2014/contrib/scala-2.11.2/lib/scala-compiler.jar:/usr/local/Isabelle2014/contrib/scala-2.11.2/lib/scala-continuations-library_2.11-1.0.2.jar:/usr/local/Isabelle2014/contrib/scala-2.11.2/lib/scala-continuations-plugin_2.11.2-1.0.2.jar:/usr/local/Isabelle2014/contrib/scala-2.11.2/lib/scala-library.jar:/usr/local/Isabelle2014/contrib/scala-2.11.2/lib/scala-parser-combinators_2.11-1.0.2.jar:/usr/local/Isabelle2014/contrib/scala-2.11.2/lib/scala-reflect.jar:/usr/local/Isabelle2014/contrib/scala-2.11.2/lib/scala-swing_2.11-1.0.1.jar:/usr/local/Isabelle2014/contrib/scala-2.11.2/lib/scala-xml_2.11-1.0.2.jar:/usr/local/Isabelle2014/contrib/scala-2.11.2/lib/scalap-2.11.2.jar:/usr/local/Isabelle2014/contrib/xz-java-1.2-1/lib/xz.jar
+GNOME_DESKTOP_SESSION_ID=this-is-deprecated
+CVC3_VERSION=2.4.1
+KODKODI_VERSION=1.5.2
+SPASS_VERSION=3.8ds
+XZ_JAVA_HOME=/usr/local/Isabelle2014/contrib/xz-java-1.2-1
+ISABELLE_LATEX=latex
+JEDIT_JAVA_OPTIONS=-Xms128m -Xmx1024m -Xss2m
+LOGNAME=wneuper
+ISABELLE_TOOLS=/usr/local/Isabelle2014/lib/Tools:/usr/local/Isabelle2014/src/Tools/Code/lib/Tools:/usr/local/Isabelle2014/src/Tools/jEdit/lib/Tools:/usr/local/Isabelle2014/src/HOL/Mirabelle/lib/Tools:/usr/local/Isabelle2014/src/HOL/Mutabelle/lib/Tools:/usr/local/Isabelle2014/src/HOL/TPTP/lib/Tools:/usr/local/Isabelle2014/contrib/Haskabelle-2014/lib/Tools
+MIRABELLE_HOME=/usr/local/Isabelle2014/src/HOL/Mirabelle
+JFREECHART_JAR_NAMES=iText-2.1.5.jar jcommon-1.0.18.jar jfreechart-1.0.14.jar
+JORTHO_DICTIONARIES=/usr/local/Isabelle2014/contrib/jortho-1.0-2/dictionaries/en.gz:/usr/local/Isabelle2014/contrib/jortho-1.0-2/dictionaries/en_US.gz:/usr/local/Isabelle2014/contrib/jortho-1.0-2/dictionaries/en_GB-ise.gz:/usr/local/Isabelle2014/contrib/jortho-1.0-2/dictionaries/en_GB-ize.gz:/usr/local/Isabelle2014/contrib/jortho-1.0-2/dictionaries/en_CA.gz
+ML_SOURCES=/usr/local/Isabelle2014/contrib/polyml-5.5.2-1/src
+XDG_DATA_DIRS=/usr/share/ubuntu-2d:/usr/share/gnome:/usr/local/share/:/usr/share/
+DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-tq0Kqyrh58,guid=f2dd02a9749b0b9da128fb580000001d
+LESSOPEN=| /usr/bin/lesspipe %s
+ISABELLE_PLATFORM=x86-linux
+ISABELLE_PDFLATEX=pdflatex
+SCALA_HOME=/usr/local/Isabelle2014/contrib/scala-2.11.2
+CVC3_COMPONENT=/usr/local/Isabelle2014/contrib/cvc3-2.4.1
+Z3_SOLVER=/usr/local/Isabelle2014/contrib/z3-3.2-1/x86-linux/z3
+DISPLAY=:0
+MUTABELLE_LOGIC=HOL
+ISABELLE_DOCS=/usr/local/Isabelle2014/doc:/usr/local/Isabelle2014/src/Tools/jEdit/dist/doc:/usr/local/Isabelle2014/contrib/Haskabelle-2014/doc
+XDG_CURRENT_DESKTOP=Unity
+LESSCLOSE=/usr/bin/lesspipe %s %s
+NO_AT_BRIDGE=1
+ISABELLE_SYMBOLS=/usr/local/Isabelle2014/etc/symbols:/home/wneuper/.isabelle/Isabelle2014/etc/symbols
+ISABELLE_SCALA_SCRIPT=/usr/local/Isabelle2014/bin/isabelle_scala_script
+ISABELLE_SCALA_BUILD_OPTIONS=-encoding UTF-8 -nowarn -target:jvm-1.7 -Xmax-classfile-name 130
+JEDIT_SETTINGS=/home/wneuper/.isabelle/Isabelle2014/jedit
+Z3_INSTALLED=yes
+COLORTERM=gnome-terminal
+XAUTHORITY=/home/wneuper/.Xauthority
+ISABELLE_JEDIT_OPTIONS=
+ISABELLE_NEOS_SERVER=http://neos-server.org:3332
+BASH_FUNC_librarypath%%=() {  for X in "$@";
+ do
+ case "$ISABELLE_PLATFORM" in 
+ *-darwin)
+ if [ -z "$DYLD_LIBRARY_PATH" ]; then
+ DYLD_LIBRARY_PATH="$X";
+ else
+ DYLD_LIBRARY_PATH="$X:$DYLD_LIBRARY_PATH";
+ fi;
+ export DYLD_LIBRARY_PATH
+ ;;
+ *)
+ if [ -z "$LD_LIBRARY_PATH" ]; then
+ LD_LIBRARY_PATH="$X";
+ else
+ LD_LIBRARY_PATH="$X:$LD_LIBRARY_PATH";
+ fi;
+ export LD_LIBRARY_PATH
+ ;;
+ esac;
+ done
+}
+BASH_FUNC_splitarray%%=() {  SPLITARRAY=();
+ local IFS="$1";
+ shift;
+ for X in $*;
+ do
+ SPLITARRAY["${#SPLITARRAY[@]}"]="$X";
+ done
+}
+BASH_FUNC_classpath%%=() {  for X in "$@";
+ do
+ if [ -z "$ISABELLE_CLASSPATH" ]; then
+ ISABELLE_CLASSPATH="$X";
+ else
+ ISABELLE_CLASSPATH="$ISABELLE_CLASSPATH:$X";
+ fi;
+ done;
+ export ISABELLE_CLASSPATH
+}
+BASH_FUNC_jvmpath%%=() {  echo "$@"
+}
+BASH_FUNC_isabelle_scala_script%%=() {  "$ISABELLE_SCALA_SCRIPT" "$@"
+}
+BASH_FUNC_isabelle_admin_build%%=() {  return 0
+}
+BASH_FUNC_isabelle_process%%=() {  "$ISABELLE_PROCESS" "$@"
+}
+BASH_FUNC_init_components%%=() {  local BASE="$1";
+ local CATALOG="$2";
+ if [ ! -f "$CATALOG" ]; then
+ echo "Bad component catalog file: \"$CATALOG\"" 1>&2;
+ exit 2;
+ fi;
+ { 
+ while { 
+ unset REPLY;
+ read -r;
+ test "$?" = 0 -o -n "$REPLY"
+ }; do
+ case "$REPLY" in 
+ \#* | "")
+
+ ;;
+ /*)
+ init_component "$REPLY"
+ ;;
+ *)
+ init_component "$BASE/$REPLY"
+ ;;
+ esac;
+ done
+ } < "$CATALOG"
+}
+BASH_FUNC_init_component%%=() {  local COMPONENT="$1";
+ case "$COMPONENT" in 
+ /*)
+
+ ;;
+ *)
+ echo "Absolute component path required: \"$COMPONENT\"" 1>&2;
+ exit 2
+ ;;
+ esac;
+ if [ -d "$COMPONENT" ]; then
+ if [ -z "$ISABELLE_COMPONENTS" ]; then
+ ISABELLE_COMPONENTS="$COMPONENT";
+ else
+ ISABELLE_COMPONENTS="$ISABELLE_COMPONENTS:$COMPONENT";
+ fi;
+ else
+ echo "### Missing Isabelle component: \"$COMPONENT\"" 1>&2;
+ if [ -z "$ISABELLE_COMPONENTS_MISSING" ]; then
+ ISABELLE_COMPONENTS_MISSING="$COMPONENT";
+ else
+ ISABELLE_COMPONENTS_MISSING="$ISABELLE_COMPONENTS_MISSING:$COMPONENT";
+ fi;
+ fi;
+ if [ -f "$COMPONENT/etc/settings" ]; then
+ source "$COMPONENT/etc/settings";
+ local RC="$?";
+ if [ "$RC" -ne 0 ]; then
+ echo "Return code $RC from bash script: \"$COMPONENT/etc/settings\"" 1>&2;
+ exit 2;
+ fi;
+ fi;
+ if [ -f "$COMPONENT/etc/components" ]; then
+ init_components "$COMPONENT" "$COMPONENT/etc/components";
+ fi
+}
+BASH_FUNC_isabelle_scala%%=() {  if [ -z "$ISABELLE_JDK_HOME" ]; then
+ echo "Unknown ISABELLE_JDK_HOME -- Java tools unavailable" 1>&2;
+ return 127;
+ else
+ if [ -z "$SCALA_HOME" ]; then
+ echo "Unknown SCALA_HOME -- Scala unavailable" 1>&2;
+ return 127;
+ else
+ local PRG="$1";
+ shift;
+ "$SCALA_HOME/bin/$PRG" "$@";
+ fi;
+ fi
+}
+BASH_FUNC_isabelle_jdk%%=() {  if [ -z "$ISABELLE_JDK_HOME" ]; then
+ echo "Unknown ISABELLE_JDK_HOME -- Java tools unavailable" 1>&2;
+ return 127;
+ else
+ local PRG="$1";
+ shift;
+ "$ISABELLE_JDK_HOME/bin/$PRG" "$@";
+ fi
+}
+BASH_FUNC_isabelle%%=() {  "$ISABELLE_TOOL" "$@"
+}
+wneuper@ProBook:~/proto4/libisabelle$ 
+
+####################################################################
+
