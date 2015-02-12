@@ -1,0 +1,363 @@
+/home/wneuper/proto3/repos/isac-java/src/java/properties/START_ISABELLE
+
+SML Execution Thread starting...
+SML Execution Thread started
+SML input stream
+SML output stream
+[[to sml: theory TTY_Communication imports Isac begin 
+Clients2Kernel Thread started
+Kernel2Clients Thread started
+TimeChecker Thread started
+TimeCheckerThread: no requests, sleeping for 30000 millis
+connection received
+>>> new client_ in : java.io.BufferedReader@47124746
+>>> new client_ out: java.io.PrintWriter@6f1f23e5
+new Client accepted, id=1
+[[from sml: > val commit = fn: unit -> bool
+[[from sml: val it = (): unit
+[[from sml: Unofficial version of Isabelle/Isac (unidentified repository version)
+[[from sml: theory TTY_Communication
+TimeCheckerThread: no requests, sleeping for 30000 millis
+TimeCheckerThread: no requests, sleeping for 30000 millis
+TimeCheckerThread: no requests, sleeping for 30000 millis
+-----smallest free javaCalcID = 0
+new calculation: CalcTree [(["equality (x+1=(2::real))", "solveFor x", "solutions L"],("Test",["sqroot-test","univariate","equation","test"],["Test","squ-equ-test-subpbl1"]))];
+[[to sml: ML {* CalcTree [(["equality (x+1=(2::real))", "solveFor x", "solutions L"],("Test",["sqroot-test","univariate","equation","test"],["Test","squ-equ-test-subpbl1"]))]; *}
+[[from sml: > @@@@@begin@@@@@
+[[from sml:  1 
+[[from sml: <CALCTREE>
+[[from sml:    <CALCID> 1 </CALCID>
+[[from sml: </CALCTREE>
+[[from sml: @@@@@end@@@@@
+found CalcID: 1
+>> Response sent to user java.io.PrintWriter@6f1f23e5
+<CALCTREE>   <CALCID> 1 </CALCID></CALCTREE>
+[[from sml: val it = (): unit
+[[from sml: 
+[[to sml: ML {* Iterator 1; *}
+[[from sml: > @@@@@begin@@@@@
+[[from sml:  1 
+[[from sml: <ADDUSER>
+[[from sml:   <CALCID> 1 </CALCID>
+[[from sml:   <USERID> 1 </USERID>
+[[from sml: </ADDUSER>
+[[from sml: @@@@@end@@@@@
+found CalcID: 1
+>> Response sent to user java.io.PrintWriter@6f1f23e5
+[[from sml: val it = (): unit
+<ADDUSER>  <CALCID> 1 </CALCID>  <USERID> 1 </USERID></ADDUSER>
+[[from sml: 
+[[to sml: ML {* moveActiveRoot 1; *}
+[[from sml: > @@@@@begin@@@@@
+[[from sml:  1 
+[[from sml: <CALCITERATOR>
+[[from sml:   <CALCID> 1 </CALCID>
+[[from sml:   <POSITION>
+[[from sml:     <INTLIST>
+[[from sml:     </INTLIST>
+[[from sml:     <POS> Pbl </POS>
+[[from sml:   </POSITION>
+[[from sml: </CALCITERATOR>
+[[from sml: @@@@@end@@@@@
+found CalcID: 1
+>> Response sent to user java.io.PrintWriter@6f1f23e5
+[[from sml: val it = (): unit
+[[from sml: 
+<CALCITERATOR>  <CALCID> 1 </CALCID>  <POSITION>    <INTLIST>    </INTLIST>    <POS> Pbl </POS>  </POSITION></CALCITERATOR>
+JavaCalcID 0 == SmlCalcID 1
+sent to bridge: getFormulaeFromTo 1 ([],Pbl) ([],Pbl) 0 false;
+[[to sml: ML {* getFormulaeFromTo 1 ([],Pbl) ([],Pbl) 0 false; *}
+[[from sml: > @@@@@begin@@@@@
+[[from sml:  1 
+[[from sml: <GETELEMENTSFROMTO>
+[[from sml:   <CALCID> 1 </CALCID>
+[[from sml:   <FORMHEADS>
+[[from sml:     <CALCFORMULA>
+[[from sml:       <POSITION>
+[[from sml:         <INTLIST>
+[[from sml:         </INTLIST>
+[[from sml:         <POS> Pbl </POS>
+[[from sml:       </POSITION>
+[[from sml:       <FORMULA>
+[[from sml:         <MATHML>
+[[from sml:           <ISA> solve (x + 1 = 2, x) </ISA>
+[[from sml:         </MATHML>
+[[from sml:       </FORMULA>
+[[from sml:     </CALCFORMULA>
+[[from sml:   </FORMHEADS>
+[[from sml: </GETELEMENTSFROMTO>
+[[from sml: @@@@@end@@@@@
+found CalcID: 1
+>> Response sent to user java.io.PrintWriter@6f1f23e5
+<GETELEMENTSFROMTO>  <CALCID> 1 </CALCID>  <FORMHEADS>    <CALCFORMULA>      <POSITION>        <INTLIST>        </INTLIST>        <POS> Pbl </POS>      </POSITION>      <FORMULA>        <MATHML>          <ISA> solve (x + 1 = 2, x) </ISA>        </MATHML>      </FORMULA>    </CALCFORMULA>  </FORMHEADS></GETELEMENTSFROMTO>
+[[from sml: val it = (): unit
+[[from sml: 
+JavaCalcID 0 == SmlCalcID 1
+sent to bridge: getFormulaeFromTo 1 ([],Pbl) ([],Pbl) 0 false;
+[[to sml: ML {* getFormulaeFromTo 1 ([],Pbl) ([],Pbl) 0 false; *}
+[[from sml: > @@@@@begin@@@@@
+[[from sml:  1 
+[[from sml: <GETELEMENTSFROMTO>
+[[from sml:   <CALCID> 1 </CALCID>
+[[from sml:   <FORMHEADS>
+[[from sml:     <CALCFORMULA>
+[[from sml:       <POSITION>
+[[from sml:         <INTLIST>
+[[from sml:         </INTLIST>
+[[from sml:         <POS> Pbl </POS>
+[[from sml:       </POSITION>
+[[from sml:       <FORMULA>
+[[from sml:         <MATHML>
+[[from sml:           <ISA> solve (x + 1 = 2, x) </ISA>
+[[from sml:         </MATHML>
+[[from sml:       </FORMULA>
+[[from sml:     </CALCFORMULA>
+[[from sml:   </FORMHEADS>
+[[from sml: </GETELEMENTSFROMTO>
+[[from sml: @@@@@end@@@@@
+found CalcID: 1
+<GETELEMENTSFROMTO>  <CALCID> 1 </CALCID>  <FORMHEADS>    <CALCFORMULA>      <POSITION>        <INTLIST>        </INTLIST>        <POS> Pbl </POS>      </POSITION>      <FORMULA>        <MATHML>          <ISA> solve (x + 1 = 2, x) </ISA>        </MATHML>      </FORMULA>    </CALCFORMULA>  </FORMHEADS></GETELEMENTSFROMTO>
+>> Response sent to user java.io.PrintWriter@6f1f23e5
+[[from sml: val it = (): unit
+[[from sml: 
+JavaCalcID 0 == SmlCalcID 1
+sent to bridge: refFormula 1 ([],Pbl);
+[[to sml: ML {* refFormula 1 ([],Pbl); *}
+[[from sml: > @@@@@begin@@@@@
+[[from sml:  1 
+[[from sml: <REFFORMULA>
+[[from sml:   <CALCID> 1 </CALCID>
+[[from sml:   <CALCHEAD status = "incorrect">
+[[from sml:     <POSITION>
+[[from sml:       <INTLIST>
+[[from sml:       </INTLIST>
+[[from sml:       <POS> Pbl </POS>
+[[from sml:     </POSITION>
+[[from sml:     <HEAD>
+[[from sml:       <MATHML>
+[[from sml:         <ISA> solve (x + 1 = 2, x) </ISA>
+[[from sml:       </MATHML>
+[[from sml:     </HEAD>
+[[from sml:     <MODEL>
+[[from sml:       <GIVEN>  </GIVEN>
+[[from sml:       <WHERE>
+[[from sml:         <ITEM status="false">
+[[from sml:             <MATHML>
+[[from sml:               <ISA> precond_rootpbl v_v </ISA>
+[[from sml:             </MATHML>
+[[from sml:         </ITEM>
+[[from sml:       </WHERE>
+[[from sml:       <FIND>  </FIND>
+[[from sml:       <RELATE>  </RELATE>
+[[from sml:     </MODEL>
+[[from sml:     <BELONGSTO> Pbl </BELONGSTO>
+[[from sml:     <SPECIFICATION>
+[[from sml:       <THEORYID> e_domID </THEORYID>
+[[from sml:       <PROBLEMID>
+[[from sml:         <STRINGLIST>
+[[from sml:           <STRING> e_pblID </STRING>
+[[from sml:         </STRINGLIST>
+[[from sml:       </PROBLEMID>
+[[from sml:       <METHODID>
+[[from sml:         <STRINGLIST>
+[[from sml:           <STRING> e_metID </STRING>
+[[from sml:         </STRINGLIST>
+[[from sml:       </METHODID>
+[[from sml:     </SPECIFICATION>
+[[from sml:   </CALCHEAD>
+[[from sml: </REFFORMULA>
+[[from sml: @@@@@end@@@@@
+found CalcID: 1
+>> Response sent to user java.io.PrintWriter@6f1f23e5
+<REFFORMULA>  <CALCID> 1 </CALCID>  <CALCHEAD status = "incorrect">    <POSITION>      <INTLIST>      </INTLIST>      <POS> Pbl </POS>    </POSITION>    <HEAD>      <MATHML>        <ISA> solve (x + 1 = 2, x) </ISA>      </MATHML>    </HEAD>    <MODEL>      <GIVEN>  </GIVEN>      <WHERE>        <ITEM status="false">            <MATHML>              <ISA> precond_rootpbl v_v </ISA>            </MATHML>        </ITEM>      </WHERE>      <FIND>  </FIND>      <RELATE>  </RELATE>    </MODEL>    <BELONGSTO> Pbl </BELONGSTO>    <SPECIFICATION>      <THEORYID> e_domID </THEORYID>      <PROBLEMID>        <STRINGLIST>          <STRING> e_pblID </STRING>        </STRINGLIST>      </PROBLEMID>      <METHODID>        <STRINGLIST>          <STRING> e_metID </STRING>        </STRINGLIST>      </METHODID>    </SPECIFICATION>  </CALCHEAD></REFFORMULA>
+[[from sml: val it = (): unit
+[[from sml: 
+JavaCalcID 0 == SmlCalcID 1
+sent to bridge: autoCalculate 1 CompleteCalc;
+[[to sml: ML {* autoCalculate 1 CompleteCalc; *}
+[[from sml: > val it = <future>: unit future
+[[from sml: 
+[[from sml: > [" ",":","r","t","s","d","i","_","d","e","m","a","n","_","y","p","o","c","_","s","i"]e_e F
+[[from sml: [" ",":","r","t","s","d","i","_","d","e","m","a","n","_","y","p","o","c","_","s","i"]v_v F
+[[from sml: [" ",":","r","t","s","d","i","_","d","e","m","a","n","_","y","p","o","c","_","s","i"]v_v'i' T
+[[from sml: [" ",":","r","t","s","d","i","_","d","e","m","a","n","_","y","p","o","c","_","s","i"]e_e F
+[[from sml: [" ",":","r","t","s","d","i","_","d","e","m","a","n","_","y","p","o","c","_","s","i"]v_v F
+[[from sml: [" ",":","r","t","s","d","i","_","d","e","m","a","n","_","y","p","o","c","_","s","i"]v_v'i' T
+[[from sml: [" ",":","r","t","s","d","i","_","d","e","m","a","n","_","y","p","o","c","_","s","i"]e_e F
+[[from sml: [" ",":","r","t","s","d","i","_","d","e","m","a","n","_","y","p","o","c","_","s","i"]v_v F
+[[from sml: [" ",":","r","t","s","d","i","_","d","e","m","a","n","_","y","p","o","c","_","s","i"]v_v'i' T
+[[from sml: *** upd_env_opt: (NONE,[x = 1])
+[[from sml: @@@@@begin@@@@@
+[[from sml:  1 
+[[from sml: <AUTOCALC>
+[[from sml:   <CALCID> 1 </CALCID>
+[[from sml:   <CALCCHANGED>
+[[from sml:     <UNCHANGED>
+[[from sml:       <INTLIST>
+[[from sml:       </INTLIST>
+[[from sml:       <POS> Pbl </POS>
+[[from sml:     </UNCHANGED>
+[[from sml:     <DELETED>
+[[from sml:       <INTLIST>
+[[from sml:       </INTLIST>
+[[from sml:       <POS> Pbl </POS>
+[[from sml:     </DELETED>
+[[from sml:     <GENERATED>
+[[from sml:       <INTLIST>
+[[from sml:       </INTLIST>
+[[from sml:       <POS> Res </POS>
+[[from sml:     </GENERATED>
+[[from sml:   </CALCCHANGED>
+[[from sml: </AUTOCALC>
+[[from sml: @@@@@end@@@@@
+found CalcID: 1
+>> Response sent to user java.io.PrintWriter@6f1f23e5
+<AUTOCALC>  <CALCID> 1 </CALCID>  <CALCCHANGED>    <UNCHANGED>      <INTLIST>      </INTLIST>      <POS> Pbl </POS>    </UNCHANGED>    <DELETED>      <INTLIST>      </INTLIST>      <POS> Pbl </POS>    </DELETED>    <GENERATED>      <INTLIST>      </INTLIST>      <POS> Res </POS>    </GENERATED>  </CALCCHANGED></AUTOCALC>
+JavaCalcID 0 == SmlCalcID 1
+sent to bridge: getFormulaeFromTo 1 ([],Pbl) ([],Res) 0 false;
+[[to sml: ML {* getFormulaeFromTo 1 ([],Pbl) ([],Res) 0 false; *}
+[[from sml: @@@@@begin@@@@@
+[[from sml:  1 
+[[from sml: <GETELEMENTSFROMTO>
+[[from sml:   <CALCID> 1 </CALCID>
+[[from sml:   <FORMHEADS>
+[[from sml:     <CALCFORMULA>
+[[from sml:       <POSITION>
+[[from sml:         <INTLIST>
+[[from sml:         </INTLIST>
+[[from sml:         <POS> Res </POS>
+[[from sml:       </POSITION>
+[[from sml:       <FORMULA>
+[[from sml:         <MATHML>
+[[from sml:           <ISA> [x = 1] </ISA>
+[[from sml:         </MATHML>
+[[from sml:       </FORMULA>
+[[from sml:     </CALCFORMULA>
+[[from sml:   </FORMHEADS>
+[[from sml: </GETELEMENTSFROMTO>
+[[from sml: @@@@@end@@@@@
+found CalcID: 1
+>> Response sent to user java.io.PrintWriter@6f1f23e5
+<GETELEMENTSFROMTO>  <CALCID> 1 </CALCID>  <FORMHEADS>    <CALCFORMULA>      <POSITION>        <INTLIST>        </INTLIST>        <POS> Res </POS>      </POSITION>      <FORMULA>        <MATHML>          <ISA> [x = 1] </ISA>        </MATHML>      </FORMULA>    </CALCFORMULA>  </FORMHEADS></GETELEMENTSFROMTO>
+[[from sml: val it = (): unit
+[[from sml: 
+JavaCalcID 0 == SmlCalcID 1
+sent to bridge: getFormulaeFromTo 1 ([],Pbl) ([],Res) 0 false;
+[[to sml: ML {* getFormulaeFromTo 1 ([],Pbl) ([],Res) 0 false; *}
+[[from sml: > @@@@@begin@@@@@
+[[from sml:  1 
+[[from sml: <GETELEMENTSFROMTO>
+[[from sml:   <CALCID> 1 </CALCID>
+[[from sml:   <FORMHEADS>
+[[from sml:     <CALCFORMULA>
+[[from sml:       <POSITION>
+[[from sml:         <INTLIST>
+[[from sml:         </INTLIST>
+[[from sml:         <POS> Res </POS>
+[[from sml:       </POSITION>
+[[from sml:       <FORMULA>
+[[from sml:         <MATHML>
+[[from sml:           <ISA> [x = 1] </ISA>
+[[from sml:         </MATHML>
+[[from sml:       </FORMULA>
+[[from sml:     </CALCFORMULA>
+[[from sml:   </FORMHEADS>
+[[from sml: </GETELEMENTSFROMTO>
+[[from sml: @@@@@end@@@@@
+found CalcID: 1
+>> Response sent to user java.io.PrintWriter@6f1f23e5
+<GETELEMENTSFROMTO>  <CALCID> 1 </CALCID>  <FORMHEADS>    <CALCFORMULA>      <POSITION>        <INTLIST>        </INTLIST>        <POS> Res </POS>      </POSITION>      <FORMULA>        <MATHML>          <ISA> [x = 1] </ISA>        </MATHML>      </FORMULA>    </CALCFORMULA>  </FORMHEADS></GETELEMENTSFROMTO>
+[[from sml: val it = (): unit
+[[from sml: 
+JavaCalcID 0 == SmlCalcID 1
+sent to bridge: refFormula 1 ([],Res);
+[[to sml: ML {* refFormula 1 ([],Res); *}
+[[from sml: > @@@@@begin@@@@@
+[[from sml:  1 
+[[from sml: <REFFORMULA>
+[[from sml:   <CALCID> 1 </CALCID>
+[[from sml:   <CALCFORMULA>
+[[from sml:     <POSITION>
+[[from sml:       <INTLIST>
+[[from sml:       </INTLIST>
+[[from sml:       <POS> Res </POS>
+[[from sml:     </POSITION>
+[[from sml:     <FORMULA>      <MATHML>
+[[from sml:         <ISA> [x = 1] </ISA>
+[[from sml:       </MATHML>
+[[from sml:     </FORMULA>
+[[from sml:   </CALCFORMULA>
+[[from sml: </REFFORMULA>
+[[from sml: @@@@@end@@@@@
+found CalcID: 1
+>> Response sent to user java.io.PrintWriter@6f1f23e5
+<REFFORMULA>  <CALCID> 1 </CALCID>  <CALCFORMULA>    <POSITION>      <INTLIST>      </INTLIST>      <POS> Res </POS>    </POSITION>    <FORMULA>      <MATHML>        <ISA> [x = 1] </ISA>      </MATHML>    </FORMULA>  </CALCFORMULA></REFFORMULA>
+[[from sml: val it = (): unit
+[[from sml: 
+JavaCalcID 0 == SmlCalcID 1
+sent to bridge: refFormula 1 ([],Res);
+[[to sml: ML {* refFormula 1 ([],Res); *}
+[[from sml: > @@@@@begin@@@@@
+[[from sml:  1 
+[[from sml: <REFFORMULA>
+[[from sml:   <CALCID> 1 </CALCID>
+[[from sml:   <CALCFORMULA>
+[[from sml:     <POSITION>
+[[from sml:       <INTLIST>
+[[from sml:       </INTLIST>
+[[from sml:       <POS> Res </POS>
+[[from sml:     </POSITION>
+[[from sml:     <FORMULA>      <MATHML>
+[[from sml:         <ISA> [x = 1] </ISA>
+[[from sml:       </MATHML>
+[[from sml:     </FORMULA>
+[[from sml:   </CALCFORMULA>
+[[from sml: </REFFORMULA>
+[[from sml: @@@@@end@@@@@
+found CalcID: 1
+<REFFORMULA>  <CALCID> 1 </CALCID>  <CALCFORMULA>    <POSITION>      <INTLIST>      </INTLIST>      <POS> Res </POS>    </POSITION>    <FORMULA>      <MATHML>        <ISA> [x = 1] </ISA>      </MATHML>    </FORMULA>  </CALCFORMULA></REFFORMULA>
+>> Response sent to user java.io.PrintWriter@6f1f23e5
+[[from sml: val it = (): unit
+[[from sml: 
+JavaCalcID 0 == SmlCalcID 1
+sent to bridge: refFormula 1 ([],Res);
+[[to sml: ML {* refFormula 1 ([],Res); *}
+[[from sml: > @@@@@begin@@@@@
+[[from sml:  1 
+[[from sml: <REFFORMULA>
+[[from sml:   <CALCID> 1 </CALCID>
+[[from sml:   <CALCFORMULA>
+[[from sml:     <POSITION>
+[[from sml:       <INTLIST>
+[[from sml:       </INTLIST>
+[[from sml:       <POS> Res </POS>
+[[from sml:     </POSITION>
+[[from sml:     <FORMULA>      <MATHML>
+[[from sml:         <ISA> [x = 1] </ISA>
+[[from sml:       </MATHML>
+[[from sml:     </FORMULA>
+[[from sml:   </CALCFORMULA>
+[[from sml: </REFFORMULA>
+[[from sml: @@@@@end@@@@@
+found CalcID: 1
+>> Response sent to user java.io.PrintWriter@6f1f23e5
+<REFFORMULA>  <CALCID> 1 </CALCID>  <CALCFORMULA>    <POSITION>      <INTLIST>      </INTLIST>      <POS> Res </POS>    </POSITION>    <FORMULA>      <MATHML>        <ISA> [x = 1] </ISA>      </MATHML>    </FORMULA>  </CALCFORMULA></REFFORMULA>
+[[from sml: val it = (): unit
+[[from sml: 
+JavaCalcID 0 == SmlCalcID 1
+sent to bridge: DEconstrCalcTree 1;
+[[to sml: ML {* DEconstrCalcTree 1; *}
+[[from sml: > @@@@@begin@@@@@
+[[from sml:  1 
+[[from sml: <DELCALC>
+[[from sml:   <CALCID> 1 </CALCID>
+[[from sml: </DELCALC>
+[[from sml: @@@@@end@@@@@
+found CalcID: 1
+>> Response sent to user java.io.PrintWriter@6f1f23e5
+[[from sml: val it = (): unit
+[[from sml: 
+<DELCALC>  <CALCID> 1 </CALCID></DELCALC>
+TimeCheckerThread: no requests, sleeping for 30000 millis
+TimeCheckerThread: no requests, sleeping for 30000 millis
+
