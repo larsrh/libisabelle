@@ -1,0 +1,23 @@
+wneuper@ProBook:/usr/local/Isabelle2014/src/Pure$ ls -l
+
+Isabelle2014                libisabelle/pide-core/src/main
+                                        files   present missing: *.ML
+ ~~/src/Pure/Concurrent     present     26       7      19
+ ~~/src/Pure/General        present     64      19      45
+ ~~/src/Pure/GUI            //missing
+ ~~/src/Pure/Isar           present     41       4      37
+ ~~/src/Pure/ML             //missing
+ ~~/src/Pure/ML-Systems     //missing
+ ~~/src/Pure/PIDE           present     26      12      24
+ ~~/src/Pure/Proof          //missing
+ ~~/src/Pure/Syntax         //missing
+ ~~/src/Pure/System         present     19      10       9
+ ~~/src/Pure/Thy            present     14       5       9
+ ~~/src/Pure/Tools          present     21       3      18
+ :                          //missing
+ :                          //missing
+ ~~/src/Pure/library.scala  present
+ ~~/src/Pure/ROOT.scala     present
+ ~~/src/Pure/term_xml.ML    present
+ ~~/src/Pure/term.scala     present
+
