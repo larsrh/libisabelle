@@ -33,9 +33,6 @@ object System {
     }
   }
 
-    }
-  }
-
   private def mkPhaseListener(session: Session, phase: Session.Phase)(implicit ec: ExecutionContext): Future[Unit] = {
     val promise = Promise[Unit]
     val consumer = Session.Consumer[Session.Phase]("phase-listener") {
@@ -82,7 +79,6 @@ class System private(options: Options, session: Session, root: Path)(implicit ec
     case msg: Prover.Protocol_Output =>
       (msg.properties match {
         case System.Libisabelle_Response(id) => Some(id)
-        case System.Use_Theories_Result(id) => Some(id)
         case _ => None
       }) foreach { id =>
         self.synchronized {
