@@ -1,13 +1,13 @@
 protocol for Lars' mail:
 
-1) Build an image of "Hello_PIDE"
-   libisabelle$ $ISABELLE_HOME/bin/isabelle build -d . -bv Hello_PIDE
-2) Build the JAR file
+1) Build an image of "Hello_PIDE" into ~/.isabelle
+   libisabelle$ /usr/local/Isabelle2014/bin/isabelle build -d . -bv Hello_PIDE
+2) Build the JAR file into libisabelle/full/target/scala-2.11/libisabelle-full.jar
    libisabelle$ ./sbt full/assembly
 3) Make Isabelle home known to Linux
 	export ISABELLE_HOME=/usr/local/Isabelle2014
 4) Execute the example
-   $ java -cp full/target/scala-2.11/libisabelle-full.jar Hello_PIDE
+   libisabelle$ java -cp full/target/scala-2.11/libisabelle-full.jar Hello_PIDE
 
 #######################################################################
 
@@ -33,15 +33,19 @@ Finished at Wed Feb 11 16:54:40 CET 2015
 wneuper@ProBook:~/proto4/libisabelle$ 
 
 #######################################################################
+legend: "=====" marks insertion of comments...
+#######################################################################
 
 wneuper@ProBook:~/proto4/libisabelle$ ./sbt full/assembly
 Downloading sbt launcher for 0.13.7:
   From  http://typesafe.artifactoryonline.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.7/sbt-launch.jar
     To  /home/wneuper/.sbt/launchers/0.13.7/sbt-launch.jar
+        =================== <-- here all the downloads below are stored, e.g.===
 Getting org.scala-sbt sbt 0.13.7 ...
 downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt/0.13.7/jars/sbt.jar ...
 	[SUCCESSFUL ] org.scala-sbt#sbt;0.13.7!sbt.jar (705ms)
 downloading https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.10.4/scala-library-2.10.4.jar ...
+                                                                             ===-->.sbt/boot/scala-2.10.4/lib/scala-library.jar
 	[SUCCESSFUL ] org.scala-lang#scala-library;2.10.4!scala-library.jar (1089ms)
 downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/main/0.13.7/jars/main.jar ...
 	[SUCCESSFUL ] org.scala-sbt#main;0.13.7!main.jar (1883ms)
@@ -143,6 +147,7 @@ downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/test-a
 	[SUCCESSFUL ] org.scala-sbt#test-agent;0.13.7!test-agent.jar (584ms)
 downloading https://repo1.maven.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar ...
 	[SUCCESSFUL ] org.scala-sbt#test-interface;1.0!test-interface.jar (294ms)
+                                                      ===-->./home/wneuper/.sbt/boot/scala-2.10.4/org.scala-sbt/sbt/0.13.7/test-interface-1.0.jar
 downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/apply-macro/0.13.7/jars/apply-macro.jar ...
 	[SUCCESSFUL ] org.scala-sbt#apply-macro;0.13.7!apply-macro.jar (795ms)
 :: retrieving :: org.scala-sbt#boot-app
@@ -156,6 +161,7 @@ downloading https://repo1.maven.org/maven2/org/fusesource/jansi/jansi/1.4/jansi-
 :: retrieving :: org.scala-sbt#boot-scala
 	confs: [default]
 	5 artifacts copied, 0 already retrieved (24459kB/37ms)
+                                                      ===-->./home/wneuper/.ivy2/cache/org.fusesource.jansi/jansi/jars/jansi-1.4.jar
 [info] Loading project definition from /home/wneuper/proto4/libisabelle/project
 [info] Updating {file:/home/wneuper/proto4/libisabelle/project/}libisabelle-build...
 [info] Resolving org.fusesource.jansi#jansi;1.4 ...
@@ -163,8 +169,10 @@ downloading https://repo1.maven.org/maven2/org/fusesource/jansi/jansi/1.4/jansi-
 [info] 	[SUCCESSFUL ] com.eed3si9n#sbt-assembly;0.12.0!sbt-assembly.jar (2384ms)
 [info] Done updating.
 [info] Compiling 1 Scala source to /home/wneuper/proto4/libisabelle/project/target/scala-2.10/sbt-0.13/classes...
+                                                                    ==========================================examples/6, libisabelle/7, pideCore/6
 [info] Set current project to root (in build file:/home/wneuper/proto4/libisabelle/)
 [info] Updating {file:/home/wneuper/proto4/libisabelle/}pide-core...
+                                                        =============then...
 [info] Resolving org.sonatype.oss#oss-parent;7 ...
 [info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.11.5/scala-library-2.11.5.jar ...
 [info] 	[SUCCESSFUL ] org.scala-lang#scala-library;2.11.5!scala-library.jar (1099ms)
@@ -184,6 +192,7 @@ downloading https://repo1.maven.org/maven2/org/fusesource/jansi/jansi/1.4/jansi-
 [info] 	[SUCCESSFUL ] jline#jline;2.12!jline.jar (319ms)
 [info] Done updating.
 [info] Updating {file:/home/wneuper/proto4/libisabelle/}libisabelle...
+                                                        =============then...
 [info] Resolving jline#jline;2.12 ...
 [info] downloading https://repo1.maven.org/maven2/org/specs2/specs2-core_2.11/2.4.15/specs2-core_2.11-2.4.15.jar ...
 [info] 	[SUCCESSFUL ] org.specs2#specs2-core_2.11;2.4.15!specs2-core_2.11.jar (587ms)
@@ -203,12 +212,15 @@ downloading https://repo1.maven.org/maven2/org/fusesource/jansi/jansi/1.4/jansi-
 [info] 	[SUCCESSFUL ] org.scalaz#scalaz-effect_2.11;7.1.0!scalaz-effect_2.11.jar(bundle) (451ms)
 [info] Done updating.
 [info] Updating {file:/home/wneuper/proto4/libisabelle/}examples...
+                                                        =============finally.
 [info] Resolving jline#jline;2.12 ...
 [info] Done updating.
 [info] Updating {file:/home/wneuper/proto4/libisabelle/}full...
+                                                        =============??? SEE BELOW libisabelle/full/target/scala-2.11/libisabelle-full.jar
 [info] Resolving jline#jline;2.12 ...
 [info] Done updating.
 [info] Compiling 75 Scala sources to /home/wneuper/proto4/libisabelle/pide-core/target/scala-2.11/classes...
+       =====================================================================================================
 [info] 'compiler-interface' not yet compiled for Scala 2.11.5. Compiling...
 [info]   Compilation completed in 16.808 s
 [warn] /home/wneuper/proto4/libisabelle/pide-core/src/main/scala/term_xml.scala:55: match may not be exhaustive.
@@ -241,6 +253,7 @@ downloading https://repo1.maven.org/maven2/org/fusesource/jansi/jansi/1.4/jansi-
 [success] Total time: 88 s, completed 11-Feb-2015 4:59:40 PM
 
 ####################################################################
+BEFORE export ISABELLE_HOME=/usr/local/Isabelle2014 HAS BEEN ADDED:
 
 wneuper@ProBook:~/proto4/libisabelle$ java -cp full/target/scala-2.11/libisabelle-full.jar Hello_PIDE
 Exception in thread "main" java.lang.RuntimeException: Unknown Isabelle home directory
