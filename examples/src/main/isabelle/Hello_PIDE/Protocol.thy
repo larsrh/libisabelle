@@ -7,6 +7,8 @@ ML{*
 structure Operations : sig
 
   val hello : XML.body -> XML.body
+  val test_1 : XML.body -> XML.body
+  val test_2 : XML.body -> XML.body
   val Iterator : XML.body -> XML.body
 
 end = struct
@@ -17,6 +19,25 @@ end = struct
       val result = "Hello " ^ data
     in
       XML.Encode.string result
+    end
+
+  fun test_1 raw_calcID =
+    let
+      val data = XML.Decode.int raw_calcID
+      val result = string_of_int data
+    in
+      XML.Encode.string result
+    end
+
+  fun test_2 raw_calcID = 
+  	let
+  	  val calcID = XML.Decode.int raw_calcID
+  	  val result = 
+  	    "<CALCTREE> " ^ 
+  	      "<CALCID> " ^ string_of_int calcID ^ " </CALCID> " ^ 
+        "</CALCTREE>"
+    in
+      [XML.parse result]
     end
 
   (* at the interface to Java the isac-kernel adopts Java naming conventions *)
@@ -69,8 +90,9 @@ val _ = Isabelle_Process.protocol_command "libisabelle"
       case (cmd, args) of
         ("hello", [data]) =>
           exec Operations.hello data
-      | ("Iterator", [data]) =>
-          exec Operations.Iterator data
+      | ("test_1", [data]) => exec Operations.test_1 data
+      | ("test_2", [data]) => exec Operations.test_2 data
+      | ("Iterator", [data]) => exec Operations.Iterator data
       | _ =>
           error "libisabelle: unknown command"
     end)
