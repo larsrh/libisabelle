@@ -20,7 +20,6 @@ class LibisabelleSpec extends Specification with NoTimeConversions { def is = s2
 
   val system = System.instance(Some(new java.io.File(".")), "Hello_PIDE")
   val response = system.flatMap(_.sendCommand("hello", XML.Encode.string("world"))).map(XML.Decode.string)
-  val response = system.flatMap(_.sendCommand("Iterator", XML.Encode.int(1))).map(XML.Decode.int)
   val teardown = for { s <- system; _ <- response /* wait for response */; _ <- s.dispose() } yield ()
 
   def exist[A]: Matcher[A] = ((a: A) => a != null, "doesn't exist")
