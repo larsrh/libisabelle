@@ -1,0 +1,25 @@
+rm *~
+rm #*
+rm .#*
+rm *.orig
+cd doc/
+   rm *~
+   rm #*
+   rm .#*
+   rm *.orig
+   cd ..
+cd examples/src/main/isabelle/Hello_PIDE/
+ # Protocol.thy
+   rm *~
+   rm #*
+   rm .#*
+   rm *.orig
+   cd ../../../../../
+cd examples/src/main/java/
+ # Hello_PIDE.java
+   rm *~
+   rm #*
+   rm .#*
+   rm *.orig
+   cd ../../../../
+
