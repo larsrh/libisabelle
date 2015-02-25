@@ -33,11 +33,11 @@ end = struct
   	let
   	  val calcID = XML.Decode.int raw_calcID
   	  val result = 
-  	    "<CALCTREE> " ^ 
-  	      "<CALCID> " ^ string_of_int calcID ^ " </CALCID> " ^ 
-        "</CALCTREE>"
+  	    XML.Elem (("CALCTREE", []),
+  	      [XML.Elem (("CALCID", []), 
+  	        [XML.Text (string_of_int calcID)])])
     in
-      [XML.parse result]
+      [result]
     end
 
   (* at the interface to Java the isac-kernel adopts Java naming conventions *)
@@ -46,12 +46,14 @@ end = struct
   	  val calcID = XML.Decode.int raw_calcID
   	  val iterID = (* computed by isac-kernel *) 111
   	  val result = 
-  	    "<ADDUSER> " ^ 
-  	      "<CALCID> " ^ string_of_int calcID ^ " </CALCID> " ^ 
-  	      "<USERID> " ^ string_of_int iterID ^ " </USERID> " ^
-        "</ADDUSER>"
+        XML.Elem (("ADDUSER", []),
+          [XML.Elem (("CALCID", []), 
+            [XML.Text (string_of_int calcID)]),
+           XML.Elem (("USERID", []), 
+            [XML.Text (string_of_int iterID)])
+          ])
     in
-      [XML.parse result]
+      [result]
     end
 
 end
