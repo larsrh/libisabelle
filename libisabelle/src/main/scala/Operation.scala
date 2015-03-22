@@ -4,19 +4,14 @@ import isabelle.XML
 
 object Operation {
 
-  def fromEncodeDecode[I, O](name0: String, encode: XML.Encode.T[I], decode: XML.Decode.T[O]): Operation[I, O] =
+  def fromCodecs[I, O](name0: String, enc: XMLCodec[I], dec: XMLCodec[O]): Operation[I, O] =
     new Operation[I, O] {
       val name = name0
-      def toProver(in: I) = List(encode(in))
-      def fromProver(out: XML.Body) =
-        try { Right(decode(out)) }
-        catch {
-          case ex: XML.Error => Left(ex)
-        }
+      def toProver(in: I) = List(enc.encode(in))
+      def fromProver(out: XML.Body) = dec.decode(out)
     }
 
-
-  val Hello = fromEncodeDecode("hello", XML.Encode.string, XML.Decode.string)
+  val Hello = fromCodecs("hello", XMLCodec.String, XMLCodec.String)
 
 }
 
