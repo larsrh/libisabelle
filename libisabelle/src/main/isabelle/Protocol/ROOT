@@ -1,0 +1,3 @@
+session Protocol = HOL +
+  theories
+    Protocol
