@@ -105,18 +105,21 @@ class System private(options: Options, session: Session, root: Path)(implicit ec
   }
 
 
-  private val decodeCommand: XML.Decode.T[Try[XML.Body]] =
+  private val decodeResponse: XML.Decode.T[Try[XML.Body]] =
     XML.Decode.variant(List(
       { case (List(), a) => Success(a) },
       { case (List(), exn) => Failure(System.ProverException(XML.content(exn))) }
     ))
 
-  def sendCommand(command: String, args: XML.Body*): Future[XML.Body] =
+  def invokeRaw(name: String, args: XML.Body*): Future[XML.Body] =
     withRequest {
-      val args0 = List(count.toString, command) ::: args.toList.map(YXML.string_of_body)
+      val args0 = List(count.toString, name) ::: args.toList.map(YXML.string_of_body)
       session.protocol_command("libisabelle", args0: _*)
     } flatMap { msg =>
-      Future.fromTry(decodeCommand(YXML.parse_body(msg.text)))
+      Future.fromTry(decodeResponse(YXML.parse_body(msg.text)))
     }
+
+  def invoke[I, O](operation: Operation[I, O])(arg: I): Future[Either[XML.Error, O]] =
+    invokeRaw(operation.name, operation.toProver(arg): _*).map(operation.fromProver)
 
 }

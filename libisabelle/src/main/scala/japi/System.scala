@@ -32,10 +32,13 @@ class JSystem private(system: System, timeout: Duration) {
   def dispose(): Unit =
     await(system.dispose)
 
-  def sendCommand(command: String, args: java.util.List[String]): String =
-    XML.Decode.string(await(system.sendCommand(command, args.asScala.map(XML.Encode.string): _*)))
+  def invokeRaw(name: String, args: java.util.List[XML.Body]): XML.Body =
+    await(system.invokeRaw(name, args.asScala: _*))
 
-  def sendCommandXML(command: String, args: java.util.List[XML.Body]): XML.Body =
-    await(system.sendCommand(command, args.asScala: _*))
+  def invoke[I, O](operation: Operation[I, O], arg: I): O =
+    await(system.invoke(operation)(arg)) match {
+      case Left(err) => throw err
+      case Right(v) => v
+    }
 
 }

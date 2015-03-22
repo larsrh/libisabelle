@@ -6,21 +6,21 @@ ML\<open>
 
 signature LIBISABELLE = sig
   type operation = XML.body list -> XML.body
-  type id = string
+  type name = string
 
-  val add_operation : id -> operation -> unit
+  val add_operation : name -> operation -> unit
 end
 
 structure Libisabelle : LIBISABELLE = struct
 
 type operation = XML.body list -> XML.body
-type id = string
+type name = string
 
 val operations =
   Synchronized.var "libisabelle.operations" (Symtab.empty: operation Symtab.table)
 
-fun add_operation id operation =
-  Synchronized.change operations (Symtab.update_new (id, operation))
+fun add_operation name operation =
+  Synchronized.change operations (Symtab.update_new (name, operation))
 
 
 val encode_result = XML.Encode.variant
@@ -28,7 +28,7 @@ val encode_result = XML.Encode.variant
    fn Exn.Exn exn => ([], XML.Encode.string (@{make_string} exn))]
 
 val _ = Isabelle_Process.protocol_command "libisabelle"
-  (fn id :: cmd :: args =>
+  (fn id :: name :: args =>
     let
       val id = Markup.parse_int id
       val response =
@@ -45,7 +45,7 @@ val _ = Isabelle_Process.protocol_command "libisabelle"
           end);
         ())
     in
-      (case Symtab.lookup (Synchronized.value operations) cmd of
+      (case Symtab.lookup (Synchronized.value operations) name of
         SOME operation => exec operation
       | NONE => exec (fn _ => raise Fail "libisabelle: unknown command"))
     end)
