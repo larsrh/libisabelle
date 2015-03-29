@@ -7,7 +7,7 @@ object build extends Build {
 
   lazy val standardSettings = Seq(
     organization := "cs.tum.edu.isabelle",
-    scalaVersion := "2.11.5"
+    scalaVersion := "2.11.6"
   )
 
   lazy val root = Project(
@@ -34,6 +34,8 @@ object build extends Build {
     settings = standardSettings ++ Seq(
       name := "libisabelle",
       libraryDependencies ++= Seq(
+        "org.apache.commons" % "commons-compress" % "1.9",
+        "org.apache.commons" % "commons-lang3" % "3.3.2",
         "org.specs2" %% "specs2-core" % "2.4.15" % "test"
       )
     ),
