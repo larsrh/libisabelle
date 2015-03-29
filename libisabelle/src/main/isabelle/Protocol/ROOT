@@ -1,3 +1,4 @@
 session Protocol = Pure +
   theories
+    Codec_Test
     Protocol
