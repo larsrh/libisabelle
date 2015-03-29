@@ -1,5 +1,5 @@
 theory Protocol
-imports Main
+imports Pure
 begin
 
 ML\<open>
