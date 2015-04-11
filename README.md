@@ -1,6 +1,8 @@
 # libisabelle
 Minimal wrapper around Isabelle/PIDE for non-IDE applications
 
+[![Build Status](https://travis-ci.org/larsrh/libisabelle.svg?branch=master)](https://travis-ci.org/larsrh/libisabelle)
+
 ## Setup
 
 `libisabelle` is a Scala library which talks to Isabelle.
