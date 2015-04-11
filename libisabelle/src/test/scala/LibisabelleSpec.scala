@@ -25,8 +25,8 @@ class LibisabelleSpec extends Specification with NoTimeConversions { def is = s2
   def exist[A]: Matcher[A] = ((a: A) => a != null, "doesn't exist")
 
 
-  def start = system must exist.await(timeout = 10.seconds)
-  def req = response must beRight("Hello world").await(timeout = 5.seconds)
-  def stop = teardown must exist.await(timeout = 5.seconds)
+  def start = system must exist.await(timeout = 30.seconds)
+  def req = response must beRight("Hello world").await(timeout = 30.seconds)
+  def stop = teardown must exist.await(timeout = 30.seconds)
 
 }
