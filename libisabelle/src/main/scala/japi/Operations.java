@@ -6,8 +6,8 @@ public class Operations {
 
   private Operations() {}
 
-  public static <I, O> Operation<I, O> fromCodecs(String name, XMLCodec<I> enc, XMLCodec<O> dec) {
-    return Operation$.MODULE$.fromCodecs(name, enc, dec);
+  public static <I, O> Operation<I, O> fromCodecs(String name, Codec<I> enc, Codec<O> dec) {
+    return new Operation<I, O>(name, enc, dec);
   }
 
   public static final Operation<String, String> HELLO =

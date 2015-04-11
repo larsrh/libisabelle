@@ -7,7 +7,8 @@ object build extends Build {
 
   lazy val standardSettings = Seq(
     organization := "cs.tum.edu.isabelle",
-    scalaVersion := "2.11.6"
+    scalaVersion := "2.11.6",
+    javacOptions += "-Xlint:unchecked"
   )
 
   lazy val root = Project(
@@ -36,7 +37,9 @@ object build extends Build {
       libraryDependencies ++= Seq(
         "org.apache.commons" % "commons-compress" % "1.9",
         "org.apache.commons" % "commons-lang3" % "3.3.2",
-        "org.specs2" %% "specs2-core" % "2.4.15" % "test"
+        "org.specs2" %% "specs2-core" % "2.4.15" % "test",
+        "org.specs2" %% "specs2-scalacheck" % "2.4.15" % "test",
+        "org.scalacheck" %% "scalacheck" % "1.12.2" % "test"
       )
     ),
     dependencies = Seq(pideCore)

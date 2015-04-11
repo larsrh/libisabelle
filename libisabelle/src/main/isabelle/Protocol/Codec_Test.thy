@@ -25,6 +25,9 @@ ML_command\<open>
   check_for "Codec.list (Codec.list Codec.string)";
   check_for "Codec.list (Codec.tuple Codec.int Codec.int)";
   check_for "Codec.tuple Codec.int (Codec.list Codec.int)";
+  check_for "Codec.option Codec.int";
+  check_for "Codec.option (Codec.list Codec.int)";
+  check_for "Codec.list (Codec.option (Codec.int))";
 \<close>
 
 end

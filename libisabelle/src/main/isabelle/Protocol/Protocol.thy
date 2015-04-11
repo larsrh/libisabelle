@@ -11,8 +11,6 @@ signature LIBISABELLE = sig
      to_lib : 'o codec,
      action : 'i -> 'o}
 
-  exception GENERIC of string
-
   val add_operation : name -> ('i, 'o) operation -> unit
   val operation_setup : bstring -> Symbol_Pos.source -> theory -> unit
 end
@@ -42,16 +40,6 @@ fun add_operation name {from_lib, to_lib, action} =
     Synchronized.change operations (Symtab.update (name, raw))
   end
 
-val result_codec =
-  let
-    (* slightly fishy codec, doesn't preserve exception type *)
-    fun enc (Exn.Res tree) = (0, Codec.encode Codec.tree tree)
-      | enc (Exn.Exn exn) = (1, Codec.encode Codec.string (@{make_string} exn))
-    fun dec 0 = SOME (Codec.decode Codec.tree #> Codec.map_result Exn.Res)
-      | dec 1 = SOME (Codec.decode Codec.string #> Codec.map_result (Exn.Exn o GENERIC))
-      | dec _ = NONE
-  in Codec.variant enc dec "Exn.Result" end
-
 val _ = Isabelle_Process.protocol_command "libisabelle"
   (fn id :: name :: [arg] =>
     let
@@ -64,7 +52,7 @@ val _ = Isabelle_Process.protocol_command "libisabelle"
         (Future.fork (fn () =>
           let
             val res = Exn.interruptible_capture f args
-            val yxml = YXML.string_of (Codec.encode result_codec res)
+            val yxml = YXML.string_of (Codec.encode (Codec.exn_result Codec.id) res)
           in
             Output.protocol_message response [yxml]
           end);

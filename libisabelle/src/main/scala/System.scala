@@ -9,7 +9,7 @@ object System {
 
   // public interface
 
-  case class ProverException(msg: String) extends RuntimeException(msg)
+  case class ProverException(msg: String, body: XML.Body) extends RuntimeException(msg)
 
   def instance(sessionPath: Option[java.io.File], sessionName: String)(implicit ec: ExecutionContext): Future[System] = {
     val path = sessionPath.map(f => Path.explode(f.getAbsolutePath()))
@@ -105,21 +105,12 @@ class System private(options: Options, session: Session, root: Path)(implicit ec
   }
 
 
-  private val decodeResponse: XML.Decode.T[Try[XML.Body]] =
-    XML.Decode.variant(List(
-      { case (List(), a) => Success(a) },
-      { case (List(), exn) => Failure(System.ProverException(XML.content(exn))) }
-    ))
-
-  def invokeRaw(name: String, args: XML.Body*): Future[XML.Body] =
+  def invoke[I, O](operation: Operation[I, O])(arg: I): Future[Result[O]] =
     withRequest {
-      val args0 = List(count.toString, name) ::: args.toList.map(YXML.string_of_body)
+      val args0 = List(count.toString, operation.name, YXML.string_of_tree(operation.encode(arg)))
       session.protocol_command("libisabelle", args0: _*)
-    } flatMap { msg =>
-      Future.fromTry(decodeResponse(YXML.parse_body(msg.text)))
+    } map { msg =>
+      operation.decode(YXML.parse(msg.text))
     }
-
-  def invoke[I, O](operation: Operation[I, O])(arg: I): Future[Either[XML.Error, O]] =
-    invokeRaw(operation.name, operation.toProver(arg): _*).map(operation.fromProver)
 
 }

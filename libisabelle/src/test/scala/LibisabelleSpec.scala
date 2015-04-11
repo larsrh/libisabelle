@@ -10,7 +10,7 @@ import org.specs2.time.NoTimeConversions
 
 class LibisabelleSpec extends Specification with NoTimeConversions { def is = s2"""
 
-  This is a specification to test basic protocol interaction
+  Basic protocol interaction
 
   An Isabelle session
     can be started        $start

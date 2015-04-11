@@ -1,22 +1,18 @@
 package edu.tum.cs.isabelle
 
-import isabelle.XML
+import isabelle._
 
 object Operation {
 
-  def fromCodecs[I, O](name0: String, enc: XMLCodec[I], dec: XMLCodec[O]): Operation[I, O] =
-    new Operation[I, O] {
-      val name = name0
-      def toProver(in: I) = List(enc.encode(in))
-      def fromProver(out: XML.Body) = dec.decode(out)
-    }
+  def implicitly[I : Codec, O : Codec](name: String): Operation[I, O] =
+    Operation(name, Codec[I], Codec[O])
 
-  val Hello = fromCodecs("hello", XMLCodec.String, XMLCodec.String)
+  val Hello = implicitly[String, String]("hello")
 
 }
 
-trait Operation[I, O] {
-  val name: String
-  def toProver(in: I): List[XML.Body]
-  def fromProver(out: XML.Body): Either[XML.Error, O]
+case class Operation[I, O](name: String, toProver: Codec[I], fromProver: Codec[O]) {
+  def encode(i: I): XML.Tree = toProver.encode(i)
+  def decode(xml: XML.Tree): Result[O] =
+    Codec.exnResult(fromProver).decode(xml).right.map(Exn.release)
 }
