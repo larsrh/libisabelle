@@ -11,6 +11,20 @@ object build extends Build {
     javacOptions += "-Xlint:unchecked"
   )
 
+  lazy val warningSettings = Seq(
+    scalacOptions ++= Seq(
+      "-deprecation",
+      "-encoding", "UTF-8",
+      "-unchecked",
+      "-Xlint",
+      "-Yno-adapted-args",
+      "-Ywarn-dead-code",
+      "-Ywarn-numeric-widen",
+      "-Ywarn-value-discard",
+      "-Xfatal-warnings"
+    )
+  )
+
   lazy val root = Project(
     id = "root",
     base = file("."),
@@ -32,7 +46,7 @@ object build extends Build {
   lazy val libisabelle = Project(
     id = "libisabelle",
     base = file("libisabelle"),
-    settings = standardSettings ++ Seq(
+    settings = standardSettings ++ warningSettings ++ Seq(
       name := "libisabelle",
       libraryDependencies ++= Seq(
         "org.apache.commons" % "commons-compress" % "1.9",
@@ -49,7 +63,7 @@ object build extends Build {
   lazy val examples = Project(
     id = "examples",
     base = file("examples"),
-    settings = standardSettings ++ Seq(
+    settings = standardSettings ++ warningSettings ++ Seq(
       name := "examples"
     ),
     dependencies = Seq(libisabelle)

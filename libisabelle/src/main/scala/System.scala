@@ -46,7 +46,7 @@ object System {
   private def mkPhaseListener(session: Session, phase: Session.Phase)(implicit ec: ExecutionContext): Future[Unit] = {
     val promise = Promise[Unit]
     val consumer = Session.Consumer[Session.Phase]("phase-listener") {
-      case `phase` => promise.trySuccess(())
+      case `phase` => promise.trySuccess(()); ()
       case _ =>
     }
     session.phase_changed += consumer

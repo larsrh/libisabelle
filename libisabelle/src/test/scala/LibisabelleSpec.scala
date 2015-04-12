@@ -8,9 +8,8 @@ import isabelle.XML
 
 import org.specs2.Specification
 import org.specs2.matcher.Matcher
-import org.specs2.time.NoTimeConversions
 
-class LibisabelleSpec extends Specification with NoTimeConversions { def is = s2"""
+class LibisabelleSpec extends Specification { def is = s2"""
 
   Basic protocol interaction
 

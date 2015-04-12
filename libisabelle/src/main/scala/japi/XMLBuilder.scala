@@ -9,7 +9,7 @@ case class TreeBuilder(markup: Markup, body: XML.Body) {
   def this(name: String) = this(Markup(name, Nil), Nil)
 
   def addAttribute(key: String, value: String) =
-    copy(markup = markup.copy(properties = markup.properties :+ (key, value)))
+    copy(markup = markup.copy(properties = markup.properties :+ ((key, value))))
 
   def addAttributes(map: java.util.Map[String, String]) =
     copy(markup = markup.copy(properties = markup.properties ++ map.asScala))
