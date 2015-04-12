@@ -122,10 +122,10 @@ class System private(options: Options, session: Session, root: Path)(implicit ec
       val args = count.toString +: root.implode +: thys.map(_.getPath())
       session.protocol_command("use_theories", args: _*)
     } flatMap { msg =>
-      Future.fromTry(msg.properties match {
-        case Ok(ok) => Success(ok)
-        case _ => Failure(System.ProverException("prover returned malformed message", msg.body))
-      })
+      msg.properties match {
+        case Ok(ok) => Future.successful(ok)
+        case _ => Future.failed(System.ProverException("prover returned malformed message", msg.body))
+      }
     }
 
 

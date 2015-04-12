@@ -1,6 +1,7 @@
 lazy val standardSettings = Seq(
   organization := "cs.tum.edu.isabelle",
   scalaVersion := "2.11.6",
+  crossScalaVersions := Seq("2.10.5", "2.11.6"),
   javacOptions += "-Xlint:unchecked",
   resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
 )
@@ -35,9 +36,14 @@ lazy val pideCore = project.in(file("pide-core"))
   .settings(moduleName := "pide-core")
   .settings(standardSettings)
   .settings(
-    libraryDependencies ++= Seq(
-      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.2"
-    )
+    libraryDependencies ++= {
+      if (scalaVersion.value startsWith "2.10")
+        Seq()
+      else
+        Seq(
+          "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.2"
+        )
+    }
   )
 
 lazy val libisabelle = project
