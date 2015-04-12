@@ -13,4 +13,7 @@ public class Operations {
   public static final Operation<String, String> HELLO =
     Operation$.MODULE$.Hello();
 
+  public static final Operation<java.util.List<String>, Void> USE_THYS =
+    Operation$.MODULE$.UseThys_Java();
+
 }

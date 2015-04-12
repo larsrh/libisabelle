@@ -15,14 +15,13 @@ object System {
     val path = sessionPath.map(f => Path.explode(f.getAbsolutePath()))
     val session = startSession(path, sessionName)
 
-    session.map(new System(Options.init(), _, path.getOrElse(Path.current)))
+    session.map(new System(Options.init(), _))
   }
 
 
   // implementation details
 
   private val ID = "id"
-  private val USE_THEORIES_RESULT = "use_theories_result"
   private val LIBISABELLE_RESPONSE = "libisabelle_response"
 
   private object Libisabelle_Response {
@@ -30,15 +29,6 @@ object System {
       case
         (Markup.FUNCTION, LIBISABELLE_RESPONSE) ::
         (ID, Properties.Value.Long(id)) :: Nil => Some(id)
-      case _ => None
-    }
-  }
-
-  private object Use_Theories_Result {
-    def unapply(props: Properties.T): Option[Long] = props match {
-      case
-        (Markup.FUNCTION, USE_THEORIES_RESULT) ::
-        (ID, Properties.Value.Long(id)) :: _ => Some(id)
       case _ => None
     }
   }
@@ -80,20 +70,19 @@ object System {
 
 }
 
-class System private(options: Options, session: Session, root: Path)(implicit ec: ExecutionContext) { self =>
+class System private(options: Options, session: Session)(implicit ec: ExecutionContext) { self =>
 
   @volatile private var count = 0L
-  @volatile private var pending = Map.empty[Long, Promise[Prover.Protocol_Output]]
+  @volatile private var pending = Map.empty[Long, Promise[XML.Tree]]
 
   session.all_messages += Session.Consumer[Prover.Message]("firehose") {
     case msg: Prover.Protocol_Output =>
       (msg.properties match {
         case System.Libisabelle_Response(id) => Some(id)
-        case System.Use_Theories_Result(id) => Some(id)
         case _ => None
       }) foreach { id =>
         self.synchronized {
-          pending(id).success(msg)
+          pending(id).success(YXML.parse(msg.text))
           pending -= id
         }
       }
@@ -107,8 +96,8 @@ class System private(options: Options, session: Session, root: Path)(implicit ec
     future
   }
 
-  private def withRequest(f: => Unit): Future[Prover.Protocol_Output] = synchronized {
-    val promise = Promise[Prover.Protocol_Output]
+  private def withRequest(f: => Unit): Future[XML.Tree] = synchronized {
+    val promise = Promise[XML.Tree]
     pending += (count -> promise)
     f
     count += 1
@@ -117,24 +106,10 @@ class System private(options: Options, session: Session, root: Path)(implicit ec
 
   private val Ok = new Properties.Boolean("ok")
 
-  def loadTheories(thys: java.io.File*): Future[Boolean] =
-    withRequest {
-      val args = count.toString +: root.implode +: thys.map(_.getPath())
-      session.protocol_command("use_theories", args: _*)
-    } flatMap { msg =>
-      msg.properties match {
-        case Ok(ok) => Future.successful(ok)
-        case _ => Future.failed(System.ProverException("prover returned malformed message", msg.body))
-      }
-    }
-
-
   def invoke[I, O](operation: Operation[I, O])(arg: I): Future[Result[O]] =
     withRequest {
       val args0 = List(count.toString, operation.name, YXML.string_of_tree(operation.encode(arg)))
       session.protocol_command("libisabelle", args0: _*)
-    } map { msg =>
-      operation.decode(YXML.parse(msg.text))
-    }
+    } map { operation.decode }
 
 }

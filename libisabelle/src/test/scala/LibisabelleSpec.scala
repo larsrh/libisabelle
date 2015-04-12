@@ -23,7 +23,7 @@ class LibisabelleSpec extends Specification { def is = s2"""
   val TypeOf = Operation.implicitly[String, String]("type_of")
 
   val system = System.instance(Some(new java.io.File(".")), "Protocol")
-  val loaded = system.flatMap(_.loadTheories(new java.io.File("libisabelle/src/test/isabelle/Test")))
+  val loaded = system.flatMap(_.invoke(Operation.UseThys)(List("libisabelle/src/test/isabelle/Test")))
   val response = for { s <- system; _ <- loaded; res <- s.invoke(TypeOf)("op ==>") } yield res
   val teardown = for { s <- system; _ <- response /* wait for response */; _ <- s.dispose } yield ()
 
@@ -31,7 +31,7 @@ class LibisabelleSpec extends Specification { def is = s2"""
 
 
   def start = system must exist.awaitFor(30.seconds)
-  def load = loaded must beTrue.awaitFor(30.seconds)
+  def load = loaded must exist.awaitFor(30.seconds)
   def req = response must beRight("prop => prop => prop").awaitFor(30.seconds)
   def stop = teardown must exist.awaitFor(30.seconds)
 

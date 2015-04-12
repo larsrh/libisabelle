@@ -38,7 +38,4 @@ class JSystem private(system: System, timeout: Duration) {
       case Right(v) => v
     }
 
-  def loadTheories(thys: java.util.List[java.io.File]): Boolean =
-    await(system.loadTheories(thys.asScala: _*))
-
 }

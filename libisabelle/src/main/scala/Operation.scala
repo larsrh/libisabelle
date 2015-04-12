@@ -1,5 +1,7 @@
 package edu.tum.cs.isabelle
 
+import scala.collection.JavaConverters._
+
 import isabelle._
 
 object Operation {
@@ -8,6 +10,12 @@ object Operation {
     Operation(name, Codec[I], Codec[O])
 
   val Hello = implicitly[String, String]("hello")
+  val UseThys = implicitly[List[String], Unit]("use_thys")
+
+  protected[isabelle] val UseThys_Java =
+    Operation("use_thys",
+      Codec[List[String]].transform[java.util.List[String]](_.asJava, _.asScala.toList),
+      Codec[Unit].transform[Void](_ => null, _ => ()))
 
 }
 

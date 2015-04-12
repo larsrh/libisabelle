@@ -81,4 +81,9 @@ operation_setup hello = \<open>
    to_lib = Codec.string,
    action = (fn data => "Hello " ^ data)}\<close>
 
+operation_setup use_thys = \<open>
+  {from_lib = Codec.list Codec.string,
+   to_lib = Codec.unit,
+   action = Thy_Info.use_thys o map (rpair Position.none)}\<close>
+
 end
