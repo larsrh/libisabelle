@@ -37,8 +37,8 @@ object build extends Build {
       libraryDependencies ++= Seq(
         "org.apache.commons" % "commons-compress" % "1.9",
         "org.apache.commons" % "commons-lang3" % "3.3.2",
-        "org.specs2" %% "specs2-core" % "2.4.15" % "test",
-        "org.specs2" %% "specs2-scalacheck" % "2.4.15" % "test",
+        "org.specs2" %% "specs2-core" % "3.4" % "test",
+        "org.specs2" %% "specs2-scalacheck" % "3.4" % "test",
         "org.scalacheck" %% "scalacheck" % "1.12.2" % "test"
       )
     ),

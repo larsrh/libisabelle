@@ -1,6 +1,6 @@
 language: scala
 scala:
-  - 2.11.5
+  - 2.11.6
 env:
   - ISABELLE_HOME=./Isabelle2014
 before_install:

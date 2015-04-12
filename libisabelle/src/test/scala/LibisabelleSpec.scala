@@ -2,6 +2,8 @@ package edu.tum.cs.isabelle
 
 import scala.concurrent.duration._
 
+import edu.tum.cs.isabelle.defaults._
+
 import isabelle.XML
 
 import org.specs2.Specification
@@ -29,9 +31,9 @@ class LibisabelleSpec extends Specification with NoTimeConversions { def is = s2
   def exist[A]: Matcher[A] = ((a: A) => a != null, "doesn't exist")
 
 
-  def start = system must exist.await(timeout = 30.seconds)
-  def load = loaded must beTrue.await(timeout = 30.seconds)
-  def req = response must beRight("prop => prop => prop").await(timeout = 30.seconds)
-  def stop = teardown must exist.await(timeout = 30.seconds)
+  def start = system must exist.awaitFor(30.seconds)
+  def load = loaded must beTrue.awaitFor(30.seconds)
+  def req = response must beRight("prop => prop => prop").awaitFor(30.seconds)
+  def stop = teardown must exist.awaitFor(30.seconds)
 
 }
