@@ -66,8 +66,8 @@ fun add_operation name {from_lib, to_lib, action} {sequential, bracket} =
         Codec.Success i => Codec.encode to_lib (action i)
       | Codec.Failure (msg, _) => raise Fail ("decoding input failed " ^ msg)
     val raw' = raw
-      |> (if sequential then sequentialize name else I)
       |> (if bracket then bracketize else I)
+      |> (if sequential then sequentialize name else I)
   in
     Synchronized.change operations (Symtab.update (name, raw'))
   end
