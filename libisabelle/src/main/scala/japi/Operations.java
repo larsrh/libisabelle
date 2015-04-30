@@ -7,7 +7,7 @@ public class Operations {
   private Operations() {}
 
   public static <I, O> Operation<I, O> fromCodecs(String name, Codec<I> enc, Codec<O> dec) {
-    return new Operation<I, O>(name, enc, dec);
+    return Operation$.MODULE$.simple(name, enc, dec);
   }
 
   public static final Operation<String, String> HELLO =

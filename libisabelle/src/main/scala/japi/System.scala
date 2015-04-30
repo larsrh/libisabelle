@@ -33,9 +33,6 @@ class JSystem private(system: System, timeout: Duration) {
     await(system.dispose)
 
   def invoke[I, O](operation: Operation[I, O], arg: I): O =
-    await(system.invoke(operation)(arg)) match {
-      case Left((msg, body)) => throw System.ProverException(msg, body)
-      case Right(v) => v
-    }
+    Exn.release(await(system.invoke(operation)(arg)))
 
 }

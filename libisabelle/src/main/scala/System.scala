@@ -7,10 +7,6 @@ import isabelle._
 
 object System {
 
-  // public interface
-
-  case class ProverException(msg: String, body: XML.Body) extends RuntimeException(msg)
-
   def instance(sessionPath: Option[java.io.File], sessionName: String)(implicit ec: ExecutionContext): Future[System] = {
     val path = sessionPath.map(f => Path.explode(f.getAbsolutePath()))
     val session = startSession(path, sessionName)
@@ -68,25 +64,71 @@ object System {
     master
   }
 
+
+  private trait OperationState { self =>
+    type T
+    val id: Long
+    val bracketed: Boolean
+    val observer: Observer[T]
+    val promise: Promise[Exn.Result[T]]
+
+    def withObserver(observer0: Observer[T]) = new OperationState {
+      type T = self.T
+      val id = self.id
+      val bracketed = self.bracketed
+      val observer = observer0
+      val promise = self.promise
+    }
+
+    def tryComplete() = observer match {
+      case Observer.Success(t) => promise.success(t); true
+      case Observer.Failure(err) => promise.failure(err); true
+      case _  => false
+    }
+
+    def advance(msg: Prover.Message) = observer match {
+      case Observer.More(step, finish) => msg match {
+        case msg: Prover.Protocol_Output =>
+          msg.properties match {
+            case System.Libisabelle_Response(id) if id == this.id =>
+              val xml = YXML.parse(msg.text)
+              withObserver(finish(xml))
+            case _ =>
+              this
+          }
+        case _ =>
+          this
+      }
+      case _ =>
+        this
+    }
+
+  }
+
+  private def mkOperationState[T0](id0: Long, observer0: Observer[T0]) = {
+    val state = new OperationState {
+      type T = T0
+      val id = id0
+      val bracketed = false
+      val observer = observer0
+      val promise = Promise[Exn.Result[T]]
+    }
+    state.tryComplete()
+    state
+  }
+
 }
 
 class System private(options: Options, session: Session)(implicit ec: ExecutionContext) { self =>
 
   @volatile private var count = 0L
-  @volatile private var pending = Map.empty[Long, Promise[XML.Tree]]
+  @volatile private var pending = Map.empty[Long, System.OperationState]
 
   session.all_messages += Session.Consumer[Prover.Message]("firehose") {
-    case msg: Prover.Protocol_Output =>
-      (msg.properties match {
-        case System.Libisabelle_Response(id) => Some(id)
-        case _ => None
-      }) foreach { id =>
-        self.synchronized {
-          pending(id).success(YXML.parse(msg.text))
-          pending -= id
-        }
+    case msg =>
+      self.synchronized {
+        pending = pending.mapValues(_.advance(msg)).filterNot(_._2.tryComplete())
       }
-    case _ =>
   }
 
   def dispose: Future[Unit] = {
@@ -96,20 +138,16 @@ class System private(options: Options, session: Session)(implicit ec: ExecutionC
     future
   }
 
-  private def withRequest(f: => Unit): Future[XML.Tree] = synchronized {
-    val promise = Promise[XML.Tree]
-    pending += (count -> promise)
-    f
-    count += 1
+  def invoke[I, O](operation: Operation[I, O])(arg: I): Future[Exn.Result[O]] = {
+    val args0 = List(count.toString, operation.name, YXML.string_of_tree(operation.encode(arg)))
+    val promise = synchronized {
+      val state = System.mkOperationState(count, operation.observer)
+      pending += (count -> state)
+      count += 1
+      state.promise
+    }
+    session.protocol_command("libisabelle", args0: _*)
     promise.future
   }
-
-  private val Ok = new Properties.Boolean("ok")
-
-  def invoke[I, O](operation: Operation[I, O])(arg: I): Future[Result[O]] =
-    withRequest {
-      val args0 = List(count.toString, operation.name, YXML.string_of_tree(operation.encode(arg)))
-      session.protocol_command("libisabelle", args0: _*)
-    } map { operation.decode }
 
 }
