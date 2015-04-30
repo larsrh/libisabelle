@@ -67,14 +67,12 @@ object System {
 
   private trait OperationState { self =>
     type T
-    val id: Long
     val bracketed: Boolean
     val observer: Observer[T]
     val promise: Promise[Exn.Result[T]]
 
     def withObserver(observer0: Observer[T]) = new OperationState {
       type T = self.T
-      val id = self.id
       val bracketed = self.bracketed
       val observer = observer0
       val promise = self.promise
@@ -86,11 +84,11 @@ object System {
       case _  => false
     }
 
-    def advance(msg: Prover.Message) = observer match {
+    def advance(id: Long, msg: Prover.Message) = observer match {
       case Observer.More(step, finish) => msg match {
         case msg: Prover.Protocol_Output =>
           msg.properties match {
-            case System.Libisabelle_Response(id) if id == this.id =>
+            case System.Libisabelle_Response(id1) if id == id1 =>
               val xml = YXML.parse(msg.text)
               withObserver(finish(xml))
             case _ =>
@@ -105,10 +103,9 @@ object System {
 
   }
 
-  private def mkOperationState[T0](id0: Long, observer0: Observer[T0]) = {
+  private def mkOperationState[T0](observer0: Observer[T0]) = {
     val state = new OperationState {
       type T = T0
-      val id = id0
       val bracketed = false
       val observer = observer0
       val promise = Promise[Exn.Result[T]]
@@ -124,11 +121,10 @@ class System private(options: Options, session: Session)(implicit ec: ExecutionC
   @volatile private var count = 0L
   @volatile private var pending = Map.empty[Long, System.OperationState]
 
-  session.all_messages += Session.Consumer[Prover.Message]("firehose") {
-    case msg =>
-      self.synchronized {
-        pending = pending.mapValues(_.advance(msg)).filterNot(_._2.tryComplete())
-      }
+  session.all_messages += Session.Consumer[Prover.Message]("firehose") { msg =>
+    self.synchronized {
+      pending = pending.map { case (id, state) => id -> state.advance(id, msg) }.filterNot(_._2.tryComplete())
+    }
   }
 
   def dispose: Future[Unit] = {
@@ -140,14 +136,13 @@ class System private(options: Options, session: Session)(implicit ec: ExecutionC
 
   def invoke[I, O](operation: Operation[I, O])(arg: I): Future[Exn.Result[O]] = {
     val args0 = List(count.toString, operation.name, YXML.string_of_tree(operation.encode(arg)))
-    val promise = synchronized {
-      val state = System.mkOperationState(count, operation.observer)
+    val state = System.mkOperationState(operation.observer)
+    synchronized {
       pending += (count -> state)
       count += 1
-      state.promise
     }
     session.protocol_command("libisabelle", args0: _*)
-    promise.future
+    state.promise.future
   }
 
 }
