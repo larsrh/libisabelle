@@ -42,6 +42,15 @@ object Operation {
   def simple[I, O](name: String, toProver: Codec[I], fromProver: Codec[O]): Operation[I, O] =
     Operation(name, toProver, Observer.ignoreStep[O](Observer.decodeWith(fromProver)))
 
+  val UseThysMarkup = {
+    lazy val observer: Observer[Unit] = Observer.More(msg => {
+      println(msg)
+      observer
+    }, Observer.decodeWith(Codec[Unit]))
+
+    Operation("use_thys", Codec[List[String]], observer)
+  }
+
 }
 
 case class Operation[I, O](name: String, toProver: Codec[I], observer: Observer[O]) {
