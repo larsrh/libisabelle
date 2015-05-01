@@ -4,6 +4,8 @@ import scala.concurrent.ExecutionContext
 
 import isabelle.XML
 
+case class DecodingException(msg: String, body: XML.Body) extends RuntimeException(msg)
+
 object defaults {
   implicit lazy val isabelleExecutionContext: ExecutionContext =
     isabelle.Future.execution_context
