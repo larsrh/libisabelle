@@ -16,7 +16,7 @@ signature LIBISABELLE = sig
   val default_flags : flags
 
   val add_operation : name -> ('i, 'o) operation -> flags -> unit
-  val operation_setup : bstring -> Symbol_Pos.source -> flags -> theory -> unit
+  val operation_setup : bstring -> Symbol_Pos.source -> flags -> Proof.context -> unit
 end
 
 structure Libisabelle : LIBISABELLE = struct
@@ -99,8 +99,8 @@ fun print_bool true = "true"
 fun print_flags {sequential, bracket} =
   "({sequential=" ^ print_bool sequential ^ ",bracket=" ^ print_bool bracket ^ "})"
 
-fun operation_setup name source flags thy =
-  ML_Context.eval_in (SOME (Proof_Context.init_global thy)) ML_Compiler.flags (#pos source)
+fun operation_setup name source flags ctxt =
+  ML_Context.eval_in (SOME ctxt) ML_Compiler.flags (#pos source)
     (ML_Lex.read Position.none ("Libisabelle.add_operation " ^ ML_Syntax.print_string name ^ "(") @
       ML_Lex.read_source false source @
       ML_Lex.read Position.none ")" @
@@ -122,7 +122,7 @@ val _ =
   in
     Outer_Syntax.command @{command_spec "operation_setup"} "define protocol operation in ML"
       (parse_cmd >> (fn ((flags, name), txt) =>
-        Toplevel.theory (tap (operation_setup name txt (flags default_flags)))))
+        Toplevel.keep (Toplevel.context_of #> operation_setup name txt (flags default_flags))))
   end
 
 end
