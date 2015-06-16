@@ -5,7 +5,7 @@ scala:
 env:
   - ISABELLE_HOME=./Isabelle2014
 before_install:
-  - wget http://isabelle.in.tum.de/dist/Isabelle2014_linux.tar.gz -O /tmp/Isabelle.tar.gz
+  - wget https://isabelle.in.tum.de/website-Isabelle2014/dist/Isabelle2014_linux.tar.gz -O /tmp/Isabelle.tar.gz
   - tar xzf /tmp/Isabelle.tar.gz
 install:
   - $ISABELLE_HOME/bin/isabelle build -d . -bv Protocol
