@@ -143,7 +143,7 @@ fun option a =
 
 (* slightly fishy codec, doesn't preserve exception type *)
 exception GENERIC of string
-val exn = transform GENERIC (fn exn => @{make_string} exn) string
+val exn = transform GENERIC (fn exn => XML.content_of (YXML.parse_body (@{make_string} exn))) string
 
 fun exn_result a =
   let

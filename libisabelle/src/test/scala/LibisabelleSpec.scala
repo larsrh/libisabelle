@@ -30,7 +30,7 @@ class LibisabelleSpec extends Specification with IsabelleMatchers { def is = s2"
   def exist[A]: Matcher[A] = ((a: A) => a != null, "doesn't exist")
 
   def start = system must exist.awaitFor(30.seconds)
-  def load = loaded must exist.awaitFor(30.seconds)
+  def load = loaded must beRes(()).awaitFor(30.seconds)
   def req = response must beRes("prop => prop => prop").awaitFor(30.seconds)
   def stop = teardown must exist.awaitFor(30.seconds)
 
