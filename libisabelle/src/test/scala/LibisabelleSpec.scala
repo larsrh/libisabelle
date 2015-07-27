@@ -7,6 +7,7 @@ import edu.tum.cs.isabelle.defaults._
 import isabelle.Exn
 
 import org.specs2.Specification
+import org.specs2.concurrent.ExecutionEnv
 import org.specs2.matcher.Matcher
 
 class LibisabelleSpec extends Specification with IsabelleMatchers { def is = s2"""
@@ -14,10 +15,18 @@ class LibisabelleSpec extends Specification with IsabelleMatchers { def is = s2"
   Basic protocol interaction
 
   An Isabelle session
-    can be started          $start
-    can load theories       $load
-    reacts to requests      $req
-    can be torn down        $stop"""
+    can be started          ${implicit env: ExecutionEnv =>
+      system must exist.awaitFor(30.seconds)
+    }
+    can load theories       ${implicit env: ExecutionEnv =>
+      loaded must beRes(()).awaitFor(30.seconds)
+    }
+    reacts to requests      ${implicit env: ExecutionEnv =>
+      response must beRes("prop => prop => prop").awaitFor(30.seconds)
+    }
+    can be torn down        ${implicit env: ExecutionEnv =>
+      teardown must exist.awaitFor(30.seconds)
+    }"""
 
 
   val TypeOf = Operation.implicitly[String, String]("type_of")
@@ -28,10 +37,5 @@ class LibisabelleSpec extends Specification with IsabelleMatchers { def is = s2"
   val teardown = for { s <- system; _ <- response /* wait for response */; _ <- s.dispose } yield ()
 
   def exist[A]: Matcher[A] = ((a: A) => a != null, "doesn't exist")
-
-  def start = system must exist.awaitFor(30.seconds)
-  def load = loaded must beRes(()).awaitFor(30.seconds)
-  def req = response must beRes("prop => prop => prop").awaitFor(30.seconds)
-  def stop = teardown must exist.awaitFor(30.seconds)
 
 }
