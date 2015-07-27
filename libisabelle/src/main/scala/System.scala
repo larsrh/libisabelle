@@ -5,13 +5,35 @@ import scala.util.{Failure, Success, Try}
 
 import isabelle._
 
+import edu.tum.cs.isabelle.setup.{Configuration, Environment}
+
 object System {
 
-  def instance(sessionPath: Option[java.io.File], sessionName: String)(implicit ec: ExecutionContext): Future[System] = {
-    val path = sessionPath.map(f => Path.explode(f.getAbsolutePath()))
-    val session = startSession(path, sessionName)
+  def build(env: Environment, config: Configuration): Boolean = {
+    Isabelle_System.init(isabelle_home = env.home.toAbsolutePath.toString)
 
-    session.map(new System(Options.init(), _))
+    val path = config.path.map(f => Path.explode(f.toAbsolutePath.toString))
+
+    val rc = Build.build(
+      options = Options.init(),
+      progress = new Build.Console_Progress(verbose = true),
+      build_heap = true,
+      dirs = path.toList,
+      verbose = true,
+      sessions = List(config.session)
+    )
+
+    rc == 0
+  }
+
+  def instance(env: Environment, config: Configuration)(implicit ec: ExecutionContext): Future[System] = {
+    Isabelle_System.init(isabelle_home = env.home.toAbsolutePath.toString)
+
+    val path = config.path.map(f => Path.explode(f.toAbsolutePath.toString))
+
+    startSession(path, config.session) map { case (options, session) =>
+      new System(options, session)
+    }
   }
 
 
@@ -32,7 +54,7 @@ object System {
       session.protocol_command("Prover.options", YXML.string_of_body(options.encode))
     }
 
-  private def startSession(path: Option[Path], sessionName: String)(implicit ec: ExecutionContext): Future[Session] = {
+  private def startSession(path: Option[Path], sessionName: String)(implicit ec: ExecutionContext): Future[(Options, Session)] = {
     val options = Options.init()
 
     val content = Build.session_content(options, false, path.toList, sessionName)
@@ -40,14 +62,14 @@ object System {
 
     val session = new Session(resources)
 
-    val master =
+    val result =
       for {
         () <- mkPhaseListener(session, Session.Ready)
         () <- sendOptions(session, options)
-      } yield session
+      } yield (options, session)
 
     session.start("Isabelle" /* name is ignored anyway */, List("-r", "-q", sessionName))
-    master
+    result
   }
 
 
