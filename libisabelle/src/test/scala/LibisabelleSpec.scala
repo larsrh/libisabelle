@@ -2,31 +2,21 @@ package edu.tum.cs.isabelle
 
 import scala.concurrent.duration._
 
-import edu.tum.cs.isabelle.defaults._
-
 import isabelle.Exn
 
 import org.specs2.Specification
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.matcher.Matcher
 
-class LibisabelleSpec extends Specification with IsabelleMatchers { def is = s2"""
+class LibisabelleSpec(implicit env: ExecutionEnv) extends Specification with IsabelleMatchers { def is = s2"""
 
   Basic protocol interaction
 
   An Isabelle session
-    can be started          ${implicit env: ExecutionEnv =>
-      system must exist.awaitFor(30.seconds)
-    }
-    can load theories       ${implicit env: ExecutionEnv =>
-      loaded must beRes(()).awaitFor(30.seconds)
-    }
-    reacts to requests      ${implicit env: ExecutionEnv =>
-      response must beRes("prop => prop => prop").awaitFor(30.seconds)
-    }
-    can be torn down        ${implicit env: ExecutionEnv =>
-      teardown must exist.awaitFor(30.seconds)
-    }"""
+    can be started          ${system must exist.awaitFor(30.seconds)}
+    can load theories       ${loaded must beRes(()).awaitFor(30.seconds)}
+    reacts to requests      ${response must beRes("prop => prop => prop").awaitFor(30.seconds)}
+    can be torn down        ${teardown must exist.awaitFor(30.seconds)}"""
 
 
   val TypeOf = Operation.implicitly[String, String]("type_of")
