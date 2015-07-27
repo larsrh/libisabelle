@@ -9,6 +9,23 @@ import edu.tum.cs.isabelle.setup.{Configuration, Environment}
 
 object System {
 
+  def build(env: Environment, config: Configuration): Boolean = {
+    Isabelle_System.init(isabelle_home = env.home.toAbsolutePath.toString)
+
+    val path = config.path.map(f => Path.explode(f.toAbsolutePath.toString))
+
+    val rc = Build.build(
+      options = Options.init(),
+      progress = new Build.Console_Progress(verbose = true),
+      build_heap = true,
+      dirs = path.toList,
+      verbose = true,
+      sessions = List(config.session)
+    )
+
+    rc == 0
+  }
+
   def instance(env: Environment, config: Configuration)(implicit ec: ExecutionContext): Future[System] = {
     Isabelle_System.init(isabelle_home = env.home.toAbsolutePath.toString)
 

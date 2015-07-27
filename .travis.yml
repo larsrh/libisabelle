@@ -2,10 +2,7 @@ language: scala
 scala:
   - 2.10.5
   - 2.11.6
-env:
-  - ISABELLE_HOME=./contrib/Isabelle2014
 script:
   - sbt ++$TRAVIS_SCALA_VERSION compile
-  - sbt ++$TRAVIS_SCALA_VERSION setup/run
-  - $ISABELLE_HOME/bin/isabelle build -D . -bv
+  - sbt ++$TRAVIS_SCALA_VERSION bootstrap/run
   - sbt ++$TRAVIS_SCALA_VERSION test

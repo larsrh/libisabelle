@@ -29,7 +29,7 @@ lazy val noPublishSettings = Seq(
 lazy val root = project.in(file("."))
   .settings(standardSettings)
   .settings(noPublishSettings)
-  .aggregate(pideCore, setup, libisabelle, examples)
+  .aggregate(pideCore, setup, libisabelle, bootstrap, examples)
 
 lazy val pideCore = project.in(file("pide-core"))
   .settings(moduleName := "pide-core")
@@ -70,6 +70,12 @@ lazy val libisabelle = project
     )
   )
 
+lazy val bootstrap = project
+  .dependsOn(libisabelle)
+  .settings(standardSettings)
+  .settings(warningSettings)
+  .settings(noPublishSettings)
+
 lazy val examples = project
   .dependsOn(libisabelle)
   .settings(standardSettings)
@@ -79,6 +85,7 @@ lazy val full = project
   .dependsOn(examples)
   .settings(moduleName := "libisabelle-full")
   .settings(standardSettings)
+  .settings(noPublishSettings)
   .settings(
     assemblyJarName in assembly := s"${moduleName.value}.jar"
   )

@@ -2,7 +2,7 @@ package edu.tum.cs.isabelle.setup
 
 import java.nio.file.{Files, Path, Paths}
 
-import scala.concurrent._
+import scala.concurrent.{Future, ExecutionContext}
 
 object Setup {
 
@@ -37,14 +37,5 @@ object Setup {
 
   def guessEnvironment(path: Path): Option[Environment] =
     Version.all.flatMap(_.detectEnvironment(path)).headOption
-
-}
-
-object LocalSetup extends App {
-
-  import scala.concurrent.ExecutionContext.Implicits.global
-  println("Downloading and untarring latest supported Isabelle")
-  val path = Await.result(Setup.defaultSetup, duration.Duration.Inf)
-  println(s"Successfully untarred latest Isabelle into $path")
 
 }
