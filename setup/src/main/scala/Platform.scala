@@ -20,6 +20,8 @@ sealed abstract class Platform(val name: String)
 object Version {
   case object Isa2014 extends Version("2014")
   val latest = Isa2014
+
+  val all = List(Isa2014)
 }
 
 sealed abstract class Version(val identifier: String) {
@@ -32,13 +34,10 @@ sealed abstract class Version(val identifier: String) {
       Some(new URL(s"${baseURL}_linux.tar.gz"))
   }
 
-  private lazy val home =
-    Paths.get(s"Isabelle$identifier")
-
-  def detectInstall(base: Path): Option[Install] = {
-    val path = base resolve home
+  def detectEnvironment(base: Path): Option[Environment] = {
+    val path = base resolve s"Isabelle$identifier"
     if (Files.isDirectory(path))
-      Some(Install(path, this))
+      Some(Environment(path, this))
     else
       None
   }
@@ -48,7 +47,17 @@ sealed abstract class Version(val identifier: String) {
 
 }
 
-case class Install(home: Path, version: Version) {
+case class Environment(home: Path, version: Version) {
   override def toString: String =
     s"$version at $home"
+}
+
+object Configuration {
+  def fromPath(path: Path, session: String) =
+    Configuration(Some(path), session)
+}
+
+case class Configuration(path: Option[Path], session: String) {
+  override def toString: String =
+    s"session $session" + path.map(p => s" at $p").getOrElse("")
 }

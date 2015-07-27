@@ -21,27 +21,30 @@ object Setup {
         sys.error("couldn't determine URL")
       case Some(url) =>
         val stream = Tar.download(url)
-        Tar.extractTo(path, stream).map(Install(_, defaultVersion))
+        Tar.extractTo(path, stream).map(Environment(_, defaultVersion))
     }
 
-  def defaultSetup(implicit ec: ExecutionContext): Future[Install] =
-    defaultVersion detectInstall defaultBasePath match {
+  def defaultSetup(implicit ec: ExecutionContext): Future[Environment] =
+    defaultVersion detectEnvironment defaultBasePath match {
       case Some(install) =>
         Future.successful(install)
       case None =>
         defaultInstallTo(defaultBasePath)
     }
 
-  def temporarySetup(implicit ec: ExecutionContext): Future[Install] =
+  def temporarySetup(implicit ec: ExecutionContext): Future[Environment] =
     defaultInstallTo(Files.createTempDirectory("libisabelle").toRealPath())
+
+  def guessEnvironment(path: Path): Option[Environment] =
+    Version.all.flatMap(_.detectEnvironment(path)).headOption
 
 }
 
-object CI extends App {
+object LocalSetup extends App {
 
   import scala.concurrent.ExecutionContext.Implicits.global
-  println("Downloading and untarring latest Isabelle")
-  val path = Await.result(Setup.temporarySetup, duration.Duration.Inf)
+  println("Downloading and untarring latest supported Isabelle")
+  val path = Await.result(Setup.defaultSetup, duration.Duration.Inf)
   println(s"Successfully untarred latest Isabelle into $path")
 
 }

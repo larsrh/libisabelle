@@ -3,9 +3,9 @@ scala:
   - 2.10.5
   - 2.11.6
 env:
-  - ISABELLE_HOME=./Isabelle2014
-before_install:
-  - wget https://isabelle.in.tum.de/website-Isabelle2014/dist/Isabelle2014_linux.tar.gz -O /tmp/Isabelle.tar.gz
-  - tar xzf /tmp/Isabelle.tar.gz
-install:
-  - $ISABELLE_HOME/bin/isabelle build -d . -bv Protocol
+  - ISABELLE_HOME=./contrib/Isabelle2014
+script:
+  - sbt ++$TRAVIS_SCALA_VERSION compile
+  - sbt ++$TRAVIS_SCALA_VERSION setup/run
+  - $ISABELLE_HOME/bin/isabelle build -D . -bv
+  - sbt ++$TRAVIS_SCALA_VERSION test

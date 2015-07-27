@@ -59,6 +59,7 @@ lazy val setup = project.in(file("setup"))
 
 lazy val libisabelle = project
   .dependsOn(pideCore)
+  .dependsOn(setup)
   .settings(standardSettings)
   .settings(warningSettings)
   .settings(
