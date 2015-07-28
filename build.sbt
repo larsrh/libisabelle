@@ -57,9 +57,7 @@ lazy val pideCore2014 = project.in(file("pide-core/2014"))
       if (scalaVersion.value startsWith "2.10")
         Seq()
       else
-        Seq(
-          "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.2"
-        )
+        Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4")
     }
   )
 
