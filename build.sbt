@@ -29,7 +29,7 @@ lazy val noPublishSettings = Seq(
 lazy val root = project.in(file("."))
   .settings(standardSettings)
   .settings(noPublishSettings)
-  .aggregate(pideInterface, setup, libisabelle)
+  .aggregate(pideInterface, setup, pideImpl2014, libisabelle)
 
 lazy val pideInterface = project.in(file("pide-interface"))
   .settings(moduleName := "pide-interface")
