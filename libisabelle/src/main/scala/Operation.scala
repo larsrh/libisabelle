@@ -17,7 +17,7 @@ object Operation {
 
   def simple[I, O](name: String, toProver: Codec[I], fromProver: Codec[O]): Operation[I, O] =
     new Operation[I, O](name, toProver) {
-      def observer(env: Environment) =
+      def observer(env: Environment): env.Observer[O] =
         env.Observer.ignoreStep[O](tree => decodeWith(env, fromProver)(tree))
     }
 

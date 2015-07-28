@@ -13,12 +13,12 @@ object XMLTree {
     )(tree)
 
   case class Elem(markup: Markup, body: List[XMLTree]) extends XMLTree {
-    def toGeneric(env: Environment) =
+    def toGeneric(env: Environment): env.XMLTree =
       env.elem(markup, body.map(_.toGeneric(env)))
   }
 
   case class Text(content: String) extends XMLTree {
-    def toGeneric(env: Environment) =
+    def toGeneric(env: Environment): env.XMLTree =
       env.text(content)
   }
 

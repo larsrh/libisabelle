@@ -40,7 +40,7 @@ object Codec {
 
   private def text[A](to: A => String, from: String => Option[A]): Codec[A] = new Codec[A] {
     // FIXME escape handling
-    def encode(env: Environment)(t: A) = env.text(to(t))
+    def encode(env: Environment)(t: A): env.XMLTree = env.text(to(t))
     def decode(env: Environment)(tree: env.XMLTree) = env.destTree(tree) match {
       case Left(content) =>
         from(content) match {
@@ -60,7 +60,7 @@ object Codec {
   ).tagged("int")
 
   implicit def unit: Codec[Unit] = new Codec[Unit] {
-    def encode(env: Environment)(u: Unit) = addTag(env)("unit", None, Nil)
+    def encode(env: Environment)(u: Unit): env.XMLTree = addTag(env)("unit", None, Nil)
     def decode(env: Environment)(tree: env.XMLTree) =
       expectTag(env)("unit", tree).right.flatMap {
         case Nil => Right(())
@@ -106,7 +106,7 @@ object Codec {
       case Some(a) => (0, Codec[A].encode(env)(a))
       case None    => (1, Codec[Unit].encode(env)(()))
     }
-    def dec(env: Environment, idx: Int) = idx match {
+    def dec(env: Environment, idx: Int): Option[env.XMLTree => XMLResult[Option[A]]] = idx match {
       case 0 => Some(Codec[A].decode(env)(_).right.map(Some.apply))
       case 1 => Some(Codec[Unit].decode(env)(_).right.map(_ => None))
       case _ => None
@@ -122,7 +122,7 @@ object Codec {
       case Right(a) => (0, Codec[A].encode(env)(a))
       case Left(e)  => (1, Codec[Throwable].encode(env)(e))
     }
-    def dec(env: Environment, idx: Int) = idx match {
+    def dec(env: Environment, idx: Int): Option[env.XMLTree => XMLResult[ProverResult[A]]] = idx match {
       case 0 => Some(Codec[A].decode(env)(_).right.map(Right.apply))
       case 1 => Some(Codec[Throwable].decode(env)(_).right.map(Left.apply))
       case _ => None
@@ -139,19 +139,19 @@ trait Codec[T] { self =>
   def decode(env: Environment)(tree: env.XMLTree): XMLResult[T]
 
   def transform[U](f: T => U, g: U => T): Codec[U] = new Codec[U] {
-    def encode(env: Environment)(u: U) = self.encode(env)(g(u))
+    def encode(env: Environment)(u: U): env.XMLTree = self.encode(env)(g(u))
     def decode(env: Environment)(tree: env.XMLTree) = self.decode(env)(tree).right.map(f)
   }
 
   def list: Codec[List[T]] = new Codec[List[T]] {
-    def encode(env: Environment)(ts: List[T]) =
+    def encode(env: Environment)(ts: List[T]): env.XMLTree =
       Codec.addTag(env)("list", None, ts.map(t => self.encode(env)(t)))
     def decode(env: Environment)(tree: env.XMLTree) =
       Codec.expectTag(env)("list", tree).right.flatMap(_.traverse(self.decode(env)))
   }
 
   def tuple[U](that: Codec[U]): Codec[(T, U)] = new Codec[(T, U)] {
-    def encode(env: Environment)(tu: (T, U)) =
+    def encode(env: Environment)(tu: (T, U)): env.XMLTree =
       Codec.addTag(env)("tuple", None, List(self.encode(env)(tu._1), that.encode(env)(tu._2)))
     def decode(env: Environment)(tree: env.XMLTree) =
       Codec.expectTag(env)("tuple", tree).right.flatMap {
@@ -163,7 +163,7 @@ trait Codec[T] { self =>
   }
 
   def tagged(tag: String): Codec[T] = new Codec[T] {
-    def encode(env: Environment)(t: T) = Codec.addTag(env)(tag, None, List(self.encode(env)(t)))
+    def encode(env: Environment)(t: T): env.XMLTree = Codec.addTag(env)(tag, None, List(self.encode(env)(t)))
     def decode(env: Environment)(tree: env.XMLTree) =
       Codec.expectTag(env)(tag, tree).right.flatMap {
         case List(tree) => self.decode(env)(tree)
