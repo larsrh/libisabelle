@@ -29,10 +29,28 @@ lazy val noPublishSettings = Seq(
 lazy val root = project.in(file("."))
   .settings(standardSettings)
   .settings(noPublishSettings)
-  .aggregate(pideCore, setup, libisabelle, bootstrap, examples)
+  .aggregate(pideInterface, setup, libisabelle)
 
-lazy val pideCore = project.in(file("pide-core"))
-  .settings(moduleName := "pide-core")
+lazy val pideInterface = project.in(file("pide-interface"))
+  .settings(moduleName := "pide-interface")
+  .settings(standardSettings)
+  .settings(warningSettings)
+
+lazy val setup = project.in(file("setup"))
+  .dependsOn(pideInterface)
+  .settings(standardSettings)
+  .settings(warningSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.apache.commons" % "commons-compress" % "1.9",
+      "org.apache.commons" % "commons-lang3" % "3.3.2",
+      "com.github.fge" % "java7-fs-more" % "0.2.0",
+      "com.google.code.findbugs" % "jsr305" % "1.3.+" % "compile"
+    )
+  )
+
+lazy val pideCore2014 = project.in(file("pide-core/2014"))
+  .settings(moduleName := "pide-core-2014")
   .settings(standardSettings)
   .settings(
     libraryDependencies ++= {
@@ -45,21 +63,14 @@ lazy val pideCore = project.in(file("pide-core"))
     }
   )
 
-lazy val setup = project.in(file("setup"))
+lazy val pideImpl2014 = project.in(file("pide-impl/2014"))
+  .dependsOn(pideInterface, pideCore2014)
+  .settings(moduleName := "pide-impl-2014")
   .settings(standardSettings)
   .settings(warningSettings)
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.apache.commons" % "commons-compress" % "1.9",
-      "org.apache.commons" % "commons-lang3" % "3.3.2",
-      "com.github.fge" % "java7-fs-more" % "0.2.0",
-      "com.google.code.findbugs" % "jsr305" % "1.3.+" % "compile"
-    )
-  )
 
 lazy val libisabelle = project
-  .dependsOn(pideCore)
-  .dependsOn(setup)
+  .dependsOn(pideInterface)
   .settings(standardSettings)
   .settings(warningSettings)
   .settings(
@@ -68,24 +79,4 @@ lazy val libisabelle = project
       "org.specs2" %% "specs2-scalacheck" % "3.6.3" % "test",
       "org.scalacheck" %% "scalacheck" % "1.12.2" % "test"
     )
-  )
-
-lazy val bootstrap = project
-  .dependsOn(libisabelle)
-  .settings(standardSettings)
-  .settings(warningSettings)
-  .settings(noPublishSettings)
-
-lazy val examples = project
-  .dependsOn(libisabelle)
-  .settings(standardSettings)
-  .settings(warningSettings)
-
-lazy val full = project
-  .dependsOn(examples)
-  .settings(moduleName := "libisabelle-full")
-  .settings(standardSettings)
-  .settings(noPublishSettings)
-  .settings(
-    assemblyJarName in assembly := s"${moduleName.value}.jar"
   )

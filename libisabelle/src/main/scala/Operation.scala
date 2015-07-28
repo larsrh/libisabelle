@@ -2,57 +2,31 @@ package edu.tum.cs.isabelle
 
 import scala.collection.JavaConverters._
 
-import isabelle._
-
-sealed abstract class Observer[T]
-
-object Observer {
-
-  case class Success[T](t: Exn.Result[T]) extends Observer[T]
-  case class Failure[T](error: Exception) extends Observer[T]
-  case class More[T](step: Prover.Message => Observer[T], done: XML.Tree => Observer[T]) extends Observer[T]
-
-  def ignoreStep[T](done: XML.Tree => Observer[T]): Observer[T] = {
-    lazy val observer: Observer[T] = More(_ => observer, done)
-    observer
-  }
-
-  def decodeWith[O](fromProver: Codec[O])(tree: XML.Tree): Observer[O] =
-    Codec.exnResult(fromProver).decode(tree) match {
-      case Left((err, body)) => Observer.Failure(new DecodingException(err, body))
-      case Right(o) => Observer.Success(o)
-    }
-
-}
-
+import edu.tum.cs.isabelle.api.Environment
 
 object Operation {
+
+  private def decodeWith[O](env: Environment, fromProver: Codec[O])(tree: env.XMLTree): env.Observer[O] =
+    Codec.proverResult(fromProver).decode(env)(tree) match {
+      case Left((err, body)) => env.Observer.Failure(new DecodingException(err, body))
+      case Right(o) => env.Observer.Success(o)
+    }
 
   def implicitly[I : Codec, O : Codec](name: String): Operation[I, O] =
     simple(name, Codec[I], Codec[O])
 
+  def simple[I, O](name: String, toProver: Codec[I], fromProver: Codec[O]): Operation[I, O] =
+    new Operation[I, O](name, toProver) {
+      def observer(env: Environment) =
+        env.Observer.ignoreStep[O](tree => decodeWith(env, fromProver)(tree))
+    }
+
   val Hello = implicitly[String, String]("hello")
   val UseThys = implicitly[List[String], Unit]("use_thys")
 
-  protected[isabelle] val UseThys_Java =
-    Operation.simple("use_thys",
-      Codec[List[String]].transform[java.util.List[String]](_.asJava, _.asScala.toList),
-      Codec[Unit].transform[Void](_ => null, _ => ()))
-
-  def simple[I, O](name: String, toProver: Codec[I], fromProver: Codec[O]): Operation[I, O] =
-    Operation(name, toProver, Observer.ignoreStep[O](Observer.decodeWith(fromProver)))
-
-  val UseThysMarkup = {
-    lazy val observer: Observer[Unit] = Observer.More(msg => {
-      println(msg)
-      observer
-    }, Observer.decodeWith(Codec[Unit]))
-
-    Operation("use_thys", Codec[List[String]], observer)
-  }
-
 }
 
-case class Operation[I, O](name: String, toProver: Codec[I], observer: Observer[O]) {
-  def encode(i: I): XML.Tree = toProver.encode(i)
+abstract class Operation[I, O](val name: String, val toProver: Codec[I]) {
+  def observer(env: Environment): env.Observer[O]
+  final def encode(env: Environment)(i: I): env.XMLTree = toProver.encode(env)(i)
 }
