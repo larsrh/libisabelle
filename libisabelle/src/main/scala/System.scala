@@ -99,8 +99,8 @@ object System {
       @volatile private var pending = Map.empty[Long, OperationState]
 
       val session = env.create(config, consumer)
-      initPromise.future onSuccess {
-        case _ => env.sendOptions(session)
+      initPromise.future foreach { _ =>
+        env.sendOptions(session)
       }
 
       def dispose = {
