@@ -8,7 +8,7 @@ object Version {
   val latest = Isa2014
 }
 
-case class Version private(identifier: String) {
+case class Version(identifier: String) {
   final override def toString: String =
     s"<Isabelle$identifier>"
 }

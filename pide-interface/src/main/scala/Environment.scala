@@ -4,10 +4,16 @@ import java.nio.file.Path
 
 import scala.concurrent.ExecutionContext
 
-abstract class Environment private[isabelle](home: Path) {
+object Environment {
 
-  val version =
-    getClass().getAnnotation(classOf[Implementation]).version
+  private[isabelle] def getVersion(clazz: Class[_ <: Environment]): Option[Version] =
+    Option(clazz.getAnnotation(classOf[Implementation]).version).map(Version.apply)
+
+}
+
+abstract class Environment private[isabelle](home: Path) { self =>
+
+  val version = Environment.getVersion(getClass()).get
 
   override def toString: String =
     s"$version at $home"
@@ -37,7 +43,7 @@ abstract class Environment private[isabelle](home: Path) {
 
   case class Configuration(path: Option[Path], session: String) {
     override def toString: String =
-      s"session $session" + path.map(p => s" at $p").getOrElse("") + s" for $toString"
+      s"session $session" + path.map(p => s" at $p").getOrElse("") + s" for $self"
   }
 
 

@@ -69,7 +69,7 @@ object System {
       }
     }
 
-    def mkOperationState[T0](observer0: env.Observer[T0]) = {
+    def makeOperationState[T0](observer0: env.Observer[T0]) = {
       val state = new OperationState {
         type T = T0
         val firehose = false
@@ -110,7 +110,7 @@ object System {
 
       def invoke[I, O](operation: Operation[I, O])(arg: I) = {
         val args0 = List(count.toString, operation.name, env.toYXML(operation.encode(env)(arg)))
-        val state = mkOperationState(operation.observer(env))
+        val state = makeOperationState(operation.observer(env))
         self.synchronized {
           pending += (count -> state)
           count += 1
