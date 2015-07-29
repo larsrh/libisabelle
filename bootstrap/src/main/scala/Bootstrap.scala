@@ -1,17 +1,40 @@
-import java.nio.file._
+package edu.tum.cs.isabelle.bootstrap
+
+import java.net.URL
+import java.nio.file.Paths
+
 import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
+
 import edu.tum.cs.isabelle._
+import edu.tum.cs.isabelle.api._
 import edu.tum.cs.isabelle.setup._
 
-object Bootstrap extends App {
+object Bootstrap {
 
-  println("Downloading and untarring latest supported Isabelle")
-  val env = Await.result(Setup.defaultSetup, duration.Duration.Inf)
-  println(s"Successfully set up latest Isabelle: $env")
-  val config = Configuration.fromPath(Paths.get("."), "Protocol")
-  val built = System.build(env, config)
+  val implementations = Implementations.empty.addAll(
+    BuildInfo.getClass.getDeclaredMethods.filter(_.getName startsWith "Isa").toList.map { m =>
+      val urls = m.invoke(BuildInfo).asInstanceOf[Seq[URL]]
+      Implementations.Entry(urls.toList, "edu.tum.cs.isabelle.impl.Environment")
+    }
+  ).get
+
+}
+
+object BootstrapApp extends App {
+
+  val version = Version(args(0))
+  println(s"Downloading and untarring $version ...")
+  val setup = Await.result(Setup.defaultSetup(version), duration.Duration.Inf)
+  println("Loading an environment ...")
+  val env = setup.makeEnvironment(Bootstrap.implementations).get
+  println("Creating a configuration with default session ...")
+  val config = env.Configuration.fromPath(Paths.get("."), "Protocol")
+  println("Building session ...")
+  val built = System.build(env)(config)
   if (built)
-    println(s"Successfully built configuration: $config")
+    println(s"Success.")
+  else
+    sys.error("Failed.")
 
 }

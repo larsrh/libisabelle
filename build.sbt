@@ -25,25 +25,24 @@ lazy val noPublishSettings = Seq(
   publishArtifact := false
 )
 
-lazy val parserCombinators = Seq(
-  libraryDependencies ++= {
-    if (scalaVersion.value startsWith "2.10")
-      Seq()
-    else
-      Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4")
-  }
-)
-
 
 lazy val root = project.in(file("."))
   .settings(standardSettings)
   .settings(noPublishSettings)
-  .aggregate(pideInterface, libisabelle, setup, pideCore2014, pideImpl2014, pideCore2015, pideImpl2015)
+  .aggregate(pideInterface, libisabelle, setup, pide2014, pide2015, bootstrap)
 
 lazy val pideInterface = project.in(file("pide-interface"))
   .settings(moduleName := "pide-interface")
   .settings(standardSettings)
   .settings(warningSettings)
+  .settings(Seq(
+    libraryDependencies ++= {
+      if (scalaVersion.value startsWith "2.10")
+        Seq()
+      else
+        Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4")
+    }
+  ))
 
 lazy val libisabelle = project
   .dependsOn(pideInterface)
@@ -58,7 +57,7 @@ lazy val libisabelle = project
   )
 
 lazy val setup = project.in(file("setup"))
-  .dependsOn(pideInterface)
+  .dependsOn(libisabelle, pideInterface)
   .settings(standardSettings)
   .settings(warningSettings)
   .settings(
@@ -70,24 +69,35 @@ lazy val setup = project.in(file("setup"))
     )
   )
 
-lazy val pideCore2014 = project.in(file("pide-core/2014"))
-  .settings(moduleName := "pide-core-2014")
+lazy val pide2014 = project.in(file("pide/2014"))
+  .dependsOn(pideInterface)
+  .settings(moduleName := s"pide-2014")
   .settings(standardSettings)
-  .settings(parserCombinators)
 
-lazy val pideCore2015 = project.in(file("pide-core/2015"))
-  .settings(moduleName := "pide-core-2015")
+lazy val pide2015 = project.in(file("pide/2015"))
+  .dependsOn(pideInterface)
+  .settings(moduleName := s"pide-2015")
   .settings(standardSettings)
-  .settings(parserCombinators)
 
-lazy val pideImpl2014 = project.in(file("pide-impl/2014"))
-  .dependsOn(pideInterface, pideCore2014)
-  .settings(moduleName := "pide-impl-2014")
+lazy val versions = Map(
+  "2014" -> pide2014,
+  "2015" -> pide2015
+)
+
+lazy val bootstrap = project.in(file("bootstrap"))
+  .dependsOn(libisabelle, setup, pideInterface)
+  .settings(noPublishSettings)
   .settings(standardSettings)
   .settings(warningSettings)
-
-lazy val pideImpl2015 = project.in(file("pide-impl/2015"))
-  .dependsOn(pideInterface, pideCore2015)
-  .settings(moduleName := "pide-impl-2015")
-  .settings(standardSettings)
-  .settings(warningSettings)
+  .enablePlugins(BuildInfoPlugin)
+  .settings(
+    buildInfoPackage := "edu.tum.cs.isabelle.bootstrap",
+    buildInfoKeys ++= {
+      versions.toList.map { case (v, p) =>
+        BuildInfoKey.map(exportedProducts in (p, Runtime)) {
+          case (_, classFiles) =>
+            (s"Isa$v", (classFiles.map(_.data.toURI.toURL)))
+        }
+      }
+    }
+  )
