@@ -9,7 +9,7 @@ scala:
 script:
   - sbt ++$TRAVIS_SCALA_VERSION compile
   - sbt ++$TRAVIS_SCALA_VERSION "bootstrap/run $ISABELLE_VERSION"
-  - sbt ++$TRAVIS_SCALA_VERSION test
+  - sbt ++$TRAVIS_SCALA_VERSION "testOnly * -- isabelle.version $ISABELLE_VERSION"
 matrix:
   include:
     - jdk: oraclejdk8

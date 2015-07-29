@@ -3,13 +3,13 @@ package edu.tum.cs.isabelle.tests
 import scala.concurrent.duration._
 
 import org.specs2.Specification
-import org.specs2.concurrent.ExecutionEnv
+import org.specs2.specification.core.Env
 import org.specs2.matcher.Matcher
 
 import edu.tum.cs.isabelle._
 import edu.tum.cs.isabelle.api._
 
-class LibisabelleSpec(implicit specs2Env: ExecutionEnv) extends Specification with DefaultSetup { def is = s2"""
+class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetup { def is = s2"""
 
   Basic protocol interaction
 
@@ -19,6 +19,8 @@ class LibisabelleSpec(implicit specs2Env: ExecutionEnv) extends Specification wi
     reacts to requests      ${response must beRight("prop => prop => prop").awaitFor(30.seconds)}
     can be torn down        ${teardown must exist.awaitFor(30.seconds)}"""
 
+
+  implicit val ee = specs2Env.executionEnv
 
   val TypeOf = Operation.implicitly[String, String]("type_of")
 
