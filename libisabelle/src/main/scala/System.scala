@@ -10,7 +10,7 @@ object System {
   def build(env: Environment)(config: env.Configuration): Boolean =
     env.build(config) == 0
 
-  def create(env: Environment)(config: env.Configuration)(implicit ec: ExecutionContext): System = {
+  def create(env: Environment)(config: env.Configuration)(implicit ec: ExecutionContext): Future[System] = {
     class Output(name: String) {
       def unapply(markup: Markup): Option[Long] = markup match {
         case (env.protocolMarkup, (env.functionMarkup, `name`) :: ("id", id) :: Nil) =>
@@ -84,7 +84,7 @@ object System {
     val exitPromise = Promise[Unit]
 
     new System { self =>
-      def consumer(markup: Markup, body: env.XMLBody): Unit = (markup, body) match {
+      private def consumer(markup: Markup, body: env.XMLBody): Unit = (markup, body) match {
         case ((env.initMarkup, _), _) => initPromise.success(()); ()
         case ((env.exitMarkup, _), _) => exitPromise.success(()); ()
         case _ =>
@@ -95,12 +95,15 @@ object System {
           }
       }
 
+      private[isabelle] val promise = Promise[System]
+
       @volatile private var count = 0L
       @volatile private var pending = Map.empty[Long, OperationState]
 
-      val session = env.create(config, consumer)
+      private val session = env.create(config, consumer)
       initPromise.future foreach { _ =>
         env.sendOptions(session)
+        promise.success(self)
       }
 
       def dispose = {
@@ -118,12 +121,14 @@ object System {
         env.sendCommand(session, "libisabelle", args0)
         state.promise.future
       }
-    }
+    }.promise.future
   }
 
 }
 
 sealed abstract class System {
+  private[isabelle] val promise: Promise[System]
+
   def dispose: Future[Unit]
   def invoke[I, O](operation: Operation[I, O])(arg: I): Future[ProverResult[O]]
 }
