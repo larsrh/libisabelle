@@ -1,6 +1,6 @@
 package edu.tum.cs.isabelle
 
-import java.net.URLClassLoader
+import java.net.{URL, URLClassLoader}
 import java.nio.file.Path
 
 import scala.util.control.Exception._
@@ -10,13 +10,13 @@ import edu.tum.cs.isabelle.api._
 object Implementations extends App {
   def empty: Implementations = new Implementations(Map.empty)
 
-  case class Entry(paths: List[Path], name: String)
+  case class Entry(urls: List[URL], name: String)
 }
 
 class Implementations private(entries: Map[Version, Implementations.Entry]) {
 
   private def loadClass(entry: Implementations.Entry): Option[Class[_ <: Environment]] = {
-    val classLoader = new URLClassLoader(entry.paths.map(_.toUri.toURL).toArray, Thread.currentThread.getContextClassLoader)
+    val classLoader = new URLClassLoader(entry.urls.toArray, Thread.currentThread.getContextClassLoader)
     catching(classOf[ClassCastException]) opt classLoader.loadClass(entry.name).asSubclass(classOf[Environment])
   }
 
