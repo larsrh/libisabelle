@@ -25,16 +25,37 @@ lazy val noPublishSettings = Seq(
   publishArtifact := false
 )
 
+lazy val parserCombinators = Seq(
+  libraryDependencies ++= {
+    if (scalaVersion.value startsWith "2.10")
+      Seq()
+    else
+      Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4")
+  }
+)
+
 
 lazy val root = project.in(file("."))
   .settings(standardSettings)
   .settings(noPublishSettings)
-  .aggregate(pideInterface, setup, pideImpl2014, libisabelle)
+  .aggregate(pideInterface, libisabelle, setup, pideCore2014, pideImpl2014, pideCore2015, pideImpl2015)
 
 lazy val pideInterface = project.in(file("pide-interface"))
   .settings(moduleName := "pide-interface")
   .settings(standardSettings)
   .settings(warningSettings)
+
+lazy val libisabelle = project
+  .dependsOn(pideInterface)
+  .settings(standardSettings)
+  .settings(warningSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.specs2" %% "specs2-core" % "3.6.3" % "test",
+      "org.specs2" %% "specs2-scalacheck" % "3.6.3" % "test",
+      "org.scalacheck" %% "scalacheck" % "1.12.2" % "test"
+    )
+  )
 
 lazy val setup = project.in(file("setup"))
   .dependsOn(pideInterface)
@@ -52,14 +73,12 @@ lazy val setup = project.in(file("setup"))
 lazy val pideCore2014 = project.in(file("pide-core/2014"))
   .settings(moduleName := "pide-core-2014")
   .settings(standardSettings)
-  .settings(
-    libraryDependencies ++= {
-      if (scalaVersion.value startsWith "2.10")
-        Seq()
-      else
-        Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4")
-    }
-  )
+  .settings(parserCombinators)
+
+lazy val pideCore2015 = project.in(file("pide-core/2015"))
+  .settings(moduleName := "pide-core-2015")
+  .settings(standardSettings)
+  .settings(parserCombinators)
 
 lazy val pideImpl2014 = project.in(file("pide-impl/2014"))
   .dependsOn(pideInterface, pideCore2014)
@@ -67,14 +86,8 @@ lazy val pideImpl2014 = project.in(file("pide-impl/2014"))
   .settings(standardSettings)
   .settings(warningSettings)
 
-lazy val libisabelle = project
-  .dependsOn(pideInterface)
+lazy val pideImpl2015 = project.in(file("pide-impl/2015"))
+  .dependsOn(pideInterface, pideCore2015)
+  .settings(moduleName := "pide-impl-2015")
   .settings(standardSettings)
   .settings(warningSettings)
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.specs2" %% "specs2-core" % "3.6.3" % "test",
-      "org.specs2" %% "specs2-scalacheck" % "3.6.3" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.12.2" % "test"
-    )
-  )
