@@ -1,1 +1,3 @@
-libisabelle/src/main/isabelle/Protocol
+libisabelle/src/main/isabelle-common
+libisabelle/src/main/isabelle-2014
+libisabelle/src/main/isabelle-2015

@@ -29,7 +29,7 @@ object BootstrapApp extends App {
   println("Loading an environment ...")
   val env = setup.makeEnvironment(Bootstrap.implementations).get
   println("Creating a configuration with default session ...")
-  val config = env.Configuration.fromPath(Paths.get("."), "Protocol")
+  val config = env.Configuration.fromPath(Paths.get("."), s"Protocol${version.identifier}")
   println("Building session ...")
   val built = System.build(env)(config)
   if (built)

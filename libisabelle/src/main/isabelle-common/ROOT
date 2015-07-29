@@ -1,0 +1,3 @@
+session Codec = Pure +
+  theories
+    Codec_Test
