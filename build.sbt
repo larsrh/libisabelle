@@ -1,5 +1,6 @@
 lazy val standardSettings = Seq(
-  organization := "cs.tum.edu.isabelle",
+  organization := "info.hupel",
+  version := "0.1-SNAPSHOT",
   scalaVersion := "2.11.7",
   crossScalaVersions := Seq("2.10.5", "2.11.7", "2.12.0-M2"),
   javacOptions += "-Xlint:unchecked"
