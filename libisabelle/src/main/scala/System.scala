@@ -10,6 +10,9 @@ object System {
   def build(env: Environment)(config: env.Configuration): Boolean =
     env.build(config) == 0
 
+  def createWithDefaultContext(env: Environment)(config: env.Configuration): Future[System] =
+    create(env)(config)(env.executionContext)
+
   def create(env: Environment)(config: env.Configuration)(implicit ec: ExecutionContext): Future[System] = {
     class Output(name: String) {
       def unapply(markup: Markup): Option[Long] = markup match {
