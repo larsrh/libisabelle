@@ -29,7 +29,7 @@ lazy val noPublishSettings = Seq(
 lazy val root = project.in(file("."))
   .settings(standardSettings)
   .settings(noPublishSettings)
-  .aggregate(pideInterface, libisabelle, setup, pide2014, pide2015, bootstrap)
+  .aggregate(pideInterface, libisabelle, setup, pide2014, pide2015, bootstrap, tests)
 
 lazy val pideInterface = project.in(file("pide-interface"))
   .settings(moduleName := "pide-interface")
@@ -48,13 +48,6 @@ lazy val libisabelle = project
   .dependsOn(pideInterface)
   .settings(standardSettings)
   .settings(warningSettings)
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.specs2" %% "specs2-core" % "3.6.3" % "test",
-      "org.specs2" %% "specs2-scalacheck" % "3.6.3" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.12.2" % "test"
-    )
-  )
 
 lazy val setup = project.in(file("setup"))
   .dependsOn(libisabelle, pideInterface)
@@ -100,4 +93,17 @@ lazy val bootstrap = project.in(file("bootstrap"))
         }
       }
     }
+  )
+
+lazy val tests = project.in(file("tests"))
+  .dependsOn(bootstrap)
+  .settings(noPublishSettings)
+  .settings(standardSettings)
+  .settings(warningSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.specs2" %% "specs2-core" % "3.6.3" % "test",
+      "org.specs2" %% "specs2-scalacheck" % "3.6.3" % "test",
+      "org.scalacheck" %% "scalacheck" % "1.12.2" % "test"
+    )
   )

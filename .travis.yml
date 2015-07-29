@@ -11,6 +11,7 @@ scala:
 script:
   - sbt ++$TRAVIS_SCALA_VERSION compile
   - sbt ++$TRAVIS_SCALA_VERSION "bootstrap/run $ISABELLE_VERSION"
+  - sbt ++$TRAVIS_SCALA_VERSION test
 matrix:
   exclude:
     - jdk: openjdk7
