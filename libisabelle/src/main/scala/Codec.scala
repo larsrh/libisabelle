@@ -1,18 +1,18 @@
 package edu.tum.cs.isabelle
 
 import scala.math.BigInt
+import scala.util.control.Exception._
 
-import isabelle._
-
+import edu.tum.cs.isabelle.api._
 
 object Codec {
 
-  private def addTag(tag: String, idx: Option[Int], body: XML.Body): XML.Tree =
-    XML.Elem(Markup("tag", ("type" -> tag) :: idx.map(i => List("idx" -> i.toString)).getOrElse(Nil)), body)
+  private def addTag(env: Environment)(tag: String, idx: Option[Int], body: env.XMLBody) =
+    env.elem(("tag", ("type" -> tag) :: idx.map(i => List("idx" -> i.toString)).getOrElse(Nil)), body)
 
-  private def expectTag(tag: String, tree: XML.Tree) =
-    tree match {
-      case XML.Elem(Markup("tag", List(("type", tag0))), body) =>
+  private def expectTag(env: Environment)(tag: String, tree: env.XMLTree) =
+    env.destTree(tree) match {
+      case Right((("tag", List(("type", tag0))), body)) =>
         if (tag == tag0)
           Right(body)
         else
@@ -21,13 +21,14 @@ object Codec {
         Left("tag expected" -> List(tree))
     }
 
-  private def expectIndexedTag(tag: String, tree: XML.Tree) =
-    tree match {
-      case XML.Elem(Markup("tag", List(("type", tag0), ("idx", i))), body) =>
+  private def expectIndexedTag(env: Environment)(tag: String, tree: env.XMLTree) =
+    env.destTree(tree) match {
+      case Right((("tag", List(("type", tag0), ("idx", i))), body)) =>
         if (tag == tag0)
           try {
             Right(i.toInt -> body)
-          } catch {
+          }
+          catch {
             case ex: NumberFormatException =>
               Left(ex.toString -> List(tree))
           }
@@ -37,43 +38,31 @@ object Codec {
         Left("indexed tag expected" -> List(tree))
     }
 
-  def id: Codec[XML.Tree] = new Codec[XML.Tree] {
-    def encode(t: XML.Tree) = t
-    def decode(tree: XML.Tree) = Right(tree)
-  }
-
-
-  implicit def string: Codec[String] = new Codec[String] {
-    // FIXME replace by own routines with escape handling
-    def encode(t: String) = addTag("string", None, XML.Encode.string(t))
-    def decode(tree: XML.Tree) =
-      expectTag("string", tree).right.flatMap { body =>
-        try {
-          Right(XML.Decode.string(body))
-        } catch {
-          case err: XML.Error =>
-            Left("decoding failed" -> body)
+  private def text[A](to: A => String, from: String => Option[A]): Codec[A] = new Codec[A] {
+    // FIXME escape handling
+    def encode(env: Environment)(t: A): env.XMLTree = env.text(to(t))
+    def decode(env: Environment)(tree: env.XMLTree) = env.destTree(tree) match {
+      case Left(content) =>
+        from(content) match {
+          case Some(a) => Right(a)
+          case None => Left("decoding failed" -> List(tree))
         }
-      }
+      case _ =>
+        Left("expected text tree" -> List(tree))
+    }
   }
 
-  implicit def integer: Codec[BigInt] = new Codec[BigInt] {
-    def encode(t: BigInt) = addTag("int", None, XML.Encode.string(t.toString))
-    def decode(tree: XML.Tree) =
-      expectTag("int", tree).right.flatMap { body =>
-        try {
-          Right(BigInt(XML.Decode.string(body)))
-        } catch {
-          case _: XML.Error | _: NumberFormatException =>
-            Left("decoding failed" -> body)
-        }
-      }
-  }
+  implicit def string: Codec[String] = text[String](identity, Some.apply).tagged("string")
+
+  implicit def integer: Codec[BigInt] = text[BigInt](
+    _.toString,
+    str => catching(classOf[NumberFormatException]) opt BigInt(str)
+  ).tagged("int")
 
   implicit def unit: Codec[Unit] = new Codec[Unit] {
-    def encode(u: Unit) = addTag("unit", None, Nil)
-    def decode(tree: XML.Tree) =
-      expectTag("unit", tree).right.flatMap {
+    def encode(env: Environment)(u: Unit): env.XMLTree = addTag(env)("unit", None, Nil)
+    def decode(env: Environment)(tree: env.XMLTree) =
+      expectTag(env)("unit", tree).right.flatMap {
         case Nil => Right(())
         case body => Left("expected nothing" -> body)
       }
@@ -85,52 +74,60 @@ object Codec {
   implicit def tuple[A : Codec, B : Codec]: Codec[(A, B)] =
     Codec[A] tuple Codec[B]
 
-  def variant[A](enc: A => (Int, XML.Tree), tryDec: Int => Option[XML.Tree => Result[A]], tag: String): Codec[A] = new Codec[A] {
-    def encode(a: A) = {
-      val (idx, tree) = enc(a)
-      addTag(tag, Some(idx), List(tree))
+  // FIXME can't inline because scalac bug
+  // used to be this:
+  // def variant[A]
+  //   (env: Environment)
+  //   (enc: A => (Int, env.XMLTree), tryDec: Int => Option[env.XMLTree => Result[A]], tag: String): Codec[A]
+  private abstract class Variant[A] {
+    def enc(env: Environment, a: A): (Int, env.XMLTree)
+    def dec(env: Environment, idx: Int): Option[env.XMLTree => XMLResult[A]]
+
+    def toCodec(tag: String): Codec[A] = new Codec[A] {
+      def encode(env: Environment)(a: A): env.XMLTree = {
+        val (idx, tree) = enc(env, a)
+        addTag(env)(tag, Some(idx), List(tree))
+      }
+      def decode(env: Environment)(tree: env.XMLTree) = expectIndexedTag(env)(tag, tree).right.flatMap {
+        case (idx, List(tree)) =>
+          dec(env, idx) match {
+            case Some(dec) => dec(tree)
+            case None => Left(s"invalid index $idx" -> List(tree))
+          }
+        case _ =>
+          Left("invalid structure" -> List(tree))
+      }
     }
-    def decode(tree: XML.Tree) = expectIndexedTag(tag, tree).right.flatMap {
-      case (idx, List(tree)) =>
-        tryDec(idx) match {
-          case Some(dec) => dec(tree)
-          case None => Left(s"invalid index $idx" -> List(tree))
-        }
-      case _ =>
-        Left("invalid structure" -> List(tree))
-    }
+
   }
 
-  implicit def option[A : Codec]: Codec[Option[A]] =
-    variant(
-      _.fold((1, Codec[Unit].encode(())))(a => (0, Codec[A].encode(a))),
-      {
-        case 0 => Some(Codec[A].decode(_).right.map(Some.apply))
-        case 1 => Some(Codec[Unit].decode(_).right.map(_ => None))
-        case _ => None
-      },
-      "option"
-    )
+  implicit def option[A : Codec]: Codec[Option[A]] = new Variant[Option[A]] {
+    def enc(env: Environment, a: Option[A]): (Int, env.XMLTree) = a match {
+      case Some(a) => (0, Codec[A].encode(env)(a))
+      case None    => (1, Codec[Unit].encode(env)(()))
+    }
+    def dec(env: Environment, idx: Int): Option[env.XMLTree => XMLResult[Option[A]]] = idx match {
+      case 0 => Some(Codec[A].decode(env)(_).right.map(Some.apply))
+      case 1 => Some(Codec[Unit].decode(env)(_).right.map(_ => None))
+      case _ => None
+    }
+  } toCodec "option"
 
-  implicit def tree: Codec[XML.Tree] = id.tagged("XML.tree")
-  implicit def body: Codec[XML.Body] = id.list
-
+  // FIXME use text[Throwable]
   implicit def exn: Codec[Throwable] =
     Codec[String].transform(new RuntimeException(_), _.getMessage)
 
-  implicit def exnResult[A : Codec]: Codec[Exn.Result[A]] =
-    variant(
-      {
-        case Exn.Res(a) => (0, Codec[A].encode(a))
-        case Exn.Exn(e) => (1, Codec[Throwable].encode(e))
-      },
-      {
-        case 0 => Some(Codec[A].decode(_).right.map(Exn.Res.apply))
-        case 1 => Some(Codec[Throwable].decode(_).right.map(Exn.Exn.apply))
-        case _ => None
-      },
-      "Exn.result"
-    )
+  implicit def proverResult[A : Codec]: Codec[ProverResult[A]] = new Variant[ProverResult[A]] {
+    def enc(env: Environment, a: ProverResult[A]): (Int, env.XMLTree) = a match {
+      case Right(a) => (0, Codec[A].encode(env)(a))
+      case Left(e)  => (1, Codec[Throwable].encode(env)(e))
+    }
+    def dec(env: Environment, idx: Int): Option[env.XMLTree => XMLResult[ProverResult[A]]] = idx match {
+      case 0 => Some(Codec[A].decode(env)(_).right.map(Right.apply))
+      case 1 => Some(Codec[Throwable].decode(env)(_).right.map(Left.apply))
+      case _ => None
+    }
+  } toCodec "Exn.result"
 
   def apply[A](implicit A: Codec[A]): Codec[A] = A
 
@@ -138,40 +135,53 @@ object Codec {
 
 trait Codec[T] { self =>
 
-  def encode(t: T): XML.Tree
-  def decode(tree: XML.Tree): Result[T]
+  def encode(env: Environment)(t: T): env.XMLTree
+  def decode(env: Environment)(tree: env.XMLTree): XMLResult[T]
 
   def transform[U](f: T => U, g: U => T): Codec[U] = new Codec[U] {
-    def encode(u: U) = self.encode(g(u))
-    def decode(tree: XML.Tree) = self.decode(tree).right.map(f)
+    def encode(env: Environment)(u: U): env.XMLTree = self.encode(env)(g(u))
+    def decode(env: Environment)(tree: env.XMLTree) = self.decode(env)(tree).right.map(f)
   }
 
   def list: Codec[List[T]] = new Codec[List[T]] {
-    def encode(ts: List[T]) =
-      Codec.addTag("list", None, ts.map(self.encode))
-    def decode(tree: XML.Tree) =
-      Codec.expectTag("list", tree).right.flatMap(_.traverse(self.decode))
+    def encode(env: Environment)(ts: List[T]): env.XMLTree =
+      Codec.addTag(env)("list", None, ts.map(t => self.encode(env)(t)))
+    def decode(env: Environment)(tree: env.XMLTree) =
+      Codec.expectTag(env)("list", tree).right.flatMap(_.traverse(self.decode(env)))
   }
 
   def tuple[U](that: Codec[U]): Codec[(T, U)] = new Codec[(T, U)] {
-    def encode(tu: (T, U)) =
-      Codec.addTag("tuple", None, List(self.encode(tu._1), that.encode(tu._2)))
-    def decode(tree: XML.Tree) =
-      Codec.expectTag("tuple", tree).right.flatMap {
+    def encode(env: Environment)(tu: (T, U)): env.XMLTree =
+      Codec.addTag(env)("tuple", None, List(self.encode(env)(tu._1), that.encode(env)(tu._2)))
+    def decode(env: Environment)(tree: env.XMLTree) =
+      Codec.expectTag(env)("tuple", tree).right.flatMap {
         case List(x, y) =>
-          for { t <- self.decode(x).right; u <- that.decode(y).right } yield (t, u)
+          for { t <- self.decode(env)(x).right; u <- that.decode(env)(y).right } yield (t, u)
         case body =>
           Left("invalid structure" -> body)
       }
   }
 
   def tagged(tag: String): Codec[T] = new Codec[T] {
-    def encode(t: T) = Codec.addTag(tag, None, List(self.encode(t)))
-    def decode(tree: XML.Tree) =
-      Codec.expectTag(tag, tree).right.flatMap {
-        case List(tree) => self.decode(tree)
+    def encode(env: Environment)(t: T): env.XMLTree = Codec.addTag(env)(tag, None, List(self.encode(env)(t)))
+    def decode(env: Environment)(tree: env.XMLTree) =
+      Codec.expectTag(env)(tag, tree).right.flatMap {
+        case List(tree) => self.decode(env)(tree)
         case body => Left("invalid structure" -> body)
       }
   }
+
+}
+
+abstract class SimpleCodec[T] extends Codec[T] {
+
+  def enc(t: T): XMLTree
+  def dec(tree: XMLTree): XMLResult[T]
+
+  override final def encode(env: Environment)(t: T): env.XMLTree =
+    enc(t).toGeneric(env)
+
+  override final def decode(env: Environment)(tree: env.XMLTree): XMLResult[T] =
+    dec(XMLTree.fromGeneric(env)(tree))
 
 }

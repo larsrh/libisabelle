@@ -1,186 +1,137 @@
 package edu.tum.cs.isabelle
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
-import scala.util.{Failure, Success, Try}
+import scala.util.control.Exception._
 
-import isabelle._
-
-import edu.tum.cs.isabelle.setup.{Configuration, Environment}
+import edu.tum.cs.isabelle.api._
 
 object System {
 
-  def build(env: Environment, config: Configuration): Boolean = {
-    Isabelle_System.init(isabelle_home = env.home.toAbsolutePath.toString)
+  def build(env: Environment)(config: env.Configuration): Boolean =
+    env.build(config) == 0
 
-    val path = config.path.map(f => Path.explode(f.toAbsolutePath.toString))
+  def createWithDefaultContext(env: Environment)(config: env.Configuration): Future[System] =
+    create(env)(config)(env.executionContext)
 
-    val rc = Build.build(
-      options = Options.init(),
-      progress = new Build.Console_Progress(verbose = true),
-      build_heap = true,
-      dirs = path.toList,
-      verbose = true,
-      sessions = List(config.session)
-    )
-
-    rc == 0
-  }
-
-  def instance(env: Environment, config: Configuration)(implicit ec: ExecutionContext): Future[System] = {
-    Isabelle_System.init(isabelle_home = env.home.toAbsolutePath.toString)
-
-    val path = config.path.map(f => Path.explode(f.toAbsolutePath.toString))
-
-    startSession(path, config.session) map { case (options, session) =>
-      new System(options, session)
-    }
-  }
-
-
-  private def mkPhaseListener(session: Session, phase: Session.Phase)(implicit ec: ExecutionContext): Future[Unit] = {
-    val promise = Promise[Unit]
-    val consumer = Session.Consumer[Session.Phase]("phase-listener") {
-      case `phase` => promise.trySuccess(()); ()
-      case _ =>
-    }
-    session.phase_changed += consumer
-    val future = promise.future
-    future foreach { _ => session.phase_changed -= consumer }
-    future
-  }
-
-  private def sendOptions(session: Session, options: Options)(implicit ec: ExecutionContext): Future[Unit] =
-    Future {
-      session.protocol_command("Prover.options", YXML.string_of_body(options.encode))
+  def create(env: Environment)(config: env.Configuration)(implicit ec: ExecutionContext): Future[System] = {
+    class Output(name: String) {
+      def unapply(markup: Markup): Option[Long] = markup match {
+        case (env.protocolMarkup, (env.functionMarkup, `name`) :: ("id", id) :: Nil) =>
+          catching(classOf[NumberFormatException]) opt id.toLong
+        case _ =>
+          None
+      }
     }
 
-  private def startSession(path: Option[Path], sessionName: String)(implicit ec: ExecutionContext): Future[(Options, Session)] = {
-    val options = Options.init()
-
-    val content = Build.session_content(options, false, path.toList, sessionName)
-    val resources = new Resources(content.loaded_theories, content.known_theories, content.syntax)
-
-    val session = new Session(resources)
-
-    val result =
-      for {
-        () <- mkPhaseListener(session, Session.Ready)
-        () <- sendOptions(session, options)
-      } yield (options, session)
-
-    session.start("Isabelle" /* name is ignored anyway */, List("-r", "-q", sessionName))
-    result
-  }
-
-
-  private class Output(name: String) {
-    def unapply(props: Properties.T): Option[Long] = props match {
-      case
-        (Markup.FUNCTION, `name`) ::
-        ("id", Properties.Value.Long(id)) :: Nil => Some(id)
-      case _ => None
-    }
-  }
-
-  private object Output {
     object Response extends Output("libisabelle_response")
     object Start extends Output("libisabelle_start")
     object Stop extends Output("libisabelle_stop")
-  }
 
+    trait OperationState { self =>
+      type T
+      val firehose: Boolean
+      val observer: env.Observer[T]
+      val promise: Promise[ProverResult[T]]
 
-  private trait OperationState { self =>
-    type T
-    val firehose: Boolean
-    val observer: Observer[T]
-    val promise: Promise[Exn.Result[T]]
+      def withFirehose(firehose0: Boolean) = new OperationState {
+        type T = self.T
+        val firehose = firehose0
+        val observer = self.observer
+        val promise = self.promise
+      }
 
-    def withFirehose(firehose0: Boolean) = new OperationState {
-      type T = self.T
-      val firehose = firehose0
-      val observer = self.observer
-      val promise = self.promise
-    }
+      def withObserver(observer0: env.Observer[T]) = new OperationState {
+        type T = self.T
+        val firehose = self.firehose
+        val observer = observer0
+        val promise = self.promise
+      }
 
-    def withObserver(observer0: Observer[T]) = new OperationState {
-      type T = self.T
-      val firehose = self.firehose
-      val observer = observer0
-      val promise = self.promise
-    }
+      def tryComplete() = observer match {
+        case env.Observer.Success(t) => promise.success(t); true
+        case env.Observer.Failure(err) => promise.failure(err); true
+        case _  => false
+      }
 
-    def tryComplete() = observer match {
-      case Observer.Success(t) => promise.success(t); true
-      case Observer.Failure(err) => promise.failure(err); true
-      case _  => false
-    }
-
-    def advance(id: Long, msg: Prover.Message) = observer match {
-      case Observer.More(step, finish) => msg match {
-        case msg: Prover.Protocol_Output =>
-          msg.properties match {
-            case Output.Response(id1) if id == id1 =>
-              withObserver(finish(YXML.parse(msg.text)))
-            case Output.Start(id1) if id == id1 && !firehose =>
+      def advance(id: Long, markup: Markup, body: env.XMLBody) = observer match {
+        case env.Observer.More(step, finish) =>
+          (markup, body) match {
+            case (Response(id1), List(tree)) if id == id1 =>
+              withObserver(finish(tree))
+            case (Start(id1), _) if id == id1 && !firehose =>
               withFirehose(true)
-            case Output.Stop(id1) if id == id1 && firehose =>
+            case (Stop(id1), _) if id == id1 && firehose =>
               withFirehose(false)
             case _ if firehose =>
-              withObserver(step(msg))
+              withObserver(step(env.elem(markup, body)))
             case _ =>
               this
           }
-        case _ if firehose =>
-          withObserver(step(msg))
         case _ =>
           this
       }
-      case _ =>
-        this
     }
 
-  }
-
-  private def mkOperationState[T0](observer0: Observer[T0]) = {
-    val state = new OperationState {
-      type T = T0
-      val firehose = false
-      val observer = observer0
-      val promise = Promise[Exn.Result[T]]
+    def makeOperationState[T0](observer0: env.Observer[T0]) = {
+      val state = new OperationState {
+        type T = T0
+        val firehose = false
+        val observer = observer0
+        val promise = Promise[ProverResult[T]]
+      }
+      state.tryComplete()
+      state
     }
-    state.tryComplete()
-    state
+
+    val initPromise = Promise[Unit]
+    val exitPromise = Promise[Unit]
+
+    new System { self =>
+      private def consumer(markup: Markup, body: env.XMLBody): Unit = (markup, body) match {
+        case ((env.initMarkup, _), _) => initPromise.success(()); ()
+        case ((env.exitMarkup, _), _) => exitPromise.success(()); ()
+        case _ =>
+          self.synchronized {
+            pending =
+              pending.map { case (id, state) => id -> state.advance(id, markup, body) }
+                     .filterNot(_._2.tryComplete())
+          }
+      }
+
+      private[isabelle] val promise = Promise[System]
+
+      @volatile private var count = 0L
+      @volatile private var pending = Map.empty[Long, OperationState]
+
+      private val session = env.create(config, consumer)
+      initPromise.future foreach { _ =>
+        env.sendOptions(session)
+        promise.success(self)
+      }
+
+      def dispose = {
+        env.dispose(session)
+        exitPromise.future
+      }
+
+      def invoke[I, O](operation: Operation[I, O])(arg: I) = {
+        val args0 = List(count.toString, operation.name, env.toYXML(operation.encode(env)(arg)))
+        val state = makeOperationState(operation.observer(env))
+        self.synchronized {
+          pending += (count -> state)
+          count += 1
+        }
+        env.sendCommand(session, "libisabelle", args0)
+        state.promise.future
+      }
+    }.promise.future
   }
 
 }
 
-class System private(options: Options, session: Session)(implicit ec: ExecutionContext) { self =>
+sealed abstract class System {
+  private[isabelle] val promise: Promise[System]
 
-  @volatile private var count = 0L
-  @volatile private var pending = Map.empty[Long, System.OperationState]
-
-  session.all_messages += Session.Consumer[Prover.Message]("firehose") { msg =>
-    self.synchronized {
-      pending = pending.map { case (id, state) => id -> state.advance(id, msg) }.filterNot(_._2.tryComplete())
-    }
-  }
-
-  def dispose: Future[Unit] = {
-    // FIXME kill pending executions
-    val future = System.mkPhaseListener(session, Session.Inactive)
-    session.stop()
-    future
-  }
-
-  def invoke[I, O](operation: Operation[I, O])(arg: I): Future[Exn.Result[O]] = {
-    val args0 = List(count.toString, operation.name, YXML.string_of_tree(operation.encode(arg)))
-    val state = System.mkOperationState(operation.observer)
-    synchronized {
-      pending += (count -> state)
-      count += 1
-    }
-    session.protocol_command("libisabelle", args0: _*)
-    state.promise.future
-  }
-
+  def dispose: Future[Unit]
+  def invoke[I, O](operation: Operation[I, O])(arg: I): Future[ProverResult[O]]
 }

@@ -4,10 +4,10 @@ import java.nio.file.{Files, Path, Paths}
 
 import scala.concurrent.{Future, ExecutionContext}
 
-object Setup {
+import edu.tum.cs.isabelle.Implementations
+import edu.tum.cs.isabelle.api.{Environment, Version}
 
-  def defaultVersion =
-    Version.latest
+object Setup {
 
   def defaultBasePath =
     Paths.get("contrib")
@@ -15,27 +15,38 @@ object Setup {
   def defaultPlatform =
     Platform.guess
 
-  private def defaultInstallTo(path: Path)(implicit ec: ExecutionContext) =
-    defaultPlatform.flatMap(defaultVersion.url) match {
+  private def defaultInstallTo(path: Path, version: Version)(implicit ec: ExecutionContext) =
+    defaultPlatform.flatMap(_.url(version)) match {
       case None =>
         sys.error("couldn't determine URL")
       case Some(url) =>
         val stream = Tar.download(url)
-        Tar.extractTo(path, stream).map(Environment(_, defaultVersion))
+        Tar.extractTo(path, stream).map(Setup(_, version))
     }
 
-  def defaultSetup(implicit ec: ExecutionContext): Future[Environment] =
-    defaultVersion detectEnvironment defaultBasePath match {
+  def temporarySetup(version: Version)(implicit ec: ExecutionContext): Future[Setup] =
+    defaultInstallTo(Files.createTempDirectory("libisabelle").toRealPath(), version)
+
+  def detectSetup(base: Path, version: Version): Option[Setup] = {
+    val path = base resolve s"Isabelle${version.identifier}"
+    if (Files.isDirectory(path))
+      Some(Setup(path, version))
+    else
+      None
+  }
+
+  def defaultSetup(version: Version)(implicit ec: ExecutionContext): Future[Setup] =
+    detectSetup(defaultBasePath, version) match {
       case Some(install) =>
         Future.successful(install)
       case None =>
-        defaultInstallTo(defaultBasePath)
+        defaultInstallTo(defaultBasePath, version)
     }
 
-  def temporarySetup(implicit ec: ExecutionContext): Future[Environment] =
-    defaultInstallTo(Files.createTempDirectory("libisabelle").toRealPath())
 
-  def guessEnvironment(path: Path): Option[Environment] =
-    Version.all.flatMap(_.detectEnvironment(path)).headOption
+}
 
+case class Setup(home: Path, version: Version) {
+  def makeEnvironment(impls: Implementations): Option[Environment] =
+    impls.makeEnvironment(home, version)
 }

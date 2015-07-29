@@ -2,14 +2,9 @@ package edu.tum.cs.isabelle
 
 import scala.concurrent.ExecutionContext
 
-import isabelle.XML
+import edu.tum.cs.isabelle.api.Environment
 
-case class DecodingException(msg: String, body: XML.Body) extends RuntimeException(msg)
-
-object defaults {
-  implicit lazy val isabelleExecutionContext: ExecutionContext =
-    isabelle.Future.execution_context
-}
+case class DecodingException(msg: String, body: Environment#XMLBody) extends RuntimeException(msg)
 
 object `package` {
 
@@ -29,6 +24,6 @@ object `package` {
     }
   }
 
-  type Result[+A] = Either[(String, XML.Body), A]
+  type XMLResult[+A] = Either[(String, Environment#XMLBody), A]
 
 }
