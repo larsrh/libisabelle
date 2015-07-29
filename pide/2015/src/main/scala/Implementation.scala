@@ -1,6 +1,7 @@
 package edu.tum.cs.isabelle.impl
 
 import java.nio.file.Path
+import java.util.concurrent.{Executors, ThreadFactory}
 
 import scala.concurrent.ExecutionContext
 
@@ -10,6 +11,16 @@ import edu.tum.cs.isabelle.api
 class Environment(home: Path) extends api.Environment(home) {
 
   isabelle.Isabelle_System.init(isabelle_home = home.toAbsolutePath.toString)
+
+  private val defaultThreadFactory = isabelle.Simple_Thread.default_pool.getThreadFactory()
+
+  isabelle.Simple_Thread.default_pool.setThreadFactory(new ThreadFactory {
+    def newThread(r: Runnable) = {
+      val thread = defaultThreadFactory.newThread(r)
+      thread.setDaemon(true)
+      thread
+    }
+  })
 
   type XMLTree = isabelle.XML.Tree
 
@@ -43,7 +54,7 @@ class Environment(home: Path) extends api.Environment(home) {
     path.map(p => isabelle.Path.explode(p.toAbsolutePath.toString)).toList
 
 
-  def build(config: Configuration) = 
+  def build(config: Configuration) =
     isabelle.Build.build(
       options = options,
       progress = new isabelle.Build.Console_Progress(verbose = true),
