@@ -52,6 +52,7 @@ lazy val libisabelle = project
 
 lazy val setup = project.in(file("setup"))
   .dependsOn(libisabelle, pideInterface)
+  .settings(moduleName := s"libisabelle-setup")
   .settings(standardSettings)
   .settings(warningSettings)
   .settings(
