@@ -87,6 +87,8 @@ object System {
     val exitPromise = Promise[Unit]
 
     new System { self =>
+      val executionContext = ec
+
       private def consumer(markup: Markup, body: env.XMLBody): Unit = (markup, body) match {
         case ((env.initMarkup, _), _) => initPromise.success(()); ()
         case ((env.exitMarkup, _), _) => exitPromise.success(()); ()
@@ -131,6 +133,7 @@ object System {
 
 sealed abstract class System {
   private[isabelle] val promise: Promise[System]
+  implicit val executionContext: ExecutionContext
 
   def dispose: Future[Unit]
   def invoke[I, O](operation: Operation[I, O])(arg: I): Future[ProverResult[O]]
