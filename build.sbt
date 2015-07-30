@@ -88,9 +88,9 @@ lazy val bootstrap = project.in(file("bootstrap"))
     buildInfoPackage := "edu.tum.cs.isabelle.bootstrap",
     buildInfoKeys ++= {
       versions.toList.map { case (v, p) =>
-        BuildInfoKey.map(exportedProducts in (p, Runtime)) {
+        BuildInfoKey.map(classDirectory in (p, Compile)) {
           case (_, classFiles) =>
-            (s"Isa$v", (classFiles.map(_.data.toURI.toURL)))
+            (s"Isa$v", List(classFiles.toURI.toURL))
         }
       }
     }
