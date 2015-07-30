@@ -11,6 +11,9 @@ object Implementations extends App {
   def empty: Implementations = new Implementations(Map.empty)
 
   case class Entry(urls: List[URL], name: String)
+
+  def makeEnvironment(home: Path, clazz: Class[_ <: Environment]): Environment =
+    clazz.getConstructor(classOf[Path]).newInstance(home)
 }
 
 class Implementations private(entries: Map[Version, Implementations.Entry]) {
@@ -33,9 +36,6 @@ class Implementations private(entries: Map[Version, Implementations.Entry]) {
   def versions: Set[Version] = entries.keySet
 
   def makeEnvironment(home: Path, version: Version) =
-    entries get version flatMap loadClass map { clazz =>
-      clazz.getConstructor(classOf[Path]).newInstance(home)
-    }
-
+    entries get version flatMap loadClass map { Implementations.makeEnvironment(home, _) }
 
 }
