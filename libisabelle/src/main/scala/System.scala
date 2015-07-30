@@ -117,13 +117,16 @@ object System {
       }
 
       def invoke[I, O](operation: Operation[I, O])(arg: I) = {
-        val args0 = List(count.toString, operation.name, env.toYXML(operation.encode(env)(arg)))
         val state = makeOperationState(operation.observer(env))
-        self.synchronized {
+        val count0 = self.synchronized {
+          val count0 = count
           pending += (count -> state)
           count += 1
+          count0
         }
-        env.sendCommand(session, "libisabelle", args0)
+
+        val args = List(count0.toString, operation.name, env.toYXML(operation.encode(env)(arg)))
+        env.sendCommand(session, "libisabelle", args)
         state.promise.future
       }
     }.promise.future
