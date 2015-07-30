@@ -1,0 +1,7 @@
+session Codec = Pure +
+  theories
+    Codec_Test
+
+session "HOL-Codec" = HOL +
+  theories
+    Codec_Test
