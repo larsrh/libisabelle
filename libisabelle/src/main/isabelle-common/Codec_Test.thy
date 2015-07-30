@@ -16,6 +16,7 @@ fun gen_unit r =
 ML_command\<open>
   check_for "Codec.unit";
   check_for "Codec.int";
+  check_for "Codec.bool";
   check_for "Codec.string";
   check_for "Codec.tuple Codec.int Codec.int";
   check_for "Codec.tuple Codec.string Codec.unit";

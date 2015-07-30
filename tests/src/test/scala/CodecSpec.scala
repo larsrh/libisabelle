@@ -17,6 +17,7 @@ class CodecSpec(val specs2Env: Env) extends Specification with ScalaCheck with D
 
   Values can be converted
     of type Unit                      ${propCodec[Unit]}
+    of type Boolean                   ${propCodec[Boolean]}
     of type BigInt                    ${propCodec[BigInt]}
     of type String                    ${propCodec[String]}
     of type (BigInt, BigInt)          ${propCodec[(BigInt, BigInt)]}

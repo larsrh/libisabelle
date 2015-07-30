@@ -59,6 +59,15 @@ object Codec {
     str => catching(classOf[NumberFormatException]) opt BigInt(str)
   ).tagged("int")
 
+  implicit def boolean: Codec[Boolean] = text[Boolean](
+    _.toString,
+    {
+      case "true" => Some(true)
+      case "false" => Some(false)
+      case _ => None
+    }
+  ).tagged("bool")
+
   implicit def unit: Codec[Unit] = new Codec[Unit] {
     def encode(env: Environment)(u: Unit): env.XMLTree = addTag(env)("unit", None, Nil)
     def decode(env: Environment)(tree: env.XMLTree) =
@@ -79,7 +88,7 @@ object Codec {
   // def variant[A]
   //   (env: Environment)
   //   (enc: A => (Int, env.XMLTree), tryDec: Int => Option[env.XMLTree => Result[A]], tag: String): Codec[A]
-  private abstract class Variant[A] {
+  abstract class Variant[A] {
     def enc(env: Environment, a: A): (Int, env.XMLTree)
     def dec(env: Environment, idx: Int): Option[env.XMLTree => XMLResult[A]]
 
@@ -113,9 +122,10 @@ object Codec {
     }
   } toCodec "option"
 
-  // FIXME use text[Throwable]
-  implicit def exn: Codec[Throwable] =
-    Codec[String].transform(new RuntimeException(_), _.getMessage)
+  implicit def exn: Codec[Throwable] = text[Throwable](
+    _.getMessage,
+    str => Some(new RuntimeException(str))
+  ).tagged("exn")
 
   implicit def proverResult[A : Codec]: Codec[ProverResult[A]] = new Variant[ProverResult[A]] {
     def enc(env: Environment, a: ProverResult[A]): (Int, env.XMLTree) = a match {

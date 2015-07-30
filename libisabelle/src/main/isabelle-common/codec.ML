@@ -14,20 +14,20 @@ signature CODEC = sig
   val decode : 'a codec -> XML.tree -> 'a result
 
   val unit : unit codec
+  val bool : bool codec
   val string : string codec
   val int : int codec
   val list : 'a codec -> 'a list codec
   val tuple : 'a codec -> 'b codec -> ('a * 'b) codec
   val variant : ('a -> (int * XML.tree)) -> (int -> (XML.tree -> 'a result) option) -> string -> 'a codec
   val tagged : string -> 'a codec -> 'a codec
-  val id : XML.tree codec
-  val tree : XML.tree codec
-  val body : XML.body codec
   val option : 'a codec -> 'a option codec
 
   exception GENERIC of string
   val exn : exn codec
   val exn_result : 'a codec -> 'a Exn.result codec
+
+  val id : XML.tree codec (* internal *)
 end
 
 structure Codec : CODEC = struct
@@ -84,12 +84,6 @@ fun transform f g (Codec {encode, decode}) = Codec
   {encode = g #> encode,
    decode = decode #> map_result f}
 
-fun from_lib (e, d) tag = Codec
-  {encode = e #> add_tag tag NONE,
-   decode = (fn body => expect_tag tag body |> map_result d
-      handle XML.XML_ATOM err => Failure (err, [])
-           | XML.XML_BODY err => Failure ("decoding failed", err))}
-
 fun list a = Codec
   {encode = map (encode a) #> add_tag "list" NONE,
    decode = expect_tag "list" #> bind_result (traverse_results (decode a))}
@@ -116,9 +110,6 @@ fun tagged tag a = Codec
        [tree] => decode a tree
      | _ => Failure ("invalid structure", body))}
 
-val id = Codec {encode = I, decode = Success}
-val tree = tagged "XML.tree" id
-
 val unit = Codec
   {encode = K (add_tag "unit" NONE []),
    decode = expect_tag "unit" #> bind_result (fn body =>
@@ -126,11 +117,22 @@ val unit = Codec
        [] => Success ()
      | _ => Failure ("expected nothing", body))}
 
+fun text to from = Codec
+  {encode = XML.Text o to,
+   decode =
+    (fn tree as XML.Text content =>
+          (case from content of
+            NONE => Failure ("decoding failed", [tree]) |
+            SOME a => Success a)
+      | tree => Failure ("expected text tree", [tree]))}
+
+val id = Codec {encode = I, decode = Success}
+
 end
 
-val int = from_lib (XML.Encode.int, XML.Decode.int) "int"
-val string = from_lib (XML.Encode.string, XML.Decode.string) "string"
-val body = list tree
+val int = tagged "int" (text Markup.print_int (Exn.get_res o Exn.capture Markup.parse_int))
+val bool = tagged "bool" (text Markup.print_bool (Exn.get_res o Exn.capture Markup.parse_bool))
+val string = tagged "string" (text I SOME)
 
 fun option a =
   let
@@ -143,7 +145,7 @@ fun option a =
 
 (* slightly fishy codec, doesn't preserve exception type *)
 exception GENERIC of string
-val exn = transform GENERIC (fn exn => XML.content_of (YXML.parse_body (@{make_string} exn))) string
+val exn = tagged "exn" (text (fn exn => XML.content_of (YXML.parse_body (@{make_string} exn))) (SOME o GENERIC))
 
 fun exn_result a =
   let
