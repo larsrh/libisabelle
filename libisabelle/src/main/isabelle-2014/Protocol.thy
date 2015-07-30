@@ -43,6 +43,9 @@ exception GENERIC of string
 val operations =
   Synchronized.var "libisabelle.operations" (Symtab.empty: raw_operation Symtab.table)
 
+val requests =
+  Synchronized.var "libisabelle.requests" (Inttab.empty: (unit -> unit) Inttab.table)
+
 fun sequentialize name f =
   let
     val var = Synchronized.var ("libisabelle." ^ name) ()
@@ -79,19 +82,36 @@ val _ = Isabelle_Process.protocol_command "libisabelle"
       val response = [(Markup.functionN, "libisabelle_response"), ("id", Markup.print_int id)]
       val args = YXML.parse arg
       fun exec f =
-        (Future.fork (fn () =>
-          let
-            val res = Exn.interruptible_capture (f id) args
-            val yxml = YXML.string_of (Codec.encode (Codec.exn_result Codec.id) res)
-          in
-            Output.protocol_message response [yxml]
-          end);
-        ())
+        let
+          val future = Future.fork (fn () =>
+            let
+              val res = Exn.interruptible_capture (f id) args
+              val yxml = YXML.string_of (Codec.encode (Codec.exn_result Codec.id) res)
+            in
+              Output.protocol_message response [yxml]
+            end)
+        in
+          Synchronized.change requests (Inttab.update_new (id, fn () => Future.cancel future))
+        end
     in
       (case Symtab.lookup (Synchronized.value operations) name of
         SOME operation => exec operation
       | NONE => exec (fn _ => raise Fail "libisabelle: unknown command"))
     end)
+
+val _ = Isabelle_Process.protocol_command "libisabelle_cancel"
+  (fn ids =>
+    let
+      fun remove id tab = (Inttab.lookup tab id, Inttab.delete_safe id tab)
+      val _ =
+        map Markup.parse_int ids
+        |> fold_map remove
+        |> Synchronized.change_result requests
+        |> map (fn NONE => () | SOME f => f ())
+    in
+      ()
+    end
+  )
 
 fun print_bool true = "true"
   | print_bool false = "false"

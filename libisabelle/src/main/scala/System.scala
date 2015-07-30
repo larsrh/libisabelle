@@ -2,10 +2,13 @@ package edu.tum.cs.isabelle
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.control.Exception._
+import scala.util.control.NoStackTrace
 
 import edu.tum.cs.isabelle.api._
 
 object System {
+
+  case class CancellationException private[isabelle]() extends RuntimeException("Execution has been cancelled") with NoStackTrace
 
   def build(env: Environment)(config: env.Configuration): Boolean =
     env.build(config) == 0
@@ -116,6 +119,17 @@ object System {
         exitPromise.future
       }
 
+      def cancelAll() = {
+        val pending0 = self.synchronized {
+          val pending0 = pending
+          pending = Map.empty
+          pending0
+        }
+        val ids = pending0.keys.toList.map(_.toString)
+        env.sendCommand(session, "libisabelle_cancel", ids)
+        pending0.values.foreach(_.promise.tryFailure(CancellationException()))
+      }
+
       def invoke[I, O](operation: Operation[I, O])(arg: I) = {
         val state = makeOperationState(operation.observer(env))
         val count0 = self.synchronized {
@@ -125,7 +139,8 @@ object System {
           count0
         }
 
-        val args = List(count0.toString, operation.name, env.toYXML(operation.encode(env)(arg)))
+        val encoded = operation.encode(env)(arg)
+        val args = List(count0.toString, operation.name, env.toYXML(encoded))
         env.sendCommand(session, "libisabelle", args)
         state.promise.future
       }
@@ -139,5 +154,6 @@ sealed abstract class System {
   implicit val executionContext: ExecutionContext
 
   def dispose: Future[Unit]
+  def cancelAll(): Unit
   def invoke[I, O](operation: Operation[I, O])(arg: I): Future[ProverResult[O]]
 }
