@@ -61,7 +61,7 @@ fun expect_tag tag tree =
     XML.Elem (("tag", [("type", tag')]), body) =>
       if tag = tag' then Success body else Failure ("tag mismatch", [tree])
   | _ =>
-      Failure ("tag expected", [tree])
+      Failure ("tag " ^ tag ^ " expected", [tree])
 
 fun expect_tag' tag tree =
   case tree of
@@ -72,7 +72,7 @@ fun expect_tag' tag tree =
       else
         Failure ("tag mismatch", [tree])
   | _ =>
-      Failure ("indexed tag expected", [tree])
+      Failure ("indexed tag " ^ tag ^ " expected", [tree])
 
 
 abstype 'a codec = Codec of { encode : 'a -> XML.tree , decode: XML.tree -> 'a result } with

@@ -1,5 +1,5 @@
 theory Protocol
-imports Codec
+imports "../isabelle-common/Codec"
 keywords "operation_setup" :: thy_decl % "ML"
 begin
 
@@ -64,7 +64,7 @@ fun add_operation name {from_lib, to_lib, action} {sequential, bracket} =
     fun raw _ tree =
       case Codec.decode from_lib tree of
         Codec.Success i => Codec.encode to_lib (action i)
-      | Codec.Failure (msg, _) => raise Fail ("decoding input failed " ^ msg)
+      | Codec.Failure (msg, _) => raise Fail ("decoding input failed for operation " ^ name ^ ": " ^ msg)
     val raw' = raw
       |> (if bracket then bracketize else I)
       |> (if sequential then sequentialize name else I)
