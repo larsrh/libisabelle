@@ -26,11 +26,10 @@ lazy val standardSettings = Seq(
         <url>http://lars.hupel.info</url>
       </developer>
     </developers>
+  ),
+  credentials += Credentials(
+    Option(System.getProperty("build.publish.credentials")) map (new File(_)) getOrElse (Path.userHome / ".ivy2" / ".credentials")
   )
-)
-
-credentials += Credentials(
-  Option(System.getProperty("build.publish.credentials")) map (new File(_)) getOrElse (Path.userHome / ".ivy2" / ".credentials")
 )
 
 lazy val warningSettings = Seq(
