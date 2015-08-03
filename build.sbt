@@ -3,7 +3,34 @@ lazy val standardSettings = Seq(
   version := "0.1-SNAPSHOT",
   scalaVersion := "2.11.7",
   crossScalaVersions := Seq("2.10.5", "2.11.7", "2.12.0-M2"),
-  javacOptions += "-Xlint:unchecked"
+  javacOptions += "-Xlint:unchecked",
+  homepage := Some(url("https://github.com/larsrh/libisabelle")),
+  licenses := Seq(
+    "MIT" -> url("http://opensource.org/licenses/MIT"),
+    "BSD" -> url("http://opensource.org/licenses/BSD-3-Clause")
+  ),
+  publishArtifact in Test := false,
+  pomIncludeRepository := { _ => false },
+  publishTo := {
+    val nexus = "https://oss.sonatype.org/"
+    if (version.value.endsWith("SNAPSHOT"))
+      Some("snapshots" at nexus + "content/repositories/snapshots")
+    else
+      Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+  },
+  pomExtra := (
+    <developers>
+      <developer>
+        <id>larsrh</id>
+        <name>Lars Hupel</name>
+        <url>http://lars.hupel.info</url>
+      </developer>
+    </developers>
+  )
+)
+
+credentials += Credentials(
+  Option(System.getProperty("build.publish.credentials")) map (new File(_)) getOrElse (Path.userHome / ".ivy2" / ".credentials")
 )
 
 lazy val warningSettings = Seq(
@@ -49,10 +76,15 @@ lazy val libisabelle = project
   .dependsOn(pideInterface)
   .settings(standardSettings)
   .settings(warningSettings)
+  .enablePlugins(GitVersioning, BuildInfoPlugin)
+  .settings(Seq(
+    buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion, git.gitHeadCommit),
+    buildInfoPackage := "edu.tum.cs.isabelle"
+  ))
 
 lazy val setup = project.in(file("setup"))
   .dependsOn(libisabelle, pideInterface)
-  .settings(moduleName := s"libisabelle-setup")
+  .settings(moduleName := "libisabelle-setup")
   .settings(standardSettings)
   .settings(warningSettings)
   .settings(
@@ -66,12 +98,12 @@ lazy val setup = project.in(file("setup"))
 
 lazy val pide2014 = project.in(file("pide/2014"))
   .dependsOn(pideInterface)
-  .settings(moduleName := s"pide-2014")
+  .settings(moduleName := "pide-2014")
   .settings(standardSettings)
 
 lazy val pide2015 = project.in(file("pide/2015"))
   .dependsOn(pideInterface)
-  .settings(moduleName := s"pide-2015")
+  .settings(moduleName := "pide-2015")
   .settings(standardSettings)
 
 lazy val versions = Map(
