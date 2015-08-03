@@ -2,10 +2,13 @@ package edu.tum.cs.isabelle
 
 import scala.math.BigInt
 import scala.util.control.Exception._
+import scala.util.control.NoStackTrace
 
 import edu.tum.cs.isabelle.api._
 
 object Codec {
+
+  case class ProverException(msg: String) extends RuntimeException(msg) with NoStackTrace
 
   private def addTag(env: Environment)(tag: String, idx: Option[Int], body: env.XMLBody) =
     env.elem(("tag", ("type" -> tag) :: idx.map(i => List("idx" -> i.toString)).getOrElse(Nil)), body)
@@ -124,7 +127,7 @@ object Codec {
 
   implicit def exn: Codec[Throwable] = text[Throwable](
     _.getMessage,
-    str => Some(new RuntimeException(str))
+    str => Some(ProverException(str))
   ).tagged("exn")
 
   implicit def proverResult[A : Codec]: Codec[ProverResult[A]] = new Variant[ProverResult[A]] {

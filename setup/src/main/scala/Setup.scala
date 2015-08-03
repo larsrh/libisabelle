@@ -15,7 +15,7 @@ object Setup {
   def defaultPlatform =
     Platform.guess
 
-  private def defaultInstallTo(path: Path, version: Version)(implicit ec: ExecutionContext) =
+  def installTo(path: Path, version: Version)(implicit ec: ExecutionContext): Future[Setup] =
     defaultPlatform.flatMap(_.url(version)) match {
       case None =>
         sys.error("couldn't determine URL")
@@ -25,7 +25,7 @@ object Setup {
     }
 
   def temporarySetup(version: Version)(implicit ec: ExecutionContext): Future[Setup] =
-    defaultInstallTo(Files.createTempDirectory("libisabelle").toRealPath(), version)
+    installTo(Files.createTempDirectory("libisabelle").toRealPath(), version)
 
   def detectSetup(base: Path, version: Version): Option[Setup] = {
     val path = base resolve s"Isabelle${version.identifier}"
@@ -40,7 +40,7 @@ object Setup {
       case Some(install) =>
         Future.successful(install)
       case None =>
-        defaultInstallTo(defaultBasePath, version)
+        installTo(defaultBasePath, version)
     }
 
 
