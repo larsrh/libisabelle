@@ -1,3 +1,5 @@
+import UnidocKeys._
+
 lazy val standardSettings = Seq(
   organization := "info.hupel",
   version := "0.1-SNAPSHOT",
@@ -29,12 +31,14 @@ lazy val standardSettings = Seq(
   ),
   credentials += Credentials(
     Option(System.getProperty("build.publish.credentials")) map (new File(_)) getOrElse (Path.userHome / ".ivy2" / ".credentials")
-  )
+  ),
+  autoAPIMappings := true
 )
 
 lazy val warningSettings = Seq(
   scalacOptions ++= Seq(
     "-deprecation",
+    "-feature",
     "-encoding", "UTF-8",
     "-unchecked",
     "-Xlint",
@@ -56,20 +60,24 @@ lazy val noPublishSettings = Seq(
 lazy val root = project.in(file("."))
   .settings(standardSettings)
   .settings(noPublishSettings)
+  .settings(unidocSettings)
+  .settings(
+    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(pide2014, pide2015, bootstrap, tests)
+  )
   .aggregate(pideInterface, libisabelle, setup, pide2014, pide2015, bootstrap, tests)
 
 lazy val pideInterface = project.in(file("pide-interface"))
   .settings(moduleName := "pide-interface")
   .settings(standardSettings)
   .settings(warningSettings)
-  .settings(Seq(
+  .settings(
     libraryDependencies ++= {
       if (scalaVersion.value startsWith "2.10")
         Seq()
       else
         Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4")
     }
-  ))
+  )
 
 lazy val libisabelle = project
   .dependsOn(pideInterface)
