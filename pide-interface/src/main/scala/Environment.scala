@@ -61,6 +61,12 @@ abstract class Environment private[isabelle](home: Path) { self =>
   private[isabelle] def sendCommand(session: Session, name: String, args: List[String]): Unit
   private[isabelle] def dispose(session: Session): Unit
 
+  /**
+   *
+   * Implementations should ensure that the underlying thread pool consists of
+   * daemon threads, rendering [[edu.tum.cs.isabelle.System#dispose disposing]]
+   * of running systems unnecessary.
+   */
   implicit def executionContext: ExecutionContext
 
   sealed trait Observer[T]
