@@ -15,6 +15,7 @@ object Setup {
   def defaultPlatform =
     Platform.guess
 
+  // FIXME return type?! Option[Future[Setup]]?
   def installTo(path: Path, version: Version)(implicit ec: ExecutionContext): Future[Setup] =
     defaultPlatform.flatMap(_.url(version)) match {
       case None =>

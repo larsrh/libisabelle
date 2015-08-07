@@ -7,7 +7,7 @@ import scala.util.control.Exception._
 
 import edu.tum.cs.isabelle.api._
 
-object Implementations extends App {
+object Implementations {
   def empty: Implementations = new Implementations(Map.empty)
 
   case class Entry(urls: List[URL], name: String)

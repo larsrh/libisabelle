@@ -13,7 +13,7 @@ object Environment {
 
 abstract class Environment private[isabelle](home: Path) { self =>
 
-  val version = Environment.getVersion(getClass()).get
+  final val version = Environment.getVersion(getClass()).get
 
   override def toString: String =
     s"$version at $home"
