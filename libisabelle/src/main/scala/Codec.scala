@@ -185,16 +185,3 @@ trait Codec[T] { self =>
   }
 
 }
-
-abstract class SimpleCodec[T] extends Codec[T] {
-
-  def enc(t: T): XMLTree
-  def dec(tree: XMLTree): XMLResult[T]
-
-  override final def encode(env: Environment)(t: T): env.XMLTree =
-    enc(t).toGeneric(env)
-
-  override final def decode(env: Environment)(tree: env.XMLTree): XMLResult[T] =
-    dec(XMLTree.fromGeneric(env)(tree))
-
-}
