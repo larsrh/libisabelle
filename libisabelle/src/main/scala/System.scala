@@ -194,6 +194,8 @@ object System {
  *
  * This class is thread-safe, that is, running multiple
  * [[Operation operations]] at the same time is expected and safe.
+ *
+ * @see [[edu.tum.cs.isabelle.setup.Setup]]
  */
 sealed abstract class System {
 

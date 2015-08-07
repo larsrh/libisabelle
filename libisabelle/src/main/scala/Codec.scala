@@ -6,6 +6,7 @@ import scala.util.control.NoStackTrace
 
 import edu.tum.cs.isabelle.api._
 
+/** Combinators for [[Codec codecs]]. */
 object Codec {
 
   /**
@@ -96,11 +97,6 @@ object Codec {
   implicit def tuple[A : Codec, B : Codec]: Codec[(A, B)] =
     Codec[A] tuple Codec[B]
 
-  // FIXME can't inline because scalac bug
-  // used to be this:
-  // def variant[A]
-  //   (env: Environment)
-  //   (enc: A => (Int, env.XMLTree), tryDec: Int => Option[env.XMLTree => Result[A]], tag: String): Codec[A]
   /**
    * Template for a [[Codec codec]] for a sum type `A`.
    *
@@ -118,6 +114,36 @@ object Codec {
    * call `[[toCodec]]` with an arbitrary tag on that object to obtain the
    * actual codec. This process exists to work around a bug in the Scala
    * compiler.
+   *
+   * ''Example usage''
+   *
+   * {{{
+   * new Variant[Option[A]] {
+   *   def enc(env: Environment, a: Option[A]): (Int, env.XMLTree) = a match {
+   *     case Some(a) => (0, Codec[A].encode(env)(a))
+   *     case None    => (1, Codec[Unit].encode(env)(()))
+   *   }
+   *   def dec(env: Environment, idx: Int): Option[env.XMLTree => XMLResult[Option[A]]] = idx match {
+   *     case 0 => Some(Codec[A].decode(env)(_).right.map(Some.apply))
+   *     case 1 => Some(Codec[Unit].decode(env)(_).right.map(_ => None))
+   *     case _ => None
+   *   }
+   * } toCodec "option"
+   * }}}
+   *
+   * Note the closing call to `[[toCodec]]`. The return type annotations are
+   * required for Scala 2.10.x.
+   *
+   * ''Footnote''
+   *
+   * The preferred interface would look roughly like this:
+   *
+   * {{{
+   * def variant[A](env: Environment)(enc: A => (Int, env.XMLTree), dec: Int => Option[env.XMLTree => Result[A]], tag: String): Codec[A]
+   * }}}
+   *
+   * It can't be realised because some Scala versions have trouble establishing
+   * equivalence between path-dependent types.
    */
   abstract class Variant[A] {
 
@@ -193,7 +219,10 @@ object Codec {
   /**
    * Obtain an instance of a codec from the implicit scope.
    *
-   * Example usage: `Codec[Int].encode(env)(3)`
+   * ''Example usage''
+   * {{{
+   * Codec[Int].encode(env)(3)
+   * }}}
    */
   def apply[A](implicit A: Codec[A]): Codec[A] = A
 
