@@ -47,6 +47,9 @@ lazy val warningSettings = Seq(
     "-Ywarn-numeric-widen",
     "-Ywarn-value-discard",
     "-Xfatal-warnings"
+  ),
+  scalacOptions in (Compile, doc) := Seq(
+    "-encoding", "UTF-8"
   )
 )
 
@@ -60,11 +63,15 @@ lazy val noPublishSettings = Seq(
 lazy val root = project.in(file("."))
   .settings(standardSettings)
   .settings(noPublishSettings)
+  .aggregate(pideInterface, libisabelle, setup, pide2014, pide2015, bootstrap, tests, docs)
+
+lazy val docs = project.in(file("docs"))
+  .settings(moduleName := "libisabelle-docs")
+  .settings(standardSettings)
   .settings(unidocSettings)
   .settings(
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(pide2014, pide2015, bootstrap, tests)
   )
-  .aggregate(pideInterface, libisabelle, setup, pide2014, pide2015, bootstrap, tests)
 
 lazy val pideInterface = project.in(file("pide-interface"))
   .settings(moduleName := "pide-interface")
