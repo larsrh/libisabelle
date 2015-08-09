@@ -16,9 +16,13 @@ To get started, follow these steps:
 
 On some systems, you might need to install Perl, Python, and/or some additional libraries.
 
-Note to previous Isabelle users:
+Note to proficient Isabelle users:
 `libisabelle` does not respect `ISABELLE_HOME` by default.
 Bootstrapping will create a new installation in the `contrib` folder.
+
+## Documentation
+
+You can browse the Scaladoc [directly at Sonatype](https://oss.sonatype.org/service/local/repositories/snapshots/archive/info/hupel/libisabelle-docs_2.10/0.1-SNAPSHOT/libisabelle-docs_2.10-0.1-SNAPSHOT-javadoc.jar/!/index.html).
 
 ## Running the tests
 
@@ -47,6 +51,7 @@ libraryDependencies ++= Seq(
   "info.hupel" %% "libisabelle" % "0.1-SNAPSHOT",
   "info.hupel" %% "libisabelle-setup" % "0.1-SNAPSHOT",
   "info.hupel" %% "pide-interface" % "0.1-SNAPSHOT"
+)
 ```
 
 Depending on which Isabelle version you want, also add either of those:
