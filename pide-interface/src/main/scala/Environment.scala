@@ -4,10 +4,28 @@ import java.nio.file.Path
 
 import scala.concurrent.ExecutionContext
 
+/**
+ * Result from the prover.
+ *
+ * In the error case, usually a special
+ * [[edu.tum.cs.isabelle.Codec.ProverException ProverException]] will be
+ * provided, though implementations of an [[Environment environment]] may
+ * choose differently.
+ *
+ * @see [[edu.tum.cs.isabelle.System#invoke]]
+ * @see [[edu.tum.cs.isabelle.Codec.exn]]
+ */
+trait ProverResult[+T]
+
+object ProverResult {
+  case class Success[+T](t: T) extends ProverResult[T]
+  case class Failure(exn: Exception) extends ProverResult[Nothing]
+}
+
 object Environment {
 
   private[isabelle] def getVersion(clazz: Class[_ <: Environment]): Option[Version] =
-    Option(clazz.getAnnotation(classOf[Implementation]).version).map(Version.apply)
+    Option(clazz.getAnnotation(classOf[Implementation]).identifier).map(Version.apply)
 
 }
 
@@ -47,19 +65,19 @@ abstract class Environment private[isabelle](home: Path) { self =>
   }
 
 
-  private[isabelle] def build(config: Configuration): Int
+  protected[isabelle] def build(config: Configuration): Int
 
-  private[isabelle] val functionMarkup: String
-  private[isabelle] val protocolMarkup: String
-  private[isabelle] val initMarkup: String
-  private[isabelle] val exitMarkup: String
+  protected[isabelle] val functionTag: String
+  protected[isabelle] val protocolTag: String
+  protected[isabelle] val initTag: String
+  protected[isabelle] val exitTag: String
 
-  private[isabelle] type Session
+  protected[isabelle] type Session
 
-  private[isabelle] def create(config: Configuration, consumer: (Markup, XMLBody) => Unit): Session
-  private[isabelle] def sendOptions(session: Session): Unit
-  private[isabelle] def sendCommand(session: Session, name: String, args: List[String]): Unit
-  private[isabelle] def dispose(session: Session): Unit
+  protected[isabelle] def create(config: Configuration, consumer: (Markup, XMLBody) => Unit): Session
+  protected[isabelle] def sendOptions(session: Session): Unit
+  protected[isabelle] def sendCommand(session: Session, name: String, args: List[String]): Unit
+  protected[isabelle] def dispose(session: Session): Unit
 
   /**
    *
@@ -67,7 +85,7 @@ abstract class Environment private[isabelle](home: Path) { self =>
    * daemon threads, rendering [[edu.tum.cs.isabelle.System#dispose disposing]]
    * of running systems unnecessary.
    */
-  implicit def executionContext: ExecutionContext
+  implicit val executionContext: ExecutionContext
 
   sealed trait Observer[T]
   object Observer {

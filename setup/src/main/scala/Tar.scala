@@ -13,7 +13,7 @@ import com.github.fge.filesystem.MoreFiles
 
 object Tar {
 
-  def download(url: java.net.URL): TarArchiveInputStream =
+  def download(url: URL): TarArchiveInputStream =
     new TarArchiveInputStream(new GzipCompressorInputStream(url.openStream()))
 
   def extractTo(path: Path, tar: TarArchiveInputStream)(implicit ec: ExecutionContext): Future[Path] = Future {

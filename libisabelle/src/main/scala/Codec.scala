@@ -194,7 +194,7 @@ object Codec {
    * [[ProverException]] instead of the original exception. Should not be used
    * for encoding.
    */
-  implicit def exn: Codec[Throwable] = text[Throwable](
+  implicit def exn: Codec[Exception] = text[Exception](
     _.getMessage,
     str => Some(ProverException(str))
   ).tagged("exn")
@@ -206,12 +206,12 @@ object Codec {
    */
   implicit def proverResult[A : Codec]: Codec[ProverResult[A]] = new Variant[ProverResult[A]] {
     def enc(env: Environment, a: ProverResult[A]): (Int, env.XMLTree) = a match {
-      case Right(a) => (0, Codec[A].encode(env)(a))
-      case Left(e)  => (1, Codec[Throwable].encode(env)(e))
+      case ProverResult.Success(a) => (0, Codec[A].encode(env)(a))
+      case ProverResult.Failure(e) => (1, Codec[Exception].encode(env)(e))
     }
     def dec(env: Environment, idx: Int): Option[env.XMLTree => XMLResult[ProverResult[A]]] = idx match {
-      case 0 => Some(Codec[A].decode(env)(_).right.map(Right.apply))
-      case 1 => Some(Codec[Throwable].decode(env)(_).right.map(Left.apply))
+      case 0 => Some(Codec[A].decode(env)(_).right.map(ProverResult.Success.apply))
+      case 1 => Some(Codec[Exception].decode(env)(_).right.map(ProverResult.Failure.apply))
       case _ => None
     }
   } toCodec "Exn.result"

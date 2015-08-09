@@ -11,15 +11,15 @@ import org.specs2.matcher.Matcher
 import edu.tum.cs.isabelle._
 import edu.tum.cs.isabelle.api._
 
-class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetup { def is = s2"""
+class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetup with IsabelleMatchers { def is = s2"""
 
   Basic protocol interaction
 
   An Isabelle session
     can be started          ${system must exist.awaitFor(30.seconds)}
-    can load theories       ${loaded must beRight(()).awaitFor(30.seconds)}
-    reacts to requests      ${response must beRight("prop => prop => prop").awaitFor(5.seconds)}
-    handles errors          ${error must beLeft.awaitFor(5.seconds)}
+    can load theories       ${loaded must beSuccess(()).awaitFor(30.seconds)}
+    reacts to requests      ${response must beSuccess("prop => prop => prop").awaitFor(5.seconds)}
+    handles errors          ${error must beFailure.awaitFor(5.seconds)}
     can cancel requests     ${cancelled.failed must beAnInstanceOf[System.CancellationException].awaitFor(5.seconds)}
     can be torn down        ${teardown must exist.awaitFor(5.seconds)}"""
 

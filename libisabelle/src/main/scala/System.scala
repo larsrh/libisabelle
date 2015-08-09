@@ -59,7 +59,7 @@ object System {
   def create(env: Environment)(config: env.Configuration): Future[System] = {
     class Output(name: String) {
       def unapply(markup: Markup): Option[Long] = markup match {
-        case (env.protocolMarkup, (env.functionMarkup, `name`) :: ("id", id) :: Nil) =>
+        case (env.protocolTag, (env.functionTag, `name`) :: ("id", id) :: Nil) =>
           catching(classOf[NumberFormatException]) opt id.toLong
         case _ =>
           None
@@ -133,8 +133,8 @@ object System {
       implicit val executionContext = env.executionContext
 
       private def consumer(markup: Markup, body: env.XMLBody): Unit = (markup, body) match {
-        case ((env.initMarkup, _), _) => initPromise.success(()); ()
-        case ((env.exitMarkup, _), _) => exitPromise.success(()); ()
+        case ((env.initTag, _), _) => initPromise.success(()); ()
+        case ((env.exitTag, _), _) => exitPromise.success(()); ()
         case _ =>
           self.synchronized {
             pending =

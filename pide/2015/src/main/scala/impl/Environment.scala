@@ -7,8 +7,8 @@ import scala.concurrent.ExecutionContext
 
 import edu.tum.cs.isabelle.api
 
-@api.Implementation(version = "2015")
-class Environment(home: Path) extends api.Environment(home) {
+@api.Implementation(identifier = "2015")
+final class Environment(home: Path) extends api.Environment(home) {
 
   isabelle.Isabelle_System.init(isabelle_home = home.toAbsolutePath.toString)
 
@@ -38,23 +38,23 @@ class Environment(home: Path) extends api.Environment(home) {
     case isabelle.XML.Elem(markup, body) => Right((destMarkup(markup), body))
   }
 
-  val exitMarkup = isabelle.Markup.EXIT
-  val functionMarkup = isabelle.Markup.FUNCTION
-  val initMarkup = isabelle.Markup.INIT
-  val protocolMarkup = isabelle.Markup.PROTOCOL
+  protected[isabelle] val exitTag = isabelle.Markup.EXIT
+  protected[isabelle] val functionTag = isabelle.Markup.FUNCTION
+  protected[isabelle] val initTag = isabelle.Markup.INIT
+  protected[isabelle] val protocolTag = isabelle.Markup.PROTOCOL
 
   lazy val executionContext =
     isabelle.Future.execution_context
 
-  type Session = isabelle.Session
+  protected[isabelle] type Session = isabelle.Session
 
-  lazy val options = isabelle.Options.init()
+  private lazy val options = isabelle.Options.init()
 
   private def mkPaths(path: Option[Path]) =
     path.map(p => isabelle.Path.explode(p.toAbsolutePath.toString)).toList
 
 
-  def build(config: Configuration) =
+  protected[isabelle] def build(config: Configuration) =
     isabelle.Build.build(
       options = options,
       progress = new isabelle.Build.Console_Progress(verbose = true),
@@ -64,7 +64,7 @@ class Environment(home: Path) extends api.Environment(home) {
       sessions = List(config.session)
     )
 
-  def create(config: Configuration, consumer: (api.Markup, XMLBody) => Unit) = {
+  protected[isabelle] def create(config: Configuration, consumer: (api.Markup, XMLBody) => Unit) = {
     val content = isabelle.Build.session_content(options, false, mkPaths(config.path), config.session)
     val resources = new isabelle.Resources(content.loaded_theories, content.known_theories, content.syntax)
     val session = new isabelle.Session(resources)
@@ -81,12 +81,12 @@ class Environment(home: Path) extends api.Environment(home) {
     session
   }
 
-  def sendCommand(session: Session, name: String, args: List[String]) =
+  protected[isabelle] def sendCommand(session: Session, name: String, args: List[String]) =
     session.protocol_command(name, args: _*)
 
-  def sendOptions(session: Session) =
+  protected[isabelle] def sendOptions(session: Session) =
     session.protocol_command("Prover.options", isabelle.YXML.string_of_body(options.encode))
 
-  def dispose(session: Session) = session.stop()
+  protected[isabelle] def dispose(session: Session) = session.stop()
 
 }
