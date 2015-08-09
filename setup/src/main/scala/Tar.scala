@@ -11,6 +11,7 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 
 import com.github.fge.filesystem.MoreFiles
 
+/** Downloading and unpacking `tar` archives. */
 object Tar {
 
   def download(url: URL): TarArchiveInputStream =

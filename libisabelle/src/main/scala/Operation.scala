@@ -64,7 +64,8 @@ object Operation {
  * iteratees.
  *
  * Operations can most easily be constructed with the
- * `[[Operation.implicitly implicitly]]` combinator.
+ * `[[Operation.implicitly implicitly]]` combinator. That combinator will only
+ * wait for final results and ignore intermediate data.
  *
  * @see [[System#invoke]]
  */

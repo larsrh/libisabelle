@@ -278,7 +278,7 @@ sealed abstract class System {
    * this, but it is generally safe to assume that a failed future represents
    * an internal error (e.g. due to a wrong [[Codec codec]]), whereas a
    * successful future may contain expected errors (e.g. due to a wrong input
-   * argument).
+   * argument or a failing proof).
    *
    * The behaviour of this method after `[[dispose]]` has been called is
    * undefined. It will most likely crash or produce a hanging future. It is

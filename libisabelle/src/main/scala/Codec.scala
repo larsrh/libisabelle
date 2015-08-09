@@ -238,6 +238,10 @@ object Codec {
  * environment provides constructors and destructors. See `[[encode]]` and
  * `[[decode]]` for their respective descriptions.
  *
+ * For combinators to create codecs, refer to the [[Codec$ companion object]].
+ *
+ * ''Contract''
+ *
  * Instances of this class must satisfy the following contract:
  * [[decode Decoding]] any value produced via `[[encode]]` must succeed,
  * yielding the original value. This only has to hold for one environment,
@@ -252,8 +256,6 @@ object Codec {
  * tags are allowed (for example, when chaining multiple calls of
  * `[[tagged]]`), but produce additional overhead in the resulting XML
  * documents.
- *
- * For combinators to create codecs, refer to the [[Codec$ companion object]].
  */
 trait Codec[T] { self =>
 
