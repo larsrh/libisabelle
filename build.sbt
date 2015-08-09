@@ -70,7 +70,9 @@ lazy val docs = project.in(file("docs"))
   .settings(standardSettings)
   .settings(unidocSettings)
   .settings(
-    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(pide2014, pide2015, bootstrap, tests)
+    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(pide2014, pide2015, bootstrap, tests),
+    doc in Compile := (doc in ScalaUnidoc).value,
+    target in unidoc in ScalaUnidoc := crossTarget.value / "api"
   )
 
 lazy val pideInterface = project.in(file("pide-interface"))
