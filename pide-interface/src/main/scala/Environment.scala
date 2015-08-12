@@ -7,13 +7,11 @@ import scala.concurrent.ExecutionContext
 /**
  * Result from the prover.
  *
- * In the error case, usually a special
- * [[edu.tum.cs.isabelle.Codec.ProverException ProverException]] will be
- * provided, though implementations of an [[Environment environment]] may
- * choose differently.
+ * In the error case, a special
+ * [[edu.tum.cs.isabelle.Operation.ProverException ProverException]] will be
+ * provided.
  *
  * @see [[edu.tum.cs.isabelle.System#invoke]]
- * @see [[edu.tum.cs.isabelle.Codec.exn]]
  */
 trait ProverResult[+T]
 

@@ -2,24 +2,11 @@ package edu.tum.cs.isabelle
 
 import scala.math.BigInt
 import scala.util.control.Exception._
-import scala.util.control.NoStackTrace
 
 import edu.tum.cs.isabelle.api._
 
 /** Combinators for [[Codec codecs]]. */
 object Codec {
-
-  /**
-   * Slightly fishy exception to represent any kind of exception from the
-   * prover.
-   *
-   * There is no stack traces available, because instances should only be
-   * created when the prover throws an exception.
-   *
-   * @see [[exn]]
-   * @see [[proverResult]]
-   */
-  case class ProverException private[isabelle](msg: String) extends RuntimeException(msg) with NoStackTrace
 
   private def addTag(env: Environment)(tag: String, idx: Option[Int], body: env.XMLBody) =
     env.elem(("tag", ("type" -> tag) :: idx.map(i => List("idx" -> i.toString)).getOrElse(Nil)), body)
@@ -52,7 +39,7 @@ object Codec {
         Left("indexed tag expected" -> List(tree))
     }
 
-  private def text[A](to: A => String, from: String => Option[A]): Codec[A] = new Codec[A] {
+  private[isabelle] def text[A](to: A => String, from: String => Option[A]): Codec[A] = new Codec[A] {
     // FIXME escape handling
     def encode(env: Environment)(t: A): env.XMLTree = env.text(to(t))
     def decode(env: Environment)(tree: env.XMLTree) = env.destTree(tree) match {
@@ -186,35 +173,6 @@ object Codec {
       case _ => None
     }
   } toCodec "option"
-
-  /**
-   * Slightly fishy [[Codec codec]] instance for exceptions.
-   *
-   * Violates the exception contract, because decoding yields instances of
-   * [[ProverException]] instead of the original exception. Should not be used
-   * for encoding.
-   */
-  implicit def exn: Codec[Exception] = text[Exception](
-    _.getMessage,
-    str => Some(ProverException(str))
-  ).tagged("exn")
-
-  /**
-   * Slightly fishy [[Codec codec]] instance for prover results.
-   *
-   * Same restrictions as for `[[exn]]` apply.
-   */
-  implicit def proverResult[A : Codec]: Codec[ProverResult[A]] = new Variant[ProverResult[A]] {
-    def enc(env: Environment, a: ProverResult[A]): (Int, env.XMLTree) = a match {
-      case ProverResult.Success(a) => (0, Codec[A].encode(env)(a))
-      case ProverResult.Failure(e) => (1, Codec[Exception].encode(env)(e))
-    }
-    def dec(env: Environment, idx: Int): Option[env.XMLTree => XMLResult[ProverResult[A]]] = idx match {
-      case 0 => Some(Codec[A].decode(env)(_).right.map(ProverResult.Success.apply))
-      case 1 => Some(Codec[Exception].decode(env)(_).right.map(ProverResult.Failure.apply))
-      case _ => None
-    }
-  } toCodec "Exn.result"
 
   /**
    * Obtain an instance of a codec from the implicit scope.

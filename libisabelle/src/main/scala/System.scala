@@ -171,7 +171,8 @@ object System {
       }
 
       def invoke[I, O](operation: Operation[I, O])(arg: I) = {
-        val state = makeOperationState(operation.observer(env))
+        val (encoded, observer) = operation.prepare(env, arg)
+        val state = makeOperationState(observer)
         val count0 = self.synchronized {
           val count0 = count
           pending += (count -> state)
@@ -179,7 +180,6 @@ object System {
           count0
         }
 
-        val encoded = operation.encode(env)(arg)
         val args = List(count0.toString, operation.name, env.toYXML(encoded))
         env.sendCommand(session, "libisabelle", args)
         state.promise.future
@@ -263,7 +263,7 @@ sealed abstract class System {
    * [[edu.tum.cs.isabelle.api.Environment#Observer observer]] of the
    * operation.
    *
-   * The observer is automatically [[Operation#observer instantiated]] with
+   * The observer is automatically [[Operation#prepare instantiated]] with
    * the underlying [[edu.tum.cs.isabelle.api.Environment environment]]
    * specified when [[System#create creating]] the system.
    *
