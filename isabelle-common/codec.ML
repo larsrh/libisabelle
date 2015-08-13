@@ -59,7 +59,10 @@ fun add_tag tag idx body =
 fun expect_tag tag tree =
   case tree of
     XML.Elem (("tag", [("type", tag')]), body) =>
-      if tag = tag' then Success body else Failure ("tag mismatch", [tree])
+      if tag = tag' then
+        Success body
+      else
+        Failure ("tag mismatch: expected " ^ tag ^ ", got " ^ tag', [tree])
   | _ =>
       Failure ("tag " ^ tag ^ " expected", [tree])
 
@@ -70,7 +73,7 @@ fun expect_tag' tag tree =
         Success (XML.Decode.int_atom i, body)
           handle XML.XML_ATOM err => Failure (err, [tree])
       else
-        Failure ("tag mismatch", [tree])
+        Failure ("tag mismatch: expected " ^ tag ^ ", got " ^ tag', [tree])
   | _ =>
       Failure ("indexed tag " ^ tag ^ " expected", [tree])
 
@@ -145,7 +148,7 @@ fun option a =
 
 (* slightly fishy codec, doesn't preserve exception type *)
 exception GENERIC of string
-val exn = tagged "exn" (text (fn exn => XML.content_of (YXML.parse_body (@{make_string} exn))) (SOME o GENERIC))
+val exn = tagged "exn" (text (fn exn => (YXML.content_of (@{make_string} exn))) (SOME o GENERIC))
 
 fun exn_result a =
   let
