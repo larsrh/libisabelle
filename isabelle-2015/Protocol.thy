@@ -16,7 +16,9 @@ signature LIBISABELLE = sig
   val default_flags : flags
 
   val add_operation : name -> ('i, 'o) operation -> flags -> unit
-  val operation_setup : bstring -> Input.source -> flags -> Proof.context -> unit
+  val operation_setup_cmd : bstring -> Input.source -> flags -> Proof.context -> unit
+
+  val get_operation : name -> int -> XML.tree -> XML.tree
 end
 
 structure Libisabelle : LIBISABELLE = struct
@@ -75,6 +77,11 @@ fun add_operation name {from_lib, to_lib, action} {sequential, bracket} =
     Synchronized.change operations (Symtab.update (name, raw'))
   end
 
+fun get_operation name =
+  case Symtab.lookup (Synchronized.value operations) name of
+    SOME operation => operation
+  | NONE => fn _ => raise Fail "libisabelle: unknown command"
+
 val _ = Isabelle_Process.protocol_command "libisabelle"
   (fn id :: name :: [arg] =>
     let
@@ -94,9 +101,7 @@ val _ = Isabelle_Process.protocol_command "libisabelle"
           Synchronized.change requests (Inttab.update_new (id, fn () => Future.cancel future))
         end
     in
-      (case Symtab.lookup (Synchronized.value operations) name of
-        SOME operation => exec operation
-      | NONE => exec (fn _ => raise Fail "libisabelle: unknown command"))
+      exec (get_operation name)
     end)
 
 val _ = Isabelle_Process.protocol_command "libisabelle_cancel"
@@ -110,8 +115,7 @@ val _ = Isabelle_Process.protocol_command "libisabelle_cancel"
         |> map (fn NONE => () | SOME f => f ())
     in
       ()
-    end
-  )
+    end)
 
 fun print_bool true = "true"
   | print_bool false = "false"
@@ -119,7 +123,7 @@ fun print_bool true = "true"
 fun print_flags {sequential, bracket} =
   "({sequential=" ^ print_bool sequential ^ ",bracket=" ^ print_bool bracket ^ "})"
 
-fun operation_setup name source flags ctxt =
+fun operation_setup_cmd name source flags ctxt =
   ML_Context.eval_in (SOME ctxt) ML_Compiler.flags (Input.pos_of source)
     (ML_Lex.read ("Libisabelle.add_operation " ^ ML_Syntax.print_string name ^ "(") @
       ML_Lex.read_source false source @
@@ -142,7 +146,7 @@ val _ =
   in
     Outer_Syntax.command @{command_keyword "operation_setup"} "define protocol operation in ML"
       (parse_cmd >> (fn ((flags, name), txt) =>
-        Toplevel.keep (Toplevel.context_of #> operation_setup name txt (flags default_flags))))
+        Toplevel.keep (Toplevel.context_of #> operation_setup_cmd name txt (flags default_flags))))
   end
 
 end
