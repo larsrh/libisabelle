@@ -174,6 +174,18 @@ object Codec {
     }
   } toCodec "option"
 
+  implicit def either[A : Codec, B : Codec]: Codec[Either[A, B]] = new Variant[Either[A, B]] {
+    def enc(env: Environment, e: Either[A, B]): (Int, env.XMLTree) = e match {
+      case Left(a)  => (0, Codec[A].encode(env)(a))
+      case Right(b) => (1, Codec[B].encode(env)(b))
+    }
+    def dec(env: Environment, idx: Int): Option[env.XMLTree => XMLResult[Either[A, B]]] = idx match {
+      case 0 => Some(Codec[A].decode(env)(_).right.map(Left.apply))
+      case 1 => Some(Codec[B].decode(env)(_).right.map(Right.apply))
+      case _ => None
+    }
+  } toCodec "either"
+
   /**
    * Obtain an instance of a codec from the implicit scope.
    *

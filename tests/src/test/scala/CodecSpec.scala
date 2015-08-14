@@ -31,6 +31,7 @@ class CodecSpec(val specs2Env: Env) extends Specification with ScalaCheck with D
     of type Option[BigInt]            ${propCodec[Option[BigInt]]}
     of type Option[List[BigInt]]      ${propCodec[Option[List[BigInt]]]}
     of type List[Option[BigInt]]      ${propCodec[List[Option[BigInt]]]}
+    of type Either[String, BigInt]    ${propCodec[Either[String, BigInt]]}
   """
 
   def propCodec[A : Codec : Arbitrary] = forAll { (a: A) =>
