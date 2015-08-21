@@ -10,13 +10,6 @@ import edu.tum.cs.isabelle.api._
 object System {
 
   /**
-   * Used to mark [[scala.concurrent.Future futures]] produced by
-   * [[System#invoke invoking operations]] as cancelled via the
-   * `[[System#cancelAll cancelAll]]` method.
-   */
-  case class CancellationException private[isabelle]() extends RuntimeException("Execution has been cancelled") with NoStackTrace
-
-  /**
    * Synchronously build a
    * [[edu.tum.cs.isabelle.api.Environment#Configuration configuration]].
    *
@@ -159,18 +152,10 @@ object System {
         exitPromise.future
       }
 
-      def cancelAll() = {
-        val pending0 = self.synchronized {
-          val pending0 = pending
-          pending = Map.empty
-          pending0
-        }
-        val ids = pending0.keys.toList.map(_.toString)
-        env.sendCommand(session, "libisabelle_cancel", ids)
-        pending0.values.foreach(_.promise.tryFailure(CancellationException()))
-      }
+      def cancel(id: Long) =
+        env.sendCommand(session, "libisabelle_cancel", List(id.toString))
 
-      def invoke[I, O](operation: Operation[I, O])(arg: I) = {
+      def cancellableInvoke[I, O](operation: Operation[I, O])(arg: I) = {
         val (encoded, observer) = operation.prepare(env, arg)
         val state = makeOperationState(observer)
         val count0 = self.synchronized {
@@ -182,7 +167,7 @@ object System {
 
         val args = List(count0.toString, operation.name, env.toYXML(encoded))
         env.sendCommand(session, "libisabelle", args)
-        state.promise.future
+        new CancellableFuture(state.promise, _ => cancel(count0))
       }
     }.promise.future
   }
@@ -228,9 +213,9 @@ sealed abstract class System {
    * failed.
    *
    * It is recommended to wait for all pending futures to complete, or call
-   * `[[cancelAll]]` before shutdown. It is guaranteed that when the returned
-   * [[scala.concurrent.Future future]] succeeds, the prover has been shut
-   * down.
+   * `[[CancellableFuture#cancel cancel]]` on them before shutdown. It is
+   * guaranteed that when the returned [[scala.concurrent.Future future]]
+   * succeeds, the prover has been shut down.
    *
    * Calling anything after dispose is undefined. The object should not be used
    * afterwards.
@@ -239,22 +224,11 @@ sealed abstract class System {
    * [[edu.tum.cs.isabelle.api.Environment#executionContext implementation details]]
    * of the [[edu.tum.cs.isabelle.api.Environment environment]] used to
    * [[System.create create]] this system, it may be unneccessary to call this
-   * method. In any case, it is good practice to call it anyway.
+   * method. In any case, it is good practice to call it.
    *
    * @see [[executionContext]]
    */
   def dispose: Future[Unit]
-
-  /**
-   * Cancel all pending invocations and mark their futures as failed.
-   *
-   * The corresponding futures will be marked as failed immediately using a
-   * `[[System.CancellationException CancellationException]]`.
-   *
-   * The behaviour of this method after `[[dispose]]` has been called is
-   * undefined.
-   */
-  def cancelAll(): Unit
 
   /**
    * Invoke an [[Operation operation]] on the prover, that is,
@@ -279,11 +253,10 @@ sealed abstract class System {
    * an internal error (e.g. due to a wrong [[Codec codec]]), whereas a
    * successful future may contain expected errors (e.g. due to a wrong input
    * argument or a failing proof).
-   *
-   * The behaviour of this method after `[[dispose]]` has been called is
-   * undefined. It will most likely crash or produce a hanging future. It is
-   * safe to invoke operations after a call to `[[cancelAll]]`.
    */
-  def invoke[I, O](operation: Operation[I, O])(arg: I): Future[ProverResult[O]]
+  def cancellableInvoke[I, O](operation: Operation[I, O])(arg: I): CancellableFuture[ProverResult[O]]
+
+  final def invoke[I, O](operation: Operation[I, O])(arg: I): Future[ProverResult[O]] =
+    cancellableInvoke(operation)(arg).future
 
 }

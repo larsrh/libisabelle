@@ -20,7 +20,7 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
     can load theories       ${loaded must beSuccess(()).awaitFor(30.seconds)}
     reacts to requests      ${response must beSuccess("prop => prop => prop").awaitFor(5.seconds)}
     handles errors          ${error must beFailure.awaitFor(5.seconds)}
-    can cancel requests     ${cancelled.failed must beAnInstanceOf[System.CancellationException].awaitFor(5.seconds)}
+    can cancel requests     ${cancelled.failed must beAnInstanceOf[CancellationException].awaitFor(5.seconds)}
     can be torn down        ${teardown must exist.awaitFor(5.seconds)}"""
 
 
@@ -40,8 +40,7 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
     for {
       s <- system
       _ <- loaded
-      _ <- responses
-      res <- { val future = s.invoke(Sleepy)(1); s.cancelAll(); future }
+      res <- { val future = s.cancellableInvoke(Sleepy)(1); future.cancel(); future.future }
     }
     yield ()
 
