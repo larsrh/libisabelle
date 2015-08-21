@@ -167,7 +167,7 @@ object System {
 
         val args = List(count0.toString, operation.name, env.toYXML(encoded))
         env.sendCommand(session, "libisabelle", args)
-        new CancellableFuture(state.promise, _ => cancel(count0))
+        new CancellableFuture(state.promise, () => cancel(count0))
       }
     }.promise.future
   }

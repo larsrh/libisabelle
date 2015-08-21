@@ -1,12 +1,12 @@
 package edu.tum.cs.isabelle
 
-import scala.concurrent.{CancellationException, Future, Promise}
+import scala.concurrent._
 
-class CancellableFuture[T](promise: Promise[T], doCancel: Unit => Unit) {
+class CancellableFuture[T](private[isabelle] val promise: Promise[T], private[isabelle] val doCancel: () => Unit) {
   val future: Future[T] = promise.future
 
   def cancel(): Unit = {
-    doCancel(())
+    doCancel()
     promise.tryFailure(new CancellationException())
     ()
   }
