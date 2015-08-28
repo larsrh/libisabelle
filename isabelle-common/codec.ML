@@ -146,9 +146,12 @@ fun option a =
       | dec _ = NONE
   in variant enc dec "option" end
 
+val content_of =
+  XML.content_of o YXML.parse_body
+
 (* slightly fishy codec, doesn't preserve exception type *)
 exception GENERIC of string
-val exn = tagged "exn" (text (fn exn => (YXML.content_of (@{make_string} exn))) (SOME o GENERIC))
+val exn = tagged "exn" (text (fn exn => (content_of (@{make_string} exn))) (SOME o GENERIC))
 
 fun exn_result a =
   let
