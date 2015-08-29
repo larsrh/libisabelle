@@ -6,6 +6,8 @@ env:
 scala:
   - 2.10.5
   - 2.11.7
+install:
+  - git submodule update --init --recursive
 script:
   - sbt ++$TRAVIS_SCALA_VERSION compile
   - sbt ++$TRAVIS_SCALA_VERSION "bootstrap/run $ISABELLE_VERSION"
