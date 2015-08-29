@@ -5,7 +5,7 @@ signature PROTOCOL = sig
      to_lib : 'o codec,
      action : 'i -> 'o}
 
-  type flags = {sequential: bool, bracket: bool}
+  type flags = {sequential: bool, bracket: bool, auto: bool (* ignored *)}
 
   val default_flags : flags
   val join_flags : flags -> flags -> flags
@@ -23,17 +23,19 @@ type ('i, 'o) operation =
    to_lib : 'o codec,
    action : 'i -> 'o}
 
-type flags = {sequential: bool, bracket: bool}
+type flags = {sequential: bool, bracket: bool, auto: bool}
 
-val default_flags = {sequential = false, bracket = false}
+val default_flags = {sequential = false, bracket = false, auto = false}
 
 fun join_flags
-  {sequential = seq1, bracket = br1}
-  {sequential = seq2, bracket = br2} =
-  {sequential = seq1 orelse seq2, bracket = br1 orelse br2}
+  {sequential = seq1, bracket = br1, auto = a1}
+  {sequential = seq2, bracket = br2, auto = a2} =
+  {sequential = seq1 orelse seq2, bracket = br1 orelse br2, auto = a1 orelse a2}
 
-fun print_flags {sequential, bracket} =
-  "({sequential=" ^ Markup.print_bool sequential ^ ",bracket=" ^ Markup.print_bool bracket ^ "})"
+fun print_flags {sequential, bracket, auto} =
+  "({sequential=" ^ Markup.print_bool sequential ^ "," ^
+    "bracket=" ^ Markup.print_bool bracket ^ "," ^
+    "auto=" ^ Markup.print_bool auto ^ "})"
 
 type raw_operation = int -> XML.tree -> XML.tree
 
@@ -61,7 +63,7 @@ fun bracketize f id x =
     val _ = Output.protocol_message stop []
   in res end
 
-fun add_operation name {from_lib, to_lib, action} {sequential, bracket} =
+fun add_operation name {from_lib, to_lib, action} {sequential, bracket, ...} =
   let
     fun raw _ tree =
       case Codec.decode from_lib tree of

@@ -23,7 +23,8 @@ val _ =
       (Parse.reserved "sequential" || Parse.reserved "bracket") >>
         (fn flag => join_flags
            {sequential = flag = "sequential",
-            bracket = flag = "bracket"})
+            bracket = flag = "bracket",
+            auto = false (* not supported by Isabelle2014 *)})
     val parse_flags =
       Parse.list parse_flag >> (fn fs => fold (curry op o) fs I)
     val parse_cmd =
