@@ -16,7 +16,7 @@ object Typ {
       case TVar(iname, sort) => (2, typTVar.encode(env)((iname, sort)))
     }
 
-    def dec(env: Environment, idx: Int) = idx match {
+    def dec(env: Environment, idx: Int): Option[env.XMLTree => XMLResult[Typ]] = idx match {
       case 0 => Some(tree => typType.decode(env)(tree).right.map  { case (name, args) => Type(name, args) })
       case 1 => Some(tree => typTFree.decode(env)(tree).right.map { case (name, sort) => TFree(name, sort) })
       case 2 => Some(tree => typTVar.decode(env)(tree).right.map  { case (iname, sort) => TVar(iname, sort) })
@@ -50,7 +50,7 @@ object Term {
       case App(f, x)            => (5, termApp.encode(env)((f, x)))
     }
 
-    def dec(env: Environment, idx: Int) = idx match {
+    def dec(env: Environment, idx: Int): Option[env.XMLTree => XMLResult[Term]] = idx match {
       case 0 => Some(tree => termConst.decode(env)(tree).right.map  { case (name, typ) => Const(name, typ) })
       case 1 => Some(tree => termFree.decode(env)(tree).right.map   { case (name, typ) => Free(name, typ) })
       case 2 => Some(tree => termVar.decode(env)(tree).right.map    { case (iname, typ) => Var(iname, typ) })

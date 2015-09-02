@@ -6,7 +6,7 @@ import java.nio.file.Paths
 import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import edu.tum.cs.isabelle._
+import edu.tum.cs.isabelle.{Implementations, System}
 import edu.tum.cs.isabelle.api._
 import edu.tum.cs.isabelle.setup._
 
