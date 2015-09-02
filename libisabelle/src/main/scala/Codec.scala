@@ -84,6 +84,11 @@ object Codec {
   implicit def tuple[A : Codec, B : Codec]: Codec[(A, B)] =
     Codec[A] tuple Codec[B]
 
+  implicit def triple[A : Codec, B : Codec, C : Codec]: Codec[(A, B, C)] = Codec[(A, (B, C))].transform(
+    { case (a, (b, c)) => (a, b, c)  },
+    { case (a, b, c) => (a, (b, c)) }
+  )
+
   /**
    * Template for a [[Codec codec]] for a sum type `A`.
    *

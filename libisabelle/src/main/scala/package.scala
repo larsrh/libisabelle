@@ -16,6 +16,9 @@ case class DecodingException(msg: String, body: Environment#XMLBody) extends Run
 
 object `package` {
 
+  type Indexname = (String, BigInt)
+  type Sort = List[String]
+
   private[isabelle] implicit class ListOps[A](as: List[A]) {
     def traverse[E, B](f: A => Either[E, B]): Either[E, List[B]] = {
       @annotation.tailrec
