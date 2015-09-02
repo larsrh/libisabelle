@@ -6,19 +6,17 @@ begin
 ML_file "../isabelle-common/protocol.ML"
 
 ML\<open>
-structure Protocol: PROTOCOL = struct
-
-open Protocol
-
-fun operation_setup_cmd name source flags ctxt =
-  ML_Context.eval_in (SOME ctxt) ML_Compiler.flags (#pos source)
-    (ML_Lex.read Position.none ("Protocol.add_operation " ^ ML_Syntax.print_string name ^ "(") @
-      ML_Lex.read_source false source @
-      ML_Lex.read Position.none ")" @
-      ML_Lex.read Position.none (print_flags flags))
-
 val _ =
   let
+    open Protocol
+
+    fun operation_setup_cmd name source flags ctxt =
+      ML_Context.eval_in (SOME ctxt) ML_Compiler.flags (#pos source)
+        (ML_Lex.read Position.none ("Protocol.add_operation " ^ ML_Syntax.print_string name ^ "(") @
+          ML_Lex.read_source false source @
+          ML_Lex.read Position.none ")" @
+          ML_Lex.read Position.none (print_flags flags))
+
     val parse_flag =
       (Parse.reserved "sequential" || Parse.reserved "bracket") >>
         (fn flag => join_flags
@@ -36,8 +34,6 @@ val _ =
       (parse_cmd >> (fn ((flags, name), txt) =>
         Toplevel.keep (Toplevel.context_of #> operation_setup_cmd name txt (flags default_flags))))
   end
-
-end
 \<close>
 
 operation_setup hello = \<open>
