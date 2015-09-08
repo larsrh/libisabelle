@@ -2,11 +2,10 @@ import UnidocKeys._
 
 lazy val standardSettings = Seq(
   organization := "info.hupel",
-  version := "0.1-SNAPSHOT",
   scalaVersion := "2.11.7",
   crossScalaVersions := Seq("2.10.5", "2.11.7", "2.12.0-M2"),
   javacOptions += "-Xlint:unchecked",
-  homepage := Some(url("https://github.com/larsrh/libisabelle")),
+  homepage := Some(url("http://lars.hupel.info/libisabelle/")),
   licenses := Seq(
     "MIT" -> url("http://opensource.org/licenses/MIT"),
     "BSD" -> url("http://opensource.org/licenses/BSD-3-Clause")
@@ -28,6 +27,11 @@ lazy val standardSettings = Seq(
         <url>http://lars.hupel.info</url>
       </developer>
     </developers>
+    <scm>
+      <connection>scm:git:github.com/larsrh/libisabelle.git</connection>
+      <developerConnection>scm:git:git@github.com:larsrh/libisabelle.git</developerConnection>
+      <url>https://github.com/larsrh/libisabelle</url>
+    </scm>
   ),
   credentials += Credentials(
     Option(System.getProperty("build.publish.credentials")) map (new File(_)) getOrElse (Path.userHome / ".ivy2" / ".credentials")
@@ -157,3 +161,21 @@ lazy val tests = project.in(file("tests"))
       "org.scalacheck" %% "scalacheck" % "1.12.2" % "test"
     )
   )
+
+
+// Release stuff
+
+import ReleaseTransformations._
+
+releaseProcess := Seq[ReleaseStep](
+  checkSnapshotDependencies,
+  inquireVersions,
+  runClean,
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
+  ReleaseStep(action = Command.process("publishSigned", _), enableCrossBuild = true),
+  setNextVersion,
+  commitNextVersion,
+  ReleaseStep(action = Command.process("sonatypeReleaseAll", _), enableCrossBuild = true)
+)
