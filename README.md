@@ -22,7 +22,7 @@ Bootstrapping will create a new installation in the `contrib` folder.
 
 ## Documentation
 
-You can browse the Scaladoc [directly at Sonatype](https://oss.sonatype.org/service/local/repositories/snapshots/archive/info/hupel/libisabelle-docs_2.10/0.1-SNAPSHOT/libisabelle-docs_2.10-0.1-SNAPSHOT-javadoc.jar/!/index.html).
+You can browse the Scaladoc [directly at Sonatype](https://oss.sonatype.org/service/local/repositories/releases/archive/info/hupel/libisabelle-docs_2.10/0.1/libisabelle-docs_2.10-0.1-javadoc.jar/!/index.html).
 
 ## Running the tests
 
@@ -48,15 +48,15 @@ Drop the following lines into your `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "info.hupel" %% "libisabelle" % "0.1-SNAPSHOT",
-  "info.hupel" %% "libisabelle-setup" % "0.1-SNAPSHOT",
-  "info.hupel" %% "pide-interface" % "0.1-SNAPSHOT"
+  "info.hupel" %% "libisabelle" % "0.1",
+  "info.hupel" %% "libisabelle-setup" % "0.1",
+  "info.hupel" %% "pide-interface" % "0.1"
 )
 ```
 
 Depending on which Isabelle version you want, also add either of those:
 
 ```scala
-libraryDependencies += "info.hupel" %% "pide-2014" % "0.1-SNAPSHOT"
-libraryDependencies += "info.hupel" %% "pide-2015" % "0.1-SNAPSHOT"
+libraryDependencies += "info.hupel" %% "pide-2014" % "0.1"
+libraryDependencies += "info.hupel" %% "pide-2015" % "0.1"
 ```
