@@ -1,7 +1,7 @@
 # libisabelle
 Minimal wrapper around Isabelle/PIDE for non-IDE applications
 
-[![Build Status](https://travis-ci.org/larsrh/libisabelle.svg?branch=master)](https://travis-ci.org/larsrh/libisabelle)
+[![Build Status](https://img.shields.io/travis/larsrh/libisabelle.svg)](https://travis-ci.org/larsrh/libisabelle) [![Maven Central](https://img.shields.io/maven-central/v/info.hupel/libisabelle_2.11.svg?label=latest%20release%20for%202.11)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22info.hupel%22%20AND%20a%3A%22libisabelle_2.11%22)
 
 ## Setup
 
