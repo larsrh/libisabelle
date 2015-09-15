@@ -112,7 +112,7 @@ lazy val setup = project.in(file("setup"))
       "org.apache.commons" % "commons-compress" % "1.9",
       "org.apache.commons" % "commons-lang3" % "3.3.2",
       "com.github.fge" % "java7-fs-more" % "0.2.0",
-      "com.google.code.findbugs" % "jsr305" % "1.3.+" % "compile"
+      "com.google.code.findbugs" % "jsr305" % "1.3.9" % "compile"
     )
   )
 
