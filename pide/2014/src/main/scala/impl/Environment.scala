@@ -9,7 +9,10 @@ import edu.tum.cs.isabelle.api
 @api.Implementation(identifier = "2014")
 final class Environment(home: Path) extends api.Environment(home) {
 
-  isabelle.Isabelle_System.init(isabelle_home = home.toAbsolutePath.toString)
+  isabelle.Isabelle_System.init(
+    isabelle_home = home.toAbsolutePath.toString,
+    cygwin_root = home.resolve("contrib/cygwin").toAbsolutePath.toString
+  )
 
   type XMLTree = isabelle.XML.Tree
 
@@ -40,7 +43,7 @@ final class Environment(home: Path) extends api.Environment(home) {
   private lazy val options = isabelle.Options.init()
 
   private def mkPaths(path: Option[Path]) =
-    path.map(p => isabelle.Path.explode(p.toAbsolutePath.toString)).toList
+    path.map(p => isabelle.Path.explode(isabelle.Isabelle_System.posix_path(p.toAbsolutePath.toString))).toList
 
 
   protected[isabelle] def build(config: Configuration) =
