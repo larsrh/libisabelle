@@ -1,12 +1,16 @@
 # libisabelle
 Minimal wrapper around Isabelle/PIDE for non-IDE applications
 
-[![Build Status](https://img.shields.io/travis/larsrh/libisabelle.svg)](https://travis-ci.org/larsrh/libisabelle) [![Maven Central](https://img.shields.io/maven-central/v/info.hupel/libisabelle_2.11.svg?label=latest%20release%20for%202.11)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22info.hupel%22%20AND%20a%3A%22libisabelle_2.11%22)
+| Service                   | Status |
+| ------------------------- | ------ |
+| Travis (Linux CI)         | [![Build Status](https://img.shields.io/travis/larsrh/libisabelle.svg)](https://travis-ci.org/larsrh/libisabelle) |
+| AppVeyor (Windows CI)     | [![Build Status](https://img.shields.io/appveyor/ci/larsrh/libisabelle/master.svg)](https://ci.appveyor.com/project/larsrh/libisabelle) |
+| Maven Central             | [![Maven Central](https://img.shields.io/maven-central/v/info.hupel/libisabelle_2.11.svg?label=latest%20release%20for%202.11)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22info.hupel%22%20AND%20a%3A%22libisabelle_2.11%22) |
 
 ## Setup
 
 `libisabelle` is a Scala library which talks to Isabelle.
-It currently works with Isabelle2014 and Isabelle2015, but Linux-only.
+It currently works with Isabelle2014 and Isabelle2015.
 
 To get started, follow these steps:
 
@@ -19,6 +23,13 @@ On some systems, you might need to install Perl, Python, and/or some additional 
 Note to proficient Isabelle users:
 `libisabelle` does not respect `ISABELLE_HOME` by default.
 Bootstrapping will create a new installation in the `contrib` folder.
+
+## Operating system support
+
+Using an existing Isabelle installation, `libisabelle` should work on all platforms supported by Isabelle (Mac OS X, Linux, Windows).
+Bootstrapping an Isabelle installation from within `libisabelle` should work on both Windows and Linux.
+However, only Linux is tested regularly via continuous integration builds.
+
 
 ## Documentation
 
