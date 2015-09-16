@@ -14,15 +14,17 @@ import edu.tum.cs.isabelle.api.Version
 object Platform {
 
   /** Universal Linux platform for both 32- and 64-bit machines. */
-  case object Linux extends Platform("linux") {
-    def url(version: Version): Option[URL] = 
-      Some(new URL(s"${baseURL(version)}_linux.tar.gz"))
-  }
+  case object Linux extends Platform("linux")
+
+  /** Universal Windows platform for both 32- and 64-bit machines. */
+  case object Windows extends Platform("windows")
 
   /** Make an educated guess at the platform, not guaranteed to be correct. */
   def guess: Option[Platform] =
     if (SystemUtils.IS_OS_LINUX)
       Some(Linux)
+    else if (SystemUtils.IS_OS_WINDOWS)
+      Some(Windows)
     else
       None
 
@@ -46,6 +48,7 @@ sealed abstract class Platform(val name: String) {
    * [[edu.tum.cs.isabelle.api.Version version]] for this platform, if
    * available.
    */
-  def url(version: Version): Option[URL]
+  def url(version: Version): Option[URL] =
+    Some(new URL(s"${baseURL(version)}_$name.tar.gz"))
 
 }

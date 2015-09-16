@@ -1,0 +1,14 @@
+os: Windows Server 2012 R2
+install:
+  - cinst sbt
+  - cmd: SET PATH=%PATH%;"C:\Program Files (x86)\sbt\bin"
+  - cmd: git submodule update --init --recursive
+platform:
+  - x86
+environment:
+  ISABELLE_VERSION: 2015
+build_script:
+  - sbt compile
+test_script:
+  - sbt "bootstrap/run %ISABELLE_VERSION%"
+  - sbt test

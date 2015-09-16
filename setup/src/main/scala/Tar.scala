@@ -8,6 +8,7 @@ import scala.concurrent._
 
 import org.apache.commons.compress.archivers.tar.{TarArchiveEntry, TarArchiveInputStream}
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
+import org.apache.commons.lang3.SystemUtils
 
 import com.github.fge.filesystem.MoreFiles
 
@@ -41,7 +42,8 @@ object Tar {
           else if (entry.isFile)
             blocking {
               Files.copy(tar, subpath)
-              MoreFiles.setMode(subpath, entry.getMode)
+              if (!SystemUtils.IS_OS_WINDOWS)
+                MoreFiles.setMode(subpath, entry.getMode)
             }
           else
             sys.error("unknown tar file entry")
