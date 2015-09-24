@@ -59,15 +59,15 @@ Drop the following lines into your `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "info.hupel" %% "libisabelle" % "0.1",
-  "info.hupel" %% "libisabelle-setup" % "0.1",
-  "info.hupel" %% "pide-interface" % "0.1"
+  "info.hupel" %% "libisabelle" % "0.1.1",
+  "info.hupel" %% "libisabelle-setup" % "0.1.1",
+  "info.hupel" %% "pide-interface" % "0.1.1"
 )
 ```
 
 Depending on which Isabelle version you want, also add either of those:
 
 ```scala
-libraryDependencies += "info.hupel" %% "pide-2014" % "0.1"
-libraryDependencies += "info.hupel" %% "pide-2015" % "0.1"
+libraryDependencies += "info.hupel" %% "pide-2014" % "0.1.1"
+libraryDependencies += "info.hupel" %% "pide-2015" % "0.1.1"
 ```
