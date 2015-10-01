@@ -3,7 +3,7 @@ Minimal wrapper around Isabelle/PIDE for non-IDE applications
 
 | Service                   | Status |
 | ------------------------- | ------ |
-| Travis (Linux CI)         | [![Build Status](https://img.shields.io/travis/larsrh/libisabelle.svg)](https://travis-ci.org/larsrh/libisabelle) |
+| Travis (Linux CI)         | [![Build Status](https://travis-ci.org/larsrh/libisabelle.svg?branch=master)](https://travis-ci.org/larsrh/libisabelle) |
 | AppVeyor (Windows CI)     | [![Build Status](https://img.shields.io/appveyor/ci/larsrh/libisabelle/master.svg)](https://ci.appveyor.com/project/larsrh/libisabelle) |
 | Maven Central             | [![Maven Central](https://img.shields.io/maven-central/v/info.hupel/libisabelle_2.11.svg?label=latest%20release%20for%202.11)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22info.hupel%22%20AND%20a%3A%22libisabelle_2.11%22) |
 
@@ -16,7 +16,8 @@ To get started, follow these steps:
 
 1. Run the `sbt` script to fetch all required Scala dependencies.
    After this is done, you are in the SBT shell.
-2. Type `bootstrap/run 2015`, which will download and extract the latest supported Isabelle version for you.
+2. Compile the sources with `compile`.
+3. Bootstrap an Isabelle installation using `bootstrap/run 2015`, which will download and extract the latest supported Isabelle version for you.
 
 On some systems, you might need to install Perl, Python, and/or some additional libraries.
 
