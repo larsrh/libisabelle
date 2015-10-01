@@ -46,7 +46,7 @@ final class Environment(home: Path) extends api.Environment(home) {
     path.map(p => isabelle.Path.explode(isabelle.Isabelle_System.posix_path(p.toAbsolutePath.toString))).toList
 
 
-  protected[isabelle] def build(config: Configuration) =
+  protected[isabelle] def build(config: api.Configuration) =
     isabelle.Build.build(
       options = options,
       progress = new isabelle.Build.Console_Progress(verbose = true),
@@ -56,7 +56,7 @@ final class Environment(home: Path) extends api.Environment(home) {
       sessions = List(config.session)
     )
 
-  protected[isabelle] def create(config: Configuration, consumer: (api.Markup, XMLBody) => Unit) = {
+  protected[isabelle] def create(config: api.Configuration, consumer: (api.Markup, XMLBody) => Unit) = {
     val content = isabelle.Build.session_content(options, false, mkPaths(config.path), config.session)
     val resources = new isabelle.Resources(content.loaded_theories, content.known_theories, content.syntax)
     val session = new isabelle.Session(resources)

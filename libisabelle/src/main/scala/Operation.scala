@@ -67,8 +67,8 @@ object Operation {
    * The format of the paths is rather peculiar: They are relative to the
    * working directory at the time the [[System.create system was created]],
    * but do not include the extension `.thy`. Theories which are already part
-   * of the [[edu.tum.cs.isabelle.api.Environment#Configuration configuration]]
-   * should not be loaded again.
+   * of the [[edu.tum.cs.isabelle.api.Configuration configuration]] should not
+   * be loaded again.
    */
   val UseThys = implicitly[List[String], Unit]("use_thys")
 

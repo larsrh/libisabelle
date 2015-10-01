@@ -18,5 +18,5 @@ trait DefaultSetup {
 
   lazy val setup: Setup = Setup.detectSetup(Setup.defaultBasePath, Version(version)).get
   lazy val env: Environment = setup.makeEnvironment(Bootstrap.implementations).get
-  lazy val config: env.Configuration = env.Configuration.fromPath(Paths.get("."), s"Protocol$version")
+  lazy val config: Configuration = Configuration.fromPath(Paths.get("."), s"Protocol$version")
 }

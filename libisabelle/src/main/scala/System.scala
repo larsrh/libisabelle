@@ -11,7 +11,7 @@ object System {
 
   /**
    * Synchronously build a
-   * [[edu.tum.cs.isabelle.api.Environment#Configuration configuration]].
+   * [[edu.tum.cs.isabelle.api.Configuration configuration]].
    *
    * This operation is idempotent, but not parallel-safe. It must not be running
    * simultaneously for the same [[edu.tum.cs.isabelle.setup.Setup setup]], not
@@ -20,7 +20,7 @@ object System {
    * condition that they are using independent configurations, or that the
    * common ancestors of the configurations have already been successfully
    * built. Refer to the
-   * [[edu.tum.cs.isabelle.api.Environment#Configuration documentation of configurations]]
+   * [[edu.tum.cs.isabelle.api.Configuration documentation of configurations]]
    * for more details.
    *
    * A `true` return value indicates a successful build. Currently, there is no
@@ -30,12 +30,12 @@ object System {
    * non-interactive mode. Build products will be put into `~/.isabelle` on the
    * file system.
    */
-  def build(env: Environment)(config: env.Configuration): Boolean =
+  def build(env: Environment, config: Configuration): Boolean =
     env.build(config) == 0
 
   /**
    * Asynchronously create a new [[System system]] based on the specified
-   * [[edu.tum.cs.isabelle.api.Environment#Configuration configuration]].
+   * [[edu.tum.cs.isabelle.api.Configuration configuration]].
    *
    * The behaviour of this function when the given configuration has not been
    * [[build built]] yet is unspecified. Since building is idempotent, it is
@@ -49,7 +49,7 @@ object System {
    *
    * Build products will be read from `~/.isabelle` on the file system.
    */
-  def create(env: Environment)(config: env.Configuration): Future[System] = {
+  def create(env: Environment, config: Configuration): Future[System] = {
     class Output(name: String) {
       def unapply(markup: Markup): Option[Long] = markup match {
         case (env.protocolTag, (env.functionTag, `name`) :: ("id", id) :: Nil) =>
