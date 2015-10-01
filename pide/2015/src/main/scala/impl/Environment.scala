@@ -8,7 +8,7 @@ import scala.concurrent.ExecutionContext
 import edu.tum.cs.isabelle.api
 
 @api.Implementation(identifier = "2015")
-final class Environment(home: Path) extends api.Environment(home) {
+final class Environment protected(home: Path) extends api.Environment(home) {
 
   isabelle.Isabelle_System.init(
     isabelle_home = home.toAbsolutePath.toString,
