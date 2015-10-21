@@ -4,7 +4,6 @@ Minimal wrapper around Isabelle/PIDE for non-IDE applications
 | Service                   | Status |
 | ------------------------- | ------ |
 | Travis (Linux CI)         | [![Build Status](https://travis-ci.org/larsrh/libisabelle.svg?branch=master)](https://travis-ci.org/larsrh/libisabelle) |
-| AppVeyor (Windows CI)     | [![Build Status](https://img.shields.io/appveyor/ci/larsrh/libisabelle/master.svg)](https://ci.appveyor.com/project/larsrh/libisabelle) |
 | Maven Central             | [![Maven Central](https://img.shields.io/maven-central/v/info.hupel/libisabelle_2.11.svg?label=latest%20release%20for%202.11)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22info.hupel%22%20AND%20a%3A%22libisabelle_2.11%22) |
 
 ## Setup
@@ -34,7 +33,7 @@ However, only Linux is tested regularly via continuous integration builds.
 
 ## Documentation
 
-You can browse the Scaladoc [directly at Sonatype](https://oss.sonatype.org/service/local/repositories/releases/archive/info/hupel/libisabelle-docs_2.10/0.1/libisabelle-docs_2.10-0.1-javadoc.jar/!/index.html).
+You can browse the Scaladoc [directly at Sonatype](https://oss.sonatype.org/service/local/repositories/releases/archive/info/hupel/libisabelle-docs_2.10/0.1.2/libisabelle-docs_2.10-0.1.2-javadoc.jar/!/index.html).
 
 ## Running the tests
 
@@ -60,15 +59,15 @@ Drop the following lines into your `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "info.hupel" %% "libisabelle" % "0.1.1",
-  "info.hupel" %% "libisabelle-setup" % "0.1.1",
-  "info.hupel" %% "pide-interface" % "0.1.1"
+  "info.hupel" %% "libisabelle" % "0.1.2",
+  "info.hupel" %% "libisabelle-setup" % "0.1.2",
+  "info.hupel" %% "pide-interface" % "0.1.2"
 )
 ```
 
 Depending on which Isabelle version you want, also add either of those:
 
 ```scala
-libraryDependencies += "info.hupel" %% "pide-2014" % "0.1.1"
-libraryDependencies += "info.hupel" %% "pide-2015" % "0.1.1"
+libraryDependencies += "info.hupel" %% "pide-2014" % "0.1.2"
+libraryDependencies += "info.hupel" %% "pide-2015" % "0.1.2"
 ```
