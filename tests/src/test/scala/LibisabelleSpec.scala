@@ -29,7 +29,7 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
   val TypeOf = Operation.implicitly[String, String]("type_of")
   val Sleepy = Operation.implicitly[BigInt, Unit]("sleepy")
 
-  val system = System.create(env)(config)
+  val system = System.create(env, config)
   val loaded = system.flatMap(_.invoke(Operation.UseThys)(List("tests/src/test/isabelle/Test")))
   val response = for { s <- system; _ <- loaded; res <- s.invoke(TypeOf)("op ==>") } yield res
   val error = for { s <- system; _ <- loaded; res <- s.invoke(TypeOf)("==>") } yield res
