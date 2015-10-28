@@ -5,6 +5,7 @@ Minimal wrapper around Isabelle/PIDE for non-IDE applications
 | ------------------------- | ------ |
 | Travis (Linux CI)         | [![Build Status](https://travis-ci.org/larsrh/libisabelle.svg?branch=master)](https://travis-ci.org/larsrh/libisabelle) |
 | Maven Central             | [![Maven Central](https://img.shields.io/maven-central/v/info.hupel/libisabelle_2.11.svg?label=latest%20release%20for%202.11)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22info.hupel%22%20AND%20a%3A%22libisabelle_2.11%22) |
+| Scaladoc                  | [![Scaladoc](http://javadoc-badge.appspot.com/info.hupel/libisabelle_2.11.svg?label=scaladoc)](http://javadoc-badge.appspot.com/info.hupel/libisabelle_2.11) |
 
 ## Setup
 
@@ -30,10 +31,6 @@ Using an existing Isabelle installation, `libisabelle` should work on all platfo
 Bootstrapping an Isabelle installation from within `libisabelle` should work on both Windows and Linux.
 However, only Linux is tested regularly via continuous integration builds.
 
-
-## Documentation
-
-You can browse the Scaladoc [directly at Sonatype](https://oss.sonatype.org/service/local/repositories/releases/archive/info/hupel/libisabelle-docs_2.10/0.1.2/libisabelle-docs_2.10-0.1.2-javadoc.jar/!/index.html).
 
 ## Running the tests
 
