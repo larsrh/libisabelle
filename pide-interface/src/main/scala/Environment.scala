@@ -4,6 +4,8 @@ import java.nio.file.Path
 
 import scala.concurrent.ExecutionContext
 
+import acyclic.file
+
 /**
  * Result from the prover.
  *

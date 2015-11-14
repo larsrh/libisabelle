@@ -4,6 +4,8 @@ import scala.math.BigInt
 
 import edu.tum.cs.isabelle.api._
 
+import acyclic.file
+
 object Typ {
   implicit lazy val typCodec: Codec[Typ] = new Codec.Variant[Typ] {
     lazy val typType = Codec[(String, List[Typ])]

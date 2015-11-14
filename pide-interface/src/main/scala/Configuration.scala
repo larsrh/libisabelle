@@ -2,6 +2,8 @@ package edu.tum.cs.isabelle.api
 
 import java.nio.file.Path
 
+import acyclic.file
+
 /** Convenience constructors for [[Configuration configurations]]. */
 object Configuration {
   /**

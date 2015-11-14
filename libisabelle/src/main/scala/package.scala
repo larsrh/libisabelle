@@ -5,6 +5,8 @@ import scala.util._
 
 import edu.tum.cs.isabelle.api.Environment
 
+import acyclic.file
+
 /**
  * Error case of [[XMLResult]] as an exception.
  *

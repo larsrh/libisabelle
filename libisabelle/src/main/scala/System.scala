@@ -6,6 +6,8 @@ import scala.util.control.NoStackTrace
 
 import edu.tum.cs.isabelle.api._
 
+import acyclic.file
+
 /** Functions to build and create [[System systems]]. */
 object System {
 

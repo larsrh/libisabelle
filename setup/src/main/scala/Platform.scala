@@ -6,6 +6,8 @@ import org.apache.commons.lang3.SystemUtils
 
 import edu.tum.cs.isabelle.api.Version
 
+import acyclic.file
+
 /**
  * Detection of the machine's [[Platform platform]].
  *

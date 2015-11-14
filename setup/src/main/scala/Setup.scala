@@ -7,6 +7,8 @@ import scala.concurrent.{Future, ExecutionContext}
 import edu.tum.cs.isabelle.Implementations
 import edu.tum.cs.isabelle.api.{Environment, Version}
 
+import acyclic.file
+
 /**
  * Detecting and creating [[Setup setups]].
  *

@@ -4,6 +4,8 @@ import scala.util.control.NoStackTrace
 
 import edu.tum.cs.isabelle.api.{Environment, ProverResult}
 
+import acyclic.file
+
 /** Combinators for creating [[Operation operations]] and basic operations. */
 object Operation {
 

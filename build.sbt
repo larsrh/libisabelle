@@ -63,6 +63,12 @@ lazy val noPublishSettings = Seq(
   publishArtifact := false
 )
 
+lazy val acyclicSettings = Seq(
+  libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.3" % "provided",
+  autoCompilerPlugins := true,
+  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.3")
+)
+
 
 lazy val root = project.in(file("."))
   .settings(standardSettings)
@@ -83,6 +89,7 @@ lazy val pideInterface = project.in(file("pide-interface"))
   .settings(moduleName := "pide-interface")
   .settings(standardSettings)
   .settings(warningSettings)
+  .settings(acyclicSettings)
   .settings(
     libraryDependencies ++= {
       if (scalaVersion.value startsWith "2.10")
@@ -96,6 +103,7 @@ lazy val libisabelle = project
   .dependsOn(pideInterface)
   .settings(standardSettings)
   .settings(warningSettings)
+  .settings(acyclicSettings)
   .enablePlugins(GitVersioning, BuildInfoPlugin)
   .settings(Seq(
     buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion, git.gitHeadCommit),
@@ -107,6 +115,7 @@ lazy val setup = project.in(file("setup"))
   .settings(moduleName := "libisabelle-setup")
   .settings(standardSettings)
   .settings(warningSettings)
+  .settings(acyclicSettings)
   .settings(
     libraryDependencies ++= Seq(
       "org.apache.commons" % "commons-compress" % "1.9",
@@ -154,6 +163,7 @@ lazy val tests = project.in(file("tests"))
   .settings(noPublishSettings)
   .settings(standardSettings)
   .settings(warningSettings)
+  .settings(acyclicSettings)
   .settings(
     libraryDependencies ++= Seq(
       "org.specs2" %% "specs2-core" % "3.6.3" % "test",

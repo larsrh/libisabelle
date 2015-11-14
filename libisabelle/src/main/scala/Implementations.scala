@@ -7,6 +7,8 @@ import scala.util.control.Exception._
 
 import edu.tum.cs.isabelle.api._
 
+import acyclic.file
+
 object Implementations {
 
   /**
