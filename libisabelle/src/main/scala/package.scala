@@ -21,22 +21,6 @@ object `package` {
   type Indexname = (String, BigInt)
   type Sort = List[String]
 
-  private[isabelle] implicit class ListOps[A](as: List[A]) {
-    def traverse[E, B](f: A => Either[E, B]): Either[E, List[B]] = {
-      @annotation.tailrec
-      def go(as: List[A], bs: List[B]): Either[E, List[B]] = as match {
-        case Nil => Right(bs)
-        case a :: as =>
-          f(a) match {
-            case Right(b) => go(as, b :: bs)
-            case Left(err) => Left(err)
-          }
-      }
-
-      go(as, Nil).right.map(_.reverse)
-    }
-  }
-
   /**
    * The result type for [[Codec#decode decoding values]] from
    * [[edu.tum.cs.isabelle.api.Environment#XMLTree XML trees]]. Failure values

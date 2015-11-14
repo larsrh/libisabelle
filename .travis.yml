@@ -1,8 +1,10 @@
 language: scala
 jdk:
   - openjdk7
+  - oraclejdk8
 env:
   - ISABELLE_VERSION=2014
+  - ISABELLE_VERSION=2015
 scala:
   - 2.10.5
   - 2.11.7
@@ -12,11 +14,3 @@ script:
   - sbt ++$TRAVIS_SCALA_VERSION compile
   - sbt ++$TRAVIS_SCALA_VERSION "bootstrap/run $ISABELLE_VERSION"
   - sbt ++$TRAVIS_SCALA_VERSION test
-matrix:
-  include:
-    - jdk: oraclejdk8
-      scala: 2.12.0-M2
-      env: ISABELLE_VERSION=2014
-    - jdk: openjdk7
-      scala: 2.11.7
-      env: ISABELLE_VERSION=2015

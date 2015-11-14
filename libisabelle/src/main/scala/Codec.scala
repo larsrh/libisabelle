@@ -5,6 +5,10 @@ import scala.util.control.Exception._
 
 import edu.tum.cs.isabelle.api._
 
+import cats.std.either._
+import cats.std.list._
+import cats.syntax.traverse._
+
 import acyclic.file
 
 /** Combinators for [[Codec codecs]]. */

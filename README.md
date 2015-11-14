@@ -51,7 +51,7 @@ Make sure to have bootstrapped the installation as described above for the appro
 
 ## Including libisabelle into your project
 
-`libisabelle` is cross-built for Scala 2.10.x, 2.11.x and 2.12.x.
+`libisabelle` is cross-built for Scala 2.10.x and 2.11.x.
 Drop the following lines into your `build.sbt`:
 
 ```scala

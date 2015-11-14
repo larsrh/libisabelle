@@ -3,7 +3,7 @@ import UnidocKeys._
 lazy val standardSettings = Seq(
   organization := "info.hupel",
   scalaVersion := "2.11.7",
-  crossScalaVersions := Seq("2.10.5", "2.11.7", "2.12.0-M2"),
+  crossScalaVersions := Seq("2.10.5", "2.11.7"),
   javacOptions += "-Xlint:unchecked",
   homepage := Some(url("http://lars.hupel.info/libisabelle/")),
   licenses := Seq(
@@ -107,7 +107,10 @@ lazy val libisabelle = project
   .enablePlugins(GitVersioning, BuildInfoPlugin)
   .settings(Seq(
     buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion, git.gitHeadCommit),
-    buildInfoPackage := "edu.tum.cs.isabelle"
+    buildInfoPackage := "edu.tum.cs.isabelle",
+    libraryDependencies ++= Seq(
+      "org.spire-math" %% "cats-core" % "0.3.0"
+    )
   ))
 
 lazy val setup = project.in(file("setup"))
