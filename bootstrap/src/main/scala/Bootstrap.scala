@@ -4,6 +4,7 @@ import java.net.URL
 import java.nio.file.Paths
 
 import scala.concurrent._
+import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import edu.tum.cs.isabelle.{Implementations, System}
@@ -25,7 +26,7 @@ object BootstrapApp extends App {
 
   val version = Version(args(0))
   println(s"Downloading and untarring $version ...")
-  val setup = Await.result(Setup.defaultSetup(version), duration.Duration.Inf)
+  val setup = Await.result(Setup.defaultSetup(version), Duration.Inf)
   println("Loading an environment ...")
   val env = setup.makeEnvironment(Bootstrap.implementations).get
   println("Creating a configuration with default session ...")
