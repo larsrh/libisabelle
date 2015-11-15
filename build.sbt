@@ -73,7 +73,7 @@ lazy val acyclicSettings = Seq(
 lazy val root = project.in(file("."))
   .settings(standardSettings)
   .settings(noPublishSettings)
-  .aggregate(pideInterface, libisabelle, setup, pide2014, pide2015, bootstrap, tests, docs, appTemplate)
+  .aggregate(pideInterface, libisabelle, setup, pide2014, pide2015, bootstrap, tests, docs, appTemplate, appReport)
 
 lazy val docs = project.in(file("docs"))
   .settings(moduleName := "libisabelle-docs")
@@ -184,6 +184,12 @@ lazy val appTemplate = project.in(file("app-template"))
   .settings(standardSettings)
   .settings(warningSettings)
   .settings(acyclicSettings)
+
+lazy val appReport = project.in(file("apps/report"))
+  .dependsOn(appTemplate)
+  .settings(noPublishSettings)
+  .settings(standardSettings)
+  .settings(warningSettings)
 
 
 // Release stuff
