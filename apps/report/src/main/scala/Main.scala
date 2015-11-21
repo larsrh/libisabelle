@@ -14,12 +14,12 @@ object Main extends Template {
   def duration = Duration.Inf
 
   val UseThysMarkup = new Operation[List[String], Unit]("use_thys") {
-    def prepare(env: Environment, args: List[String]): (env.XMLTree, env.Observer[Unit]) = {
-      val tree = Codec[List[String]].encode(env)(args)
-      lazy val observer: env.Observer[Unit] = env.Observer.More(msg => {
+    def prepare(args: List[String]): (XML.Tree, Observer[Unit]) = {
+      val tree = Codec[List[String]].encode(args)
+      lazy val observer: Observer[Unit] = Observer.More(msg => {
         println(msg)
         observer
-      }, _ => env.Observer.Success(ProverResult.Success(())))
+      }, _ => Observer.Success(ProverResult.Success(())))
 
       (tree, observer)
     }

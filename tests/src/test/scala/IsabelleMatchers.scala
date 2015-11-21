@@ -2,7 +2,7 @@ package edu.tum.cs.isabelle.tests
 
 import org.specs2.matcher._
 
-import edu.tum.cs.isabelle.api._
+import edu.tum.cs.isabelle._
 
 trait IsabelleMatchers {
 

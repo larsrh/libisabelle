@@ -68,7 +68,7 @@ object System {
     trait OperationState { self =>
       type T
       val firehose: Boolean
-      val observer: env.Observer[T]
+      val observer: Observer[T]
       val promise: Promise[ProverResult[T]]
 
       def withFirehose(firehose0: Boolean) = new OperationState {
@@ -78,7 +78,7 @@ object System {
         val promise = self.promise
       }
 
-      def withObserver(observer0: env.Observer[T]) = new OperationState {
+      def withObserver(observer0: Observer[T]) = new OperationState {
         type T = self.T
         val firehose = self.firehose
         val observer = observer0
@@ -86,13 +86,13 @@ object System {
       }
 
       def tryComplete() = observer match {
-        case env.Observer.Success(t) => promise.success(t); true
-        case env.Observer.Failure(err) => promise.failure(err); true
+        case Observer.Success(t) => promise.success(t); true
+        case Observer.Failure(err) => promise.failure(err); true
         case _  => false
       }
 
-      def advance(id: Long, markup: Markup, body: env.XMLBody) = observer match {
-        case env.Observer.More(step, finish) =>
+      def advance(id: Long, markup: Markup, body: XML.Body) = observer match {
+        case Observer.More(step, finish) =>
           (markup, body) match {
             case (Response(id1), List(tree)) if id == id1 =>
               withObserver(finish(tree))
@@ -101,7 +101,7 @@ object System {
             case (Stop(id1), _) if id == id1 && firehose =>
               withFirehose(false)
             case _ if firehose =>
-              withObserver(step(env.elem(markup, body)))
+              withObserver(step(XML.elem(markup, body)))
             case _ =>
               this
           }
@@ -110,7 +110,7 @@ object System {
       }
     }
 
-    def makeOperationState[T0](observer0: env.Observer[T0]) = {
+    def makeOperationState[T0](observer0: Observer[T0]) = {
       val state = new OperationState {
         type T = T0
         val firehose = false
@@ -127,7 +127,7 @@ object System {
     new System { self =>
       implicit val executionContext = env.executionContext
 
-      private def consumer(markup: Markup, body: env.XMLBody): Unit = (markup, body) match {
+      private def consumer(markup: Markup, body: XML.Body): Unit = (markup, body) match {
         case ((env.initTag, _), _) => initPromise.success(()); ()
         case ((env.exitTag, _), _) => exitPromise.success(()); ()
         case _ =>
@@ -158,7 +158,7 @@ object System {
         env.sendCommand(session, "libisabelle_cancel", List(id.toString))
 
       def cancellableInvoke[I, O](operation: Operation[I, O])(arg: I) = {
-        val (encoded, observer) = operation.prepare(env, arg)
+        val (encoded, observer) = operation.prepare(arg)
         val state = makeOperationState(observer)
         val count0 = self.synchronized {
           val count0 = count
@@ -167,7 +167,7 @@ object System {
           count0
         }
 
-        val args = List(count0.toString, operation.name, env.toYXML(encoded))
+        val args = List(count0.toString, operation.name, encoded.toYXML)
         env.sendCommand(session, "libisabelle", args)
         new CancellableFuture(state.promise, () => cancel(count0))
       }
@@ -235,9 +235,7 @@ sealed abstract class System {
   /**
    * Invoke an [[Operation operation]] on the prover, that is,
    * [[Codec#encode encode]] the input argument, send it to the prover and
-   * stream the results to the
-   * [[edu.tum.cs.isabelle.api.Environment#Observer observer]] of the
-   * operation.
+   * stream the results to the [[Observer observer]] of the operation.
    *
    * The observer is automatically [[Operation#prepare instantiated]] with
    * the underlying [[edu.tum.cs.isabelle.api.Environment environment]]
@@ -245,8 +243,8 @@ sealed abstract class System {
    *
    * The returned [[scala.concurrent.Future future]] gets fulfilled when the
    * observer transitions into either
-   * `[[edu.tum.cs.isabelle.api.Environment#Observer.Success Success]]` or
-   * `[[edu.tum.cs.isabelle.api.Environment#Observer.Failure Failure]]` state.
+   * `[[edu.tum.cs.isabelle.Observer.Success Success]]` or
+   * `[[edu.tum.cs.isabelle.Observer.Failure Failure]]` state.
    *
    * Any well-formed response, even if it is an "error", is treated as a
    * success. Only ill-formed responses, e.g. due to [[Codec#decode decoding]]

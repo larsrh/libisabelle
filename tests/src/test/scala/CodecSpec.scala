@@ -3,7 +3,6 @@ package edu.tum.cs.isabelle.tests
 import scala.math.BigInt
 
 import org.specs2.{ScalaCheck, Specification}
-import org.specs2.specification.core.Env
 
 import org.scalacheck._
 import org.scalacheck.Prop.forAll
@@ -11,7 +10,7 @@ import org.scalacheck.Prop.forAll
 import edu.tum.cs.isabelle._
 import edu.tum.cs.isabelle.api._
 
-class CodecSpec(val specs2Env: Env) extends Specification with ScalaCheck with DefaultSetup { def is = s2"""
+class CodecSpec extends Specification with ScalaCheck { def is = s2"""
 
   Round-trip property of Codecs
 
@@ -35,7 +34,7 @@ class CodecSpec(val specs2Env: Env) extends Specification with ScalaCheck with D
   """
 
   def propCodec[A : Codec : Arbitrary] = forAll { (a: A) =>
-    Codec[A].decode(env)(Codec[A].encode(env)(a)) must beRight(a)
+    Codec[A].decode(Codec[A].encode(a)) must beRight(a)
   }
 
 }
