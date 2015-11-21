@@ -2,7 +2,7 @@ package edu.tum.cs.isabelle
 
 import scala.util.control.NoStackTrace
 
-import edu.tum.cs.isabelle.api.{Environment, ProverResult}
+import edu.tum.cs.isabelle.api.XML
 
 import acyclic.file
 
@@ -36,22 +36,22 @@ object Operation {
       str => Some(ProverException(name, str, input))
     ).tagged("exn")
 
-    def proverResult(input: I) = new Codec.Variant[ProverResult[O]] {
-      def enc(env: Environment, a: ProverResult[O]): (Int, env.XMLTree) = sys.error("impossible")
-      def dec(env: Environment, idx: Int): Option[env.XMLTree => XMLResult[ProverResult[O]]] = idx match {
-        case 0 => Some(fromProver.decode(env)(_).right.map(ProverResult.Success.apply))
-        case 1 => Some(exn(input).decode(env)(_).right.map(ProverResult.Failure.apply))
+    def proverResult(input: I) = new Codec.Variant[ProverResult[O]]("Exn.result") {
+      def enc(a: ProverResult[O]) = sys.error("impossible")
+      def dec(idx: Int) = idx match {
+        case 0 => Some(fromProver.decode(_).right.map(ProverResult.Success.apply))
+        case 1 => Some(exn(input).decode(_).right.map(ProverResult.Failure.apply))
         case _ => None
       }
-    } toCodec "Exn.result"
+    }
 
     new Operation[I, O](name) {
-      def prepare(env: Environment, i: I): (env.XMLTree, env.Observer[O]) = {
-        val tree = toProver.encode(env)(i)
-        val observer = env.Observer.ignoreStep[O] { tree =>
-          proverResult(i).decode(env)(tree) match {
-            case Left((err, body)) => env.Observer.Failure(DecodingException(err, body))
-            case Right(o) => env.Observer.Success(o)
+      def prepare(i: I): (XML.Tree, Observer[O]) = {
+        val tree = toProver.encode(i)
+        val observer = Observer.ignoreStep[O] { tree =>
+          proverResult(i).decode(tree) match {
+            case Left((err, body)) => Observer.Failure(DecodingException(err, body))
+            case Right(o) => Observer.Success(o)
           }
         }
 
@@ -85,13 +85,11 @@ object Operation {
  * latter is irrelevant.)
  *
  * Data is transferred between JVM and the prover using
- * [[edu.tum.cs.isabelle.api.Environment#XMLTree XML trees]]. To convert
- * between typed data and their XML representation, [[Codec codecs]] may be
- * used.
+ * [[edu.tum.cs.isabelle.api.XML.Tree XML trees]]. To convert between typed
+ * data and their XML representation, [[Codec codecs]] may be used.
  *
  * In the most general case, an operation listens for a stream of output from
- * the prover using an
- * [[edu.tum.cs.isabelle.api.Environment#Observer observer]], comparable to
+ * the prover using an [[edu.tum.cs.isabelle.Observer observer]], comparable to
  * iteratees.
  *
  * Operations can most easily be constructed with the
@@ -104,10 +102,9 @@ abstract class Operation[I, O](val name: String) {
 
   /**
    * Prepare an input/output operation: Convert the input argument into an
-   * [[edu.tum.cs.isabelle.api.Environment#XMLTree XML tree]] and create a
-   * fresh [[edu.tum.cs.isabelle.api.Environment#Observer observer]] to listen
-   * for results.
+   * [[edu.tum.cs.isabelle.api.XML.Tree XML tree]] and create a fresh
+   * [[edu.tum.cs.isabelle.Observer observer]] to listen for results.
    */
-  def prepare(env: Environment, i: I): (env.XMLTree, env.Observer[O])
+  def prepare(i: I): (XML.Tree, Observer[O])
 
 }

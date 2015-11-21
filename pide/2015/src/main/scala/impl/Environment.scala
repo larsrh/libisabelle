@@ -25,21 +25,8 @@ final class Environment protected(home: Path) extends api.Environment(home) {
     }
   })
 
-  type XMLTree = isabelle.XML.Tree
-
-  def fromYXML(source: String) = isabelle.YXML.parse(source)
-  def toYXML(tree: XMLTree) = isabelle.YXML.string_of_tree(tree)
-
-  def text(content: String) = isabelle.XML.Text(content)
-  def elem(markup: api.Markup, body: XMLBody) = isabelle.XML.Elem(isabelle.Markup(markup._1, markup._2), body)
-
   private def destMarkup(markup: isabelle.Markup) =
     (markup.name, markup.properties)
-
-  def destTree(tree: XMLTree) = tree match {
-    case isabelle.XML.Text(content) => Left(content)
-    case isabelle.XML.Elem(markup, body) => Right((destMarkup(markup), body))
-  }
 
   protected[isabelle] val exitTag = isabelle.Markup.EXIT
   protected[isabelle] val functionTag = isabelle.Markup.FUNCTION
@@ -67,16 +54,21 @@ final class Environment protected(home: Path) extends api.Environment(home) {
       sessions = List(config.session)
     )
 
-  protected[isabelle] def create(config: api.Configuration, consumer: (api.Markup, XMLBody) => Unit) = {
+  protected[isabelle] def create(config: api.Configuration, consumer: (api.Markup, api.XML.Body) => Unit) = {
     val content = isabelle.Build.session_content(options, false, mkPaths(config.path), config.session)
     val resources = new isabelle.Resources(content.loaded_theories, content.known_theories, content.syntax)
     val session = new isabelle.Session(resources)
 
+    def convertXML(tree: isabelle.XML.Tree): api.XML.Tree = tree match {
+      case isabelle.XML.Text(content) => api.XML.text(content)
+      case isabelle.XML.Elem(markup, body) => api.XML.elem(destMarkup(markup), body.map(convertXML))
+    }
+
     session.all_messages += isabelle.Session.Consumer[isabelle.Prover.Message]("firehose") {
       case msg: isabelle.Prover.Protocol_Output =>
-        consumer(destMarkup(msg.message.markup), isabelle.YXML.parse_body(msg.text))
+        consumer(destMarkup(msg.message.markup), api.XML.bodyFromYXML(msg.text))
       case msg: isabelle.Prover.Output =>
-        consumer(destMarkup(msg.message.markup), msg.message.body)
+        consumer(destMarkup(msg.message.markup), msg.message.body.map(convertXML))
       case _ =>
     }
 
