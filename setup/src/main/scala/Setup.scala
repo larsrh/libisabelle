@@ -84,12 +84,9 @@ object Setup {
       }
     }
 
-    val pideInterface = resolve("interface")
-    val pideVersion = resolve(version.identifier)
-
     for {
-      i <- pideInterface
-      v <- pideVersion
+      i <- resolve("interface")
+      v <- resolve(version.identifier)
       artifacts = v -- i
       res <- Future.traverse(artifacts.toList)(files.file(_, cachePolicy).run.toScalaFuture)
     }
