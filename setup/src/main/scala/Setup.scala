@@ -1,11 +1,14 @@
 package edu.tum.cs.isabelle.setup
 
+import java.io.File
 import java.nio.file.{Files, Path, Paths}
 
 import scala.concurrent.{Future, ExecutionContext}
 
+import coursier._
+
 import edu.tum.cs.isabelle.Implementations
-import edu.tum.cs.isabelle.api.{Environment, Version}
+import edu.tum.cs.isabelle.api.{BuildInfo, Environment, Version}
 
 import acyclic.file
 
@@ -55,6 +58,45 @@ object Setup {
         }
     }
 
+  def fetchImplementation(platform: Platform, version: Version)(implicit ec: ExecutionContext): Future[List[Path]] = {
+    val repositories = Seq(Repository.ivy2Local, Repository.mavenCentral, Repository.sonatypeReleases)
+
+    val files = coursier.Files(
+      Seq("https://" -> platform.localStorage.resolve("cache").toFile),
+      () => sys.error("impossible")
+    )
+
+    val cachePolicy = Repository.CachePolicy.Default
+
+    def resolve(identifier: String) = {
+      val dependency =
+        Dependency(
+          Module(BuildInfo.organization, s"pide-${identifier}_${BuildInfo.scalaBinaryVersion}"),
+          BuildInfo.version
+        )
+      Resolution(Set(dependency)).process.run(repositories).toScalaFuture.map { res =>
+        if (!res.isDone)
+          sys.error("not converged")
+        else if (!res.errors.isEmpty)
+          sys.error(s"errors: ${res.errors}")
+        else
+          res.artifacts.toSet
+      }
+    }
+
+    val pideInterface = resolve("interface")
+    val pideVersion = resolve(version.identifier)
+
+    for {
+      i <- pideInterface
+      v <- pideVersion
+      artifacts = v -- i
+      res <- Future.traverse(artifacts.toList)(files.file(_, cachePolicy).run.toScalaFuture)
+    }
+    yield
+      res.map(_.fold(sys.error, _.toPath))
+  }
+
 }
 
 /**
@@ -74,8 +116,13 @@ case class Setup(home: Path, platform: Platform, version: Version) {
   /**
    * Convenience method aliasing
    * [[edu.tum.cs.isabelle.Implementations#makeEnvironment]] with the
-   * appropriate parameters.
+   * appropriate parameters. It calls [[Setup.fetchImplementation]] to download
+   * the required classpath.
    */
-  def makeEnvironment(impls: Implementations): Option[Environment] =
-    impls.makeEnvironment(home, version)
+  def makeEnvironment(implicit ec: ExecutionContext): Future[Environment] =
+    Setup.fetchImplementation(platform, version).map { paths =>
+      val entry = Implementations.Entry(paths.map(_.toUri.toURL), "edu.tum.cs.isabelle.impl")
+      Implementations.empty.add(entry).get.makeEnvironment(home, version).get
+    }
+
 }

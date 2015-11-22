@@ -44,7 +44,7 @@ trait Template {
   final def main(args: Array[String]): Unit = Template.getVersion(args.toList) match {
     case (Some(version), args) =>
       val app = Setup.defaultSetup(version).flatMap { setup =>
-        setup.makeEnvironment(Bootstrap.implementations) match {
+        Bootstrap.implementations.makeEnvironment(setup.home, setup.version) match {
           case None =>
             sys.error("Unknown or unsupported Isabelle version")
           case Some(env) =>
