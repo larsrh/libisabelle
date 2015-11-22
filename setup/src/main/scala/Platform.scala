@@ -25,7 +25,7 @@ object Platform {
   /** Universal Windows platform for both 32- and 64-bit machines. */
   case object Windows extends Platform("windows") {
     def localStorage =
-      Paths.get(System.getenv("APPDATA")).resolve("libisabelle").toAbsolutePath
+      Paths.get(System.getenv("LOCALAPPDATA")).resolve("libisabelle").toAbsolutePath
   }
 
   /** Make an educated guess at the platform, not guaranteed to be correct. */
