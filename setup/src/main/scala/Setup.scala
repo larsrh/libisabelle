@@ -19,41 +19,40 @@ import acyclic.file
  */
 object Setup {
 
-  /** Default base path: `contrib` in the current working directory. */
-  def defaultBasePath =
-    Paths.get("contrib")
-
   /** Default platform: [[Platform.guess guessing]]. */
-  def defaultPlatform =
+  def defaultPlatform: Option[Platform] =
     Platform.guess
 
-  // FIXME return type?! Option[Future[Setup]]?
-  def installTo(path: Path, version: Version)(implicit ec: ExecutionContext): Future[Setup] =
-    defaultPlatform.flatMap(_.url(version)) match {
+  // FIXME this whole thing needs proper error handling
+
+  def installTo(platform: Platform, version: Version)(implicit ec: ExecutionContext): Future[Setup] =
+    platform.url(version) match {
       case None =>
         sys.error("couldn't determine URL")
       case Some(url) =>
         val stream = Tar.download(url)
-        Tar.extractTo(path, stream).map(Setup(_, version))
+        Tar.extractTo(platform.localStorage, stream).map(Setup(_, platform, version))
     }
 
-  def temporarySetup(version: Version)(implicit ec: ExecutionContext): Future[Setup] =
-    installTo(Files.createTempDirectory("libisabelle").toRealPath(), version)
-
-  def detectSetup(base: Path, version: Version): Option[Setup] = {
-    val path = base resolve s"Isabelle${version.identifier}"
+  def detectSetup(platform: Platform, version: Version): Option[Setup] = {
+    val path = platform.localStorage.resolve(s"Isabelle${version.identifier}")
     if (Files.isDirectory(path))
-      Some(Setup(path, version))
+      Some(Setup(path, platform, version))
     else
       None
   }
 
   def defaultSetup(version: Version)(implicit ec: ExecutionContext): Future[Setup] =
-    detectSetup(defaultBasePath, version) match {
-      case Some(install) =>
-        Future.successful(install)
+    defaultPlatform match {
       case None =>
-        installTo(defaultBasePath, version)
+        sys.error("couldn't determine platform")
+      case Some(platform) =>
+        detectSetup(platform, version) match {
+          case Some(install) =>
+            Future.successful(install)
+          case None =>
+            installTo(platform, version)
+        }
     }
 
 }
@@ -70,7 +69,8 @@ object Setup {
  *
  * The file system location is called ''home'' throughout `libisabelle`.
  */
-case class Setup(home: Path, version: Version) {
+case class Setup(home: Path, platform: Platform, version: Version) {
+
   /**
    * Convenience method aliasing
    * [[edu.tum.cs.isabelle.Implementations#makeEnvironment]] with the
