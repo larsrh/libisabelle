@@ -24,12 +24,10 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
     can be torn down        ${teardown must exist.awaitFor(5.seconds)}"""
 
 
-  implicit val ee = specs2Env.executionEnv
-
   val TypeOf = Operation.implicitly[String, String]("type_of")
   val Sleepy = Operation.implicitly[BigInt, Unit]("sleepy")
 
-  val system = System.create(env, config)
+  val system = env.flatMap(System.create(_, config))
   val loaded = system.flatMap(_.invoke(Operation.UseThys)(List("tests/src/test/isabelle/Test")))
   val response = for { s <- system; _ <- loaded; res <- s.invoke(TypeOf)("op ==>") } yield res
   val error = for { s <- system; _ <- loaded; res <- s.invoke(TypeOf)("==>") } yield res

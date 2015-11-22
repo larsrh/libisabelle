@@ -6,9 +6,7 @@ import scala.concurrent._
 import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits
 
-import edu.tum.cs.isabelle
 import edu.tum.cs.isabelle.api._
-import edu.tum.cs.isabelle.bootstrap._
 import edu.tum.cs.isabelle.setup.Setup
 
 import acyclic.file
@@ -27,12 +25,7 @@ object Template {
 
 }
 
-case class Bundle(env: Environment, version: Version, args: List[String]) {
-  val config: Configuration =
-    Configuration.fromPath(Paths.get("."), s"HOL-Protocol${version.identifier}")
-  def system: Future[isabelle.System] =
-    isabelle.System.create(env, config)
-}
+case class Bundle(env: Environment, version: Version, args: List[String])
 
 trait Template {
 
@@ -43,13 +36,8 @@ trait Template {
 
   final def main(args: Array[String]): Unit = Template.getVersion(args.toList) match {
     case (Some(version), args) =>
-      val app = Setup.defaultSetup(version).flatMap { setup =>
-        Bootstrap.implementations.makeEnvironment(setup.home, setup.version) match {
-          case None =>
-            sys.error("Unknown or unsupported Isabelle version")
-          case Some(env) =>
-            run(Bundle(env, version, args))
-        }
+      val app = Setup.defaultSetup(version).flatMap(_.makeEnvironment).flatMap { env =>
+        run(Bundle(env, version, args))
       }
 
       Await.result(app, duration)

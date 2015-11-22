@@ -9,8 +9,8 @@ scala:
 install:
   - git submodule update --init --recursive
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION compile
-  - sbt ++$TRAVIS_SCALA_VERSION "bootstrap/run $ISABELLE_VERSION"
+  - sbt ++$TRAVIS_SCALA_VERSION publishLocal
+  - sbt ++$TRAVIS_SCALA_VERSION "appBootstrap/run --version $ISABELLE_VERSION"
   - sbt ++$TRAVIS_SCALA_VERSION test
 matrix:
   include:
