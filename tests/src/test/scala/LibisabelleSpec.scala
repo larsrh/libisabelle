@@ -18,10 +18,10 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
   An Isabelle session
     can be started          ${system must exist.awaitFor(30.seconds)}
     can load theories       ${loaded must beSuccess(()).awaitFor(30.seconds)}
-    reacts to requests      ${response must beSuccess("prop => prop => prop").awaitFor(5.seconds)}
-    handles errors          ${error must beFailure.awaitFor(5.seconds)}
-    can cancel requests     ${cancelled.failed must beAnInstanceOf[CancellationException].awaitFor(5.seconds)}
-    can be torn down        ${teardown must exist.awaitFor(5.seconds)}"""
+    reacts to requests      ${response must beSuccess("prop => prop => prop").awaitFor(30.seconds)}
+    handles errors          ${error must beFailure.awaitFor(30.seconds)}
+    can cancel requests     ${cancelled.failed must beAnInstanceOf[CancellationException].awaitFor(30.seconds)}
+    can be torn down        ${teardown must exist.awaitFor(30.seconds)}"""
 
 
   val TypeOf = Operation.implicitly[String, String]("type_of")
