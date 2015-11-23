@@ -6,6 +6,7 @@ import java.nio.file.{Files, Path, Paths}
 import scala.concurrent.{Future, ExecutionContext}
 
 import coursier._
+import coursier.core.{Fetch, MavenRepository}
 
 import edu.tum.cs.isabelle.Implementations
 import edu.tum.cs.isabelle.api.{BuildInfo, Environment, Version}
@@ -59,7 +60,11 @@ object Setup {
     }
 
   def fetchImplementation(platform: Platform, version: Version)(implicit ec: ExecutionContext): Future[List[Path]] = {
-    val repositories = Seq(Repository.ivy2Local, Repository.mavenCentral, Repository.sonatypeReleases)
+    val repositories = Seq(
+      Repository.ivy2Local,
+      MavenRepository(Fetch("https://repo1.maven.org/maven2/", Some(platform.localStorage.resolve("maven").toFile))),
+      MavenRepository(Fetch("https://oss.sonatype.org/content/repositories/releases/", Some(platform.localStorage.resolve("sonatype").toFile)))
+    )
 
     val files = coursier.Files(
       Seq("https://" -> platform.localStorage.resolve("cache").toFile),
