@@ -20,14 +20,13 @@ object Implementations {
   def empty: Implementations = new Implementations(Map.empty)
 
   /**
-   * Class path coupled with a class name.
+   * Class path coupled with a package name.
    *
    * It is expected that the specified class extends
    * `[[edu.tum.cs.isabelle.api.Environment Environment]]`. Furthermore, the
-   * class path should contain all required dependencies except for the Scala
-   * standard libraries and modules.
+   * class path should contain all required dependencies.
    */
-  case class Entry(urls: List[URL], name: String)
+  case class Entry(urls: List[URL], packageName: String)
 
   /**
    * Construct a [[edu.tum.cs.isabelle.api.Environment environment]] in the
@@ -50,9 +49,13 @@ object Implementations {
  */
 class Implementations private(entries: Map[Version, Implementations.Entry]) {
 
-  private def loadClass(entry: Implementations.Entry): Option[Class[_ <: Environment]] = {
+  private def loadClass(entry: Implementations.Entry): Class[_ <: Environment] = {
     val classLoader = new URLClassLoader(entry.urls.toArray, Thread.currentThread.getContextClassLoader)
-    catching(classOf[ClassCastException]) opt classLoader.loadClass(entry.name).asSubclass(classOf[Environment])
+    val env = classLoader.loadClass(s"${entry.packageName}.Environment").asSubclass(classOf[Environment])
+    val info = classLoader.loadClass(s"${entry.packageName}.BuildInfo").getDeclaredMethod("toString").invoke(null)
+    if (BuildInfo.toString != info.toString)
+      sys.error(s"build info does not match")
+    env
   }
 
   /**
@@ -64,7 +67,7 @@ class Implementations private(entries: Map[Version, Implementations.Entry]) {
    * afterwards.
    */
   def add(entry: Implementations.Entry): Option[Implementations] =
-    loadClass(entry).flatMap(Environment.getVersion) map { version =>
+    Environment.getVersion(loadClass(entry)) map { version =>
       new Implementations(entries + (version -> entry))
     }
 
@@ -104,6 +107,6 @@ class Implementations private(entries: Map[Version, Implementations.Entry]) {
    * exactly the trick used here.
    */
   def makeEnvironment(home: Path, version: Version): Option[Environment] =
-    entries get version flatMap loadClass map { Implementations.makeEnvironment(home, _) }
+    entries get version map loadClass map { Implementations.makeEnvironment(home, _) }
 
 }

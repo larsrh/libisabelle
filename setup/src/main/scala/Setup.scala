@@ -1,11 +1,15 @@
 package edu.tum.cs.isabelle.setup
 
+import java.io.File
 import java.nio.file.{Files, Path, Paths}
 
 import scala.concurrent.{Future, ExecutionContext}
 
+import coursier._
+import coursier.core.{Fetch, MavenRepository}
+
 import edu.tum.cs.isabelle.Implementations
-import edu.tum.cs.isabelle.api.{Environment, Version}
+import edu.tum.cs.isabelle.api.{BuildInfo, Environment, Version}
 
 import acyclic.file
 
@@ -19,42 +23,81 @@ import acyclic.file
  */
 object Setup {
 
-  /** Default base path: `contrib` in the current working directory. */
-  def defaultBasePath =
-    Paths.get("contrib")
-
   /** Default platform: [[Platform.guess guessing]]. */
-  def defaultPlatform =
+  def defaultPlatform: Option[Platform] =
     Platform.guess
 
-  // FIXME return type?! Option[Future[Setup]]?
-  def installTo(path: Path, version: Version)(implicit ec: ExecutionContext): Future[Setup] =
-    defaultPlatform.flatMap(_.url(version)) match {
+  // FIXME this whole thing needs proper error handling
+
+  def installTo(platform: Platform, version: Version)(implicit ec: ExecutionContext): Future[Setup] =
+    platform.url(version) match {
       case None =>
         sys.error("couldn't determine URL")
       case Some(url) =>
         val stream = Tar.download(url)
-        Tar.extractTo(path, stream).map(Setup(_, version))
+        Tar.extractTo(platform.localStorage, stream).map(Setup(_, platform, version))
     }
 
-  def temporarySetup(version: Version)(implicit ec: ExecutionContext): Future[Setup] =
-    installTo(Files.createTempDirectory("libisabelle").toRealPath(), version)
-
-  def detectSetup(base: Path, version: Version): Option[Setup] = {
-    val path = base resolve s"Isabelle${version.identifier}"
+  def detectSetup(platform: Platform, version: Version): Option[Setup] = {
+    val path = platform.localStorage.resolve(s"Isabelle${version.identifier}")
     if (Files.isDirectory(path))
-      Some(Setup(path, version))
+      Some(Setup(path, platform, version))
     else
       None
   }
 
   def defaultSetup(version: Version)(implicit ec: ExecutionContext): Future[Setup] =
-    detectSetup(defaultBasePath, version) match {
-      case Some(install) =>
-        Future.successful(install)
+    defaultPlatform match {
       case None =>
-        installTo(defaultBasePath, version)
+        sys.error("couldn't determine platform")
+      case Some(platform) =>
+        detectSetup(platform, version) match {
+          case Some(install) =>
+            Future.successful(install)
+          case None =>
+            installTo(platform, version)
+        }
     }
+
+  def fetchImplementation(platform: Platform, version: Version)(implicit ec: ExecutionContext): Future[List[Path]] = {
+    val repositories = Seq(
+      Repository.ivy2Local,
+      MavenRepository(Fetch("https://repo1.maven.org/maven2/", Some(platform.localStorage.resolve("maven").toFile))),
+      MavenRepository(Fetch("https://oss.sonatype.org/content/repositories/releases/", Some(platform.localStorage.resolve("sonatype").toFile)))
+    )
+
+    val files = coursier.Files(
+      Seq("https://" -> platform.localStorage.resolve("cache").toFile),
+      () => sys.error("impossible")
+    )
+
+    val cachePolicy = Repository.CachePolicy.Default
+
+    def resolve(identifier: String) = {
+      val dependency =
+        Dependency(
+          Module(BuildInfo.organization, s"pide-${identifier}_${BuildInfo.scalaBinaryVersion}"),
+          BuildInfo.version
+        )
+      Resolution(Set(dependency)).process.run(repositories).toScalaFuture.map { res =>
+        if (!res.isDone)
+          sys.error("not converged")
+        else if (!res.errors.isEmpty)
+          sys.error(s"errors: ${res.errors}")
+        else
+          res.artifacts.toSet
+      }
+    }
+
+    for {
+      i <- resolve("interface")
+      v <- resolve(version.identifier)
+      artifacts = v -- i
+      res <- Future.traverse(artifacts.toList)(files.file(_, cachePolicy).run.toScalaFuture)
+    }
+    yield
+      res.map(_.fold(sys.error, _.toPath))
+  }
 
 }
 
@@ -70,12 +113,18 @@ object Setup {
  *
  * The file system location is called ''home'' throughout `libisabelle`.
  */
-case class Setup(home: Path, version: Version) {
+case class Setup(home: Path, platform: Platform, version: Version) {
+
   /**
    * Convenience method aliasing
    * [[edu.tum.cs.isabelle.Implementations#makeEnvironment]] with the
-   * appropriate parameters.
+   * appropriate parameters. It calls [[Setup.fetchImplementation]] to download
+   * the required classpath.
    */
-  def makeEnvironment(impls: Implementations): Option[Environment] =
-    impls.makeEnvironment(home, version)
+  def makeEnvironment(implicit ec: ExecutionContext): Future[Environment] =
+    Setup.fetchImplementation(platform, version).map { paths =>
+      val entry = Implementations.Entry(paths.map(_.toUri.toURL), "edu.tum.cs.isabelle.impl")
+      Implementations.empty.add(entry).get.makeEnvironment(home, version).get
+    }
+
 }

@@ -25,12 +25,18 @@ object Main extends Template {
     }
   }
 
-  def run(bundle: Bundle) =
+  def run(bundle: Bundle) = {
+    val config = Configuration.fromPath(Paths.get("."), s"HOL-Protocol${bundle.version.identifier}")
+    val built = System.build(bundle.env, config)
+    if (!built)
+      sys.error("build error")
+
     for {
-      s <- bundle.system
+      s <- System.create(bundle.env, config)
       _ <- s.invoke(UseThysMarkup)(bundle.args)
       _ <- s.dispose
     }
     yield ()
+  }
 
 }

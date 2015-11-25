@@ -17,13 +17,14 @@ To get started, follow these steps:
 1. Run the `sbt` script to fetch all required Scala dependencies.
    After this is done, you are in the SBT shell.
 2. Compile the sources with `compile`.
-3. Bootstrap an Isabelle installation using `bootstrap/run 2015`, which will download and extract the latest supported Isabelle version for you.
+3. If you have used an arbitrary snapshot of the sources (e.g. via `git clone`), run `publishLocal`.
+4. Bootstrap an Isabelle installation using `appBootstrap/run --version 2015`, which will download and extract the latest supported Isabelle version for you.
 
 On some systems, you might need to install Perl, Python, and/or some additional libraries.
 
 Note to proficient Isabelle users:
-`libisabelle` does not respect `ISABELLE_HOME` by default.
-Bootstrapping will create a new installation in the `contrib` folder.
+`libisabelle` does not respect `ISABELLE_HOME`.
+Bootstrapping will create a new installation in your home folder (Linux: `.local/share`, Windows: `%LOCALAPPDATA%`).
 
 ## Operating system support
 
@@ -60,11 +61,4 @@ libraryDependencies ++= Seq(
   "info.hupel" %% "libisabelle-setup" % "0.1.2",
   "info.hupel" %% "pide-interface" % "0.1.2"
 )
-```
-
-Depending on which Isabelle version you want, also add either of those:
-
-```scala
-libraryDependencies += "info.hupel" %% "pide-2014" % "0.1.2"
-libraryDependencies += "info.hupel" %% "pide-2015" % "0.1.2"
 ```

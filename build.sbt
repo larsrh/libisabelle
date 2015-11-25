@@ -69,18 +69,26 @@ lazy val acyclicSettings = Seq(
   addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.3")
 )
 
+lazy val apiBuildInfoKeys = Seq[BuildInfoKey](
+  version,
+  scalaVersion,
+  scalaBinaryVersion,
+  organization,
+  git.gitHeadCommit
+)
+
 
 lazy val root = project.in(file("."))
   .settings(standardSettings)
   .settings(noPublishSettings)
-  .aggregate(pideInterface, libisabelle, setup, pide2014, pide2015, bootstrap, tests, docs, appTemplate, appReport)
+  .aggregate(pideInterface, libisabelle, setup, pide2014, pide2015, tests, docs, appTemplate, appBootstrap, appReport)
 
 lazy val docs = project.in(file("docs"))
   .settings(moduleName := "libisabelle-docs")
   .settings(standardSettings)
   .settings(unidocSettings)
   .settings(
-    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(pide2014, pide2015, bootstrap, tests),
+    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(pide2014, pide2015, tests, appBootstrap, appReport),
     doc in Compile := (doc in ScalaUnidoc).value,
     target in unidoc in ScalaUnidoc := crossTarget.value / "api"
   )
@@ -90,13 +98,10 @@ lazy val pideInterface = project.in(file("pide-interface"))
   .settings(standardSettings)
   .settings(warningSettings)
   .settings(acyclicSettings)
+  .enablePlugins(GitVersioning, BuildInfoPlugin)
   .settings(
-    libraryDependencies ++= {
-      if (scalaVersion.value startsWith "2.10")
-        Seq()
-      else
-        Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4")
-    }
+    buildInfoKeys := apiBuildInfoKeys,
+    buildInfoPackage := "edu.tum.cs.isabelle.api"
   )
 
 lazy val libisabelle = project
@@ -104,10 +109,7 @@ lazy val libisabelle = project
   .settings(standardSettings)
   .settings(warningSettings)
   .settings(acyclicSettings)
-  .enablePlugins(GitVersioning, BuildInfoPlugin)
   .settings(Seq(
-    buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion, git.gitHeadCommit),
-    buildInfoPackage := "edu.tum.cs.isabelle",
     libraryDependencies ++= Seq(
       "org.spire-math" %% "cats-core" % "0.3.0"
     )
@@ -124,45 +126,38 @@ lazy val setup = project.in(file("setup"))
       "org.apache.commons" % "commons-compress" % "1.9",
       "org.apache.commons" % "commons-lang3" % "3.3.2",
       "com.github.fge" % "java7-fs-more" % "0.2.0",
-      "com.google.code.findbugs" % "jsr305" % "1.3.9" % "compile"
+      "com.google.code.findbugs" % "jsr305" % "1.3.9" % "compile",
+      "com.github.alexarchambault" %% "coursier" % "0.1.0-M1",
+      "com.github.alexarchambault" %% "coursier-files" % "0.1.0-M1"
     )
   )
 
-lazy val pide2014 = project.in(file("pide/2014"))
+def pide(version: String) = Project(s"pide$version", file(s"pide/$version"))
   .dependsOn(pideInterface)
-  .settings(moduleName := "pide-2014")
+  .settings(moduleName := s"pide-$version")
   .settings(standardSettings)
+  .enablePlugins(GitVersioning, BuildInfoPlugin)
+  .settings(Seq(
+    buildInfoKeys := apiBuildInfoKeys,
+    buildInfoPackage := "edu.tum.cs.isabelle.impl",
+    libraryDependencies ++= {
+      if (scalaVersion.value startsWith "2.10")
+        Seq()
+      else
+        Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4")
+    }
+  ))
 
-lazy val pide2015 = project.in(file("pide/2015"))
-  .dependsOn(pideInterface)
-  .settings(moduleName := "pide-2015")
-  .settings(standardSettings)
+lazy val pide2014 = pide("2014")
+lazy val pide2015 = pide("2015")
 
 lazy val versions = Map(
   "2014" -> pide2014,
   "2015" -> pide2015
 )
 
-lazy val bootstrap = project.in(file("bootstrap"))
-  .dependsOn(libisabelle, setup, pideInterface)
-  .settings(noPublishSettings)
-  .settings(standardSettings)
-  .settings(warningSettings)
-  .enablePlugins(BuildInfoPlugin)
-  .settings(
-    buildInfoPackage := "edu.tum.cs.isabelle.bootstrap",
-    buildInfoKeys ++= {
-      versions.toList.map { case (v, p) =>
-        BuildInfoKey.map(classDirectory in (p, Compile)) {
-          case (_, classFiles) =>
-            (s"Isa$v", List(classFiles.toURI.toURL))
-        }
-      }
-    }
-  )
-
 lazy val tests = project.in(file("tests"))
-  .dependsOn(bootstrap)
+  .dependsOn(libisabelle, setup)
   .settings(noPublishSettings)
   .settings(standardSettings)
   .settings(warningSettings)
@@ -179,17 +174,20 @@ lazy val tests = project.in(file("tests"))
 // Standalone applications
 
 lazy val appTemplate = project.in(file("app-template"))
-  .dependsOn(bootstrap)
+  .dependsOn(libisabelle, setup)
   .settings(noPublishSettings)
   .settings(standardSettings)
   .settings(warningSettings)
   .settings(acyclicSettings)
 
-lazy val appReport = project.in(file("apps/report"))
+def app(identifier: String) = Project(s"app${identifier.capitalize}", file(s"apps/$identifier"))
   .dependsOn(appTemplate)
   .settings(noPublishSettings)
   .settings(standardSettings)
   .settings(warningSettings)
+
+lazy val appBootstrap = app("bootstrap")
+lazy val appReport = app("report")
 
 
 // Release stuff
