@@ -49,6 +49,8 @@ object Implementations {
  */
 class Implementations private(entries: Map[Version, Implementations.Entry]) {
 
+  // FIXME error handling
+
   private def loadClass(entry: Implementations.Entry): Class[_ <: Environment] = {
     val classLoader = new URLClassLoader(entry.urls.toArray, Thread.currentThread.getContextClassLoader)
     val env = classLoader.loadClass(s"${entry.packageName}.Environment").asSubclass(classOf[Environment])
@@ -66,20 +68,18 @@ class Implementations private(entries: Map[Version, Implementations.Entry]) {
    * The class loader and the loaded class are discarded immediately
    * afterwards.
    */
-  def add(entry: Implementations.Entry): Option[Implementations] =
-    Environment.getVersion(loadClass(entry)) map { version =>
-      new Implementations(entries + (version -> entry))
-    }
+  def add(entry: Implementations.Entry): Implementations = {
+    val version = Environment.getVersion(loadClass(entry))
+    new Implementations(entries + (version -> entry))
+  }
 
   /**
    * Load a series of classes.
    *
    * @see [[add]]
    */
-  def addAll(entries: List[Implementations.Entry]): Option[Implementations] =
-    entries.foldLeft(Some(this): Option[Implementations]) { (impls, entry) =>
-      impls.flatMap(_.add(entry))
-    }
+  def addAll(entries: List[Implementations.Entry]): Implementations =
+    entries.foldLeft(this)(_ add _)
 
   /** Known versions. */
   def versions: Set[Version] = entries.keySet

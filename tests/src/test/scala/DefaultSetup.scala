@@ -14,13 +14,13 @@ trait DefaultSetup { self: Specification =>
   val specs2Env: Env
   implicit val ee = specs2Env.executionEnv
 
-  lazy val version: String =
+  lazy val version: Version =
     Option(java.lang.System.getenv("ISABELLE_VERSION")).orElse(
       specs2Env.arguments.commandLine.value("isabelle.version")
-    ).get
+    ).map(Version.apply).get
 
   lazy val platform: Platform = Setup.defaultPlatform.get
-  lazy val setup: Setup = Setup.detectSetup(platform, Version(version)).get
+  lazy val setup: Setup = Setup.detectSetup(platform, version).get
   lazy val env: Future[Environment] = setup.makeEnvironment
-  lazy val config: Configuration = Configuration.fromPath(Paths.get("."), s"Protocol$version")
+  lazy val config: Configuration = Configuration.fromPath(Paths.get("."), s"Protocol${version.identifier}")
 }

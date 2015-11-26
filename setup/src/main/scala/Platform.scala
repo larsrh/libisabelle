@@ -70,6 +70,9 @@ sealed abstract class Platform(val name: String) {
   final def setupStorage: Path =
     localStorage.resolve("setups")
 
+  final def setupStorage(version: Version): Path =
+    setupStorage.resolve(s"Isabelle${version.identifier}")
+
   final def versionedStorage: Path =
     localStorage.resolve(s"v${BuildInfo.version}")
 

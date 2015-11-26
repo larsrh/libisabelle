@@ -1,16 +1,46 @@
 package edu.tum.cs.isabelle.api
 
+import java.util.{Collections, WeakHashMap}
 import java.nio.file.Path
 
 import scala.concurrent.ExecutionContext
+
+import org.log4s._
 
 import acyclic.file
 
 
 object Environment {
 
-  private[isabelle] def getVersion(clazz: Class[_ <: Environment]): Option[Version] =
-    Option(clazz.getAnnotation(classOf[Implementation]).identifier).map(Version.apply)
+  private val logger = getLogger
+
+  private[isabelle] def getVersion(clazz: Class[_ <: Environment]): Version = {
+    val identifier = clazz.getAnnotation(classOf[Implementation]).identifier
+    if (identifier == null)
+      sys.error("malformed implementation")
+    Version(identifier)
+  }
+
+  private val instances: java.util.Map[Class[_ <: Environment], Path] =
+    Collections.synchronizedMap(new WeakHashMap())
+
+  private def checkInstance(clazz: Class[_ <: Environment], home: Path): Unit = instances.synchronized {
+    val version = getVersion(clazz)
+    if (instances.containsKey(clazz)) {
+      val oldHome = instances.get(clazz)
+      if (instances.get(clazz) == home)
+        logger.warn(s"Environment for $version has already been instantiated, but with the same path $oldHome")
+      else {
+        logger.error(s"Failed to instantiate environment for $version at $home; already existing at $oldHome")
+        sys.error("invalid instantiation")
+      }
+    }
+    else {
+      logger.info(s"Instantiating environment for $version at $home")
+      instances.put(clazz, home)
+      ()
+    }
+  }
 
 }
 
@@ -25,13 +55,9 @@ object Environment {
  *
  * A subclass of this class is called ''implementation'' througout
  * `libisabelle`. The `[[edu.tum.cs.isabelle.Implementations Implementations]]`
- * class serves as a registry of those, although using it is not required.
- *
- * Users may instantiate implementations manually, although there is a caveat:
- * After one implementation has been instantiated, the behaviour of subsequent
- * instantiations with a different path or instantiations of a different
- * implementation is undefined. For most applications, this is not a
- * significant restriction, because they only deal with a single setup.
+ * class serves as a registry of those and using it is strongly recommended.
+ * (Since subclasses should `protect` their constructors, manual instantiation
+ * would not work anyway.)
  *
  * For multi-home or multi-version scenarios, it is highly recommended that
  * users create environments through
@@ -48,8 +74,11 @@ object Environment {
  * ''Contract''
  *
  *   - An implementation is a subclass of this class.
- *   - Implementations must be final and provide a public constructor with
- *     exactly one argument (of type `java.nio.file.Path`).
+ *   - Implementations must be final and provide a constructor with exactly one
+ *    argument (of type `java.nio.file.Path`). There must be no other
+ *    constructors. The constructor should be `protected`, but must be
+ *    accessible from any class in the [[edu.tum.cs.isabelle isabelle]]
+ *    package.
  *   - Implementations must be annotated with
  *     `[[edu.tum.cs.isabelle.api.Implementation Implementation]]`, where the
  *     given [[edu.tum.cs.isabelle.api.Implementation.identifier identifier]]
@@ -71,7 +100,9 @@ object Environment {
  */
 abstract class Environment protected[isabelle](home: Path) { self =>
 
-  final val version = Environment.getVersion(getClass()).get
+  Environment.checkInstance(getClass(), home)
+
+  final val version = Environment.getVersion(getClass())
 
   override def toString: String =
     s"$version at $home"

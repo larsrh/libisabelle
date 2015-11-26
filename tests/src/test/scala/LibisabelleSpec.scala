@@ -6,7 +6,6 @@ import scala.math.BigInt
 
 import org.specs2.Specification
 import org.specs2.specification.core.Env
-import org.specs2.matcher.Matcher
 
 import edu.tum.cs.isabelle._
 import edu.tum.cs.isabelle.api._
@@ -49,7 +48,5 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
       _ <- s.dispose
     }
     yield ()
-
-  def exist[A]: Matcher[A] = ((a: A) => a != null, "doesn't exist")
 
 }

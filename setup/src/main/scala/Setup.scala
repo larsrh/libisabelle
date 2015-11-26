@@ -52,7 +52,7 @@ object Setup {
     }
 
   def detectSetup(platform: Platform, version: Version): Option[Setup] = {
-    val path = platform.setupStorage.resolve(s"Isabelle${version.identifier}")
+    val path = platform.setupStorage(version)
     if (Files.isDirectory(path)) {
       logger.info(s"Using default setup; detected $version at $path")
       Some(Setup(path, platform, version))
@@ -154,7 +154,7 @@ case class Setup(home: Path, platform: Platform, version: Version) {
   def makeEnvironment(implicit ec: ExecutionContext): Future[Environment] =
     Setup.fetchImplementation(platform, version).map { paths =>
       val entry = Implementations.Entry(paths.map(_.toUri.toURL), "edu.tum.cs.isabelle.impl")
-      Implementations.empty.add(entry).get.makeEnvironment(home, version).get
+      Implementations.empty.add(entry).makeEnvironment(home, version).get
     }
 
 }
