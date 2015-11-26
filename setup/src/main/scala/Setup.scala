@@ -8,6 +8,8 @@ import scala.concurrent.{Future, ExecutionContext}
 import coursier._
 import coursier.core.{Fetch, MavenRepository}
 
+import org.log4s._
+
 import edu.tum.cs.isabelle.Implementations
 import edu.tum.cs.isabelle.api.{BuildInfo, Environment, Version}
 
@@ -23,9 +25,19 @@ import acyclic.file
  */
 object Setup {
 
+  private val logger = getLogger
+
   /** Default platform: [[Platform.guess guessing]]. */
-  def defaultPlatform: Option[Platform] =
-    Platform.guess
+  def defaultPlatform: Option[Platform] = {
+    val guess = Platform.guess
+    logger.info(
+      guess match {
+        case Some(p) => s"Using default platform; detected $p"
+        case None    => s"Using default platform; platform could not be detected"
+      }
+    )
+    guess
+  }
 
   // FIXME this whole thing needs proper error handling
 
@@ -34,16 +46,21 @@ object Setup {
       case None =>
         sys.error("couldn't determine URL")
       case Some(url) =>
+        logger.info(s"Downloading setup $version to ${platform.setupStorage}")
         val stream = Tar.download(url)
-        Tar.extractTo(platform.localStorage, stream).map(Setup(_, platform, version))
+        Tar.extractTo(platform.setupStorage, stream).map(Setup(_, platform, version))
     }
 
   def detectSetup(platform: Platform, version: Version): Option[Setup] = {
-    val path = platform.localStorage.resolve("setups").resolve(s"Isabelle${version.identifier}")
-    if (Files.isDirectory(path))
+    val path = platform.setupStorage.resolve(s"Isabelle${version.identifier}")
+    if (Files.isDirectory(path)) {
+      logger.info(s"Using default setup; detected $version at $path")
       Some(Setup(path, platform, version))
-    else
+    }
+    else {
+      logger.info(s"Using default setup; no setup found in ${platform.setupStorage}")
       None
+    }
   }
 
   def defaultSetup(version: Version)(implicit ec: ExecutionContext): Future[Setup] =
@@ -60,7 +77,7 @@ object Setup {
     }
 
   def fetchImplementation(platform: Platform, version: Version)(implicit ec: ExecutionContext): Future[List[Path]] = {
-    val base = platform.localStorage.resolve(s"v${BuildInfo.version}")
+    val base = platform.versionedStorage
 
     val repositories = Seq(
       Repository.ivy2Local,
@@ -70,7 +87,18 @@ object Setup {
 
     val files = coursier.Files(
       Seq("https://" -> base.resolve("cache").toFile),
-      () => sys.error("impossible")
+      () => sys.error("impossible"),
+      Some(new FilesLogger {
+        def downloadingArtifact(url: String) = logger.info(s"Downloading artifact from $url ...")
+        def downloadedArtifact(url: String, success: Boolean) = {
+          val file = url.split('/').last
+          if (success)
+            logger.info(s"Successfully downloaded $file")
+          else
+            logger.error(s"Failed to download $file")
+        }
+        def foundLocally(file: File) = ()
+      })
     )
 
     val cachePolicy = Repository.CachePolicy.Default

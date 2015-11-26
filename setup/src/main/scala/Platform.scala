@@ -5,7 +5,7 @@ import java.nio.file.{Path, Paths}
 
 import org.apache.commons.lang3.SystemUtils
 
-import edu.tum.cs.isabelle.api.Version
+import edu.tum.cs.isabelle.api.{BuildInfo, Version}
 
 import acyclic.file
 
@@ -66,5 +66,11 @@ sealed abstract class Platform(val name: String) {
     Some(new URL(s"${baseURL(version)}_$name.tar.gz"))
 
   def localStorage: Path
+
+  final def setupStorage: Path =
+    localStorage.resolve("setups")
+
+  final def versionedStorage: Path =
+    localStorage.resolve(s"v${BuildInfo.version}")
 
 }

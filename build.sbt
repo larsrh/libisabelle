@@ -12,6 +12,7 @@ lazy val standardSettings = Seq(
   ),
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
+  libraryDependencies += "org.log4s" %% "log4s" % "1.2.1",
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (version.value.endsWith("SNAPSHOT"))
@@ -110,9 +111,7 @@ lazy val libisabelle = project
   .settings(warningSettings)
   .settings(acyclicSettings)
   .settings(Seq(
-    libraryDependencies ++= Seq(
-      "org.spire-math" %% "cats-core" % "0.3.0"
-    )
+    libraryDependencies += "org.spire-math" %% "cats-core" % "0.3.0"
   ))
 
 lazy val setup = project.in(file("setup"))
@@ -185,6 +184,9 @@ def app(identifier: String) = Project(s"app${identifier.capitalize}", file(s"app
   .settings(noPublishSettings)
   .settings(standardSettings)
   .settings(warningSettings)
+  .settings(
+    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.1"
+  )
 
 lazy val appBootstrap = app("bootstrap")
 lazy val appReport = app("report")
