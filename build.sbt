@@ -165,7 +165,8 @@ lazy val tests = project.in(file("tests"))
     libraryDependencies ++= Seq(
       "org.specs2" %% "specs2-core" % "3.6.5" % "test",
       "org.specs2" %% "specs2-scalacheck" % "3.6.5" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.12.5" % "test"
+      "org.scalacheck" %% "scalacheck" % "1.12.5" % "test",
+      "ch.qos.logback" % "logback-classic" % "1.1.1" % "test"
     )
   )
 
