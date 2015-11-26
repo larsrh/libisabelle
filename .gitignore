@@ -18,6 +18,3 @@ project/plugins/project/
 
 # jEdit specific
 *~
-
-# libisabelle specific
-contrib/
