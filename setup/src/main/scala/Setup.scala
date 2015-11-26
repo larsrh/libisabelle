@@ -39,7 +39,7 @@ object Setup {
     }
 
   def detectSetup(platform: Platform, version: Version): Option[Setup] = {
-    val path = platform.localStorage.resolve(s"Isabelle${version.identifier}")
+    val path = platform.localStorage.resolve("setups").resolve(s"Isabelle${version.identifier}")
     if (Files.isDirectory(path))
       Some(Setup(path, platform, version))
     else
@@ -60,14 +60,16 @@ object Setup {
     }
 
   def fetchImplementation(platform: Platform, version: Version)(implicit ec: ExecutionContext): Future[List[Path]] = {
+    val base = platform.localStorage.resolve(s"v${BuildInfo.version}")
+
     val repositories = Seq(
       Repository.ivy2Local,
-      MavenRepository(Fetch("https://repo1.maven.org/maven2/", Some(platform.localStorage.resolve("maven").toFile))),
-      MavenRepository(Fetch("https://oss.sonatype.org/content/repositories/releases/", Some(platform.localStorage.resolve("sonatype").toFile)))
+      MavenRepository(Fetch("https://repo1.maven.org/maven2/", Some(base.resolve("maven").toFile))),
+      MavenRepository(Fetch("https://oss.sonatype.org/content/repositories/releases/", Some(base.resolve("sonatype").toFile)))
     )
 
     val files = coursier.Files(
-      Seq("https://" -> platform.localStorage.resolve("cache").toFile),
+      Seq("https://" -> base.resolve("cache").toFile),
       () => sys.error("impossible")
     )
 
