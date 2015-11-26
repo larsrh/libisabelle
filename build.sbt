@@ -179,15 +179,15 @@ lazy val appTemplate = project.in(file("app-template"))
   .settings(standardSettings)
   .settings(warningSettings)
   .settings(acyclicSettings)
+  .settings(
+    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.1"
+  )
 
 def app(identifier: String) = Project(s"app${identifier.capitalize}", file(s"apps/$identifier"))
   .dependsOn(appTemplate)
   .settings(noPublishSettings)
   .settings(standardSettings)
   .settings(warningSettings)
-  .settings(
-    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.1"
-  )
 
 lazy val appBootstrap = app("bootstrap")
 lazy val appReport = app("report")
