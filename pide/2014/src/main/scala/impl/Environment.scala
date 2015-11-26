@@ -14,7 +14,6 @@ final class Environment protected(home: Path) extends api.Environment(home) {
     cygwin_root = home.resolve("contrib/cygwin").toAbsolutePath.toString
   )
 
-
   private def destMarkup(markup: isabelle.Markup) =
     (markup.name, markup.properties)
 
@@ -33,11 +32,16 @@ final class Environment protected(home: Path) extends api.Environment(home) {
   private def mkPaths(path: Option[Path]) =
     path.map(p => isabelle.Path.explode(isabelle.Isabelle_System.posix_path(p.toAbsolutePath.toString))).toList
 
+  private def progress(config: api.Configuration) = new isabelle.Build.Progress {
+    logger.info(s"Building $config ...")
+    override def echo(msg: String) = logger.info(s"${config.session}: $msg")
+    override def theory(session: String, theory: String) = logger.info(s"${config.session}: theory $theory ($session)")
+  }
 
   protected[isabelle] def build(config: api.Configuration) =
     isabelle.Build.build(
       options = options,
-      progress = new isabelle.Build.Console_Progress(verbose = true),
+      progress = progress(config),
       build_heap = true,
       dirs = mkPaths(config.path),
       verbose = true,

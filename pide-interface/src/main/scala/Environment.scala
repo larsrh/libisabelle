@@ -108,6 +108,8 @@ abstract class Environment protected[isabelle](home: Path) { self =>
     s"$version at $home"
 
 
+  protected final val logger = getLogger
+
   protected[isabelle] def build(config: Configuration): Int
 
   protected[isabelle] val functionTag: String
