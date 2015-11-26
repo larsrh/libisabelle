@@ -11,12 +11,37 @@ object XML {
   private val X = '\u0005'
   private val Y = '\u0006'
 
+  private def prettyEscape(string: String) = string
+    .replace("&", "&amp;")
+    .replace("<", "&lt;")
+    .replace(">", "&gt;")
+    .replace("\"", "&quot;")
+    .replace("'", "&apos;")
+
   sealed abstract class Tree {
     def toYXML: String = bodyToYXML(List(this))
+    def pretty(indent: Int = 0): String
   }
 
-  case class Elem(markup: Markup, body: Body) extends Tree
-  case class Text(content: String) extends Tree
+  case class Elem(markup: Markup, body: Body) extends Tree {
+    def pretty(indent: Int = 0) = {
+      val attrs = (if (markup._2.isEmpty) "" else " ") + markup._2.map { case (k, v) => s"$k='${prettyEscape(v)}'" }.mkString(" ")
+      if (body.isEmpty) {
+        " " * indent + "<" + markup._1 + attrs + " />"
+      }
+      else {
+        val head = " " * indent + "<" + markup._1 + attrs + ">"
+        val rows = body.map(_.pretty(indent + 2)).mkString("\n", "\n", "\n")
+        val foot = " " * indent + "</" + markup._1 + ">"
+        head + rows + foot
+      }
+    }
+  }
+
+  case class Text(content: String) extends Tree {
+    def pretty(indent: Int = 0) =
+      " " * indent + prettyEscape(content)
+  }
 
   type Body = List[Tree]
 

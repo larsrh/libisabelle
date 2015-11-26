@@ -16,10 +16,14 @@ object Main extends Template {
   val UseThysMarkup = new Operation[List[String], Unit]("use_thys") {
     def prepare(args: List[String]): (XML.Tree, Observer[Unit]) = {
       val tree = Codec[List[String]].encode(args)
+      println("<?xml version='1.0' ?>\n<dump>\n")
       lazy val observer: Observer[Unit] = Observer.More(msg => {
-        println(msg)
+        println(msg.pretty())
         observer
-      }, _ => Observer.Success(ProverResult.Success(())))
+      }, _ => {
+        println("\n</dump>")
+        Observer.Success(ProverResult.Success(()))
+      })
 
       (tree, observer)
     }
