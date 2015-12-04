@@ -41,13 +41,14 @@ object Setup {
 
   // FIXME this whole thing needs proper error handling
 
-  def installTo(platform: Platform, version: Version)(implicit ec: ExecutionContext): Future[Setup] =
+  def install(platform: OfficialPlatform, version: Version)(implicit ec: ExecutionContext): Future[Setup] =
     platform.url(version) match {
       case None =>
         sys.error("couldn't determine URL")
       case Some(url) =>
         logger.info(s"Downloading setup $version to ${platform.setupStorage}")
         val stream = Tar.download(url)
+        Files.createDirectories(platform.setupStorage)
         Tar.extractTo(platform.setupStorage, stream).map(Setup(_, platform, version))
     }
 
@@ -72,7 +73,10 @@ object Setup {
           case Some(install) =>
             Future.successful(install)
           case None =>
-            installTo(platform, version)
+            platform match {
+              case o: OfficialPlatform => install(o, version)
+              case _ => sys.error("unofficial platform can't be automatically installed")
+            }
         }
     }
 

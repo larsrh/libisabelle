@@ -17,13 +17,13 @@ import acyclic.file
 object Platform {
 
   /** Universal Linux platform for both 32- and 64-bit machines. */
-  case object Linux extends Platform("linux") {
+  case object Linux extends OfficialPlatform("linux") {
     def localStorage =
       Paths.get(System.getProperty("user.home")).resolve(".local/share/libisabelle").toAbsolutePath
   }
 
   /** Universal Windows platform for both 32- and 64-bit machines. */
-  case object Windows extends Platform("windows") {
+  case object Windows extends OfficialPlatform("windows") {
     def localStorage =
       Paths.get(System.getenv("LOCALAPPDATA")).resolve("libisabelle").toAbsolutePath
   }
@@ -48,10 +48,24 @@ object Platform {
  * Wrapper around Isabelle's platform identifiers.
  *
  * It is recommended to obtain instances via the
- * [[Platform$ companion object]]. No guarantees are made when constructing
- * instances manually.
+ * [[Platform$ companion object]].
  */
 sealed abstract class Platform(val name: String) {
+
+  def localStorage: Path
+
+  final def setupStorage: Path =
+    localStorage.resolve("setups")
+
+  final def setupStorage(version: Version): Path =
+    setupStorage.resolve(s"Isabelle${version.identifier}")
+
+  final def versionedStorage: Path =
+    localStorage.resolve(s"v${BuildInfo.version}")
+
+}
+
+sealed abstract class OfficialPlatform private[isabelle](name: String) extends Platform(name) {
 
   /** Default base URL pointing to the standard Isabelle server. */
   protected def baseURL(version: Version) =
@@ -64,16 +78,5 @@ sealed abstract class Platform(val name: String) {
    */
   def url(version: Version): Option[URL] =
     Some(new URL(s"${baseURL(version)}_$name.tar.gz"))
-
-  def localStorage: Path
-
-  final def setupStorage: Path =
-    localStorage.resolve("setups")
-
-  final def setupStorage(version: Version): Path =
-    setupStorage.resolve(s"Isabelle${version.identifier}")
-
-  final def versionedStorage: Path =
-    localStorage.resolve(s"v${BuildInfo.version}")
 
 }
