@@ -5,7 +5,7 @@ Minimal wrapper around Isabelle/PIDE for non-IDE applications
 | ------------------------- | ------ |
 | Travis (Linux CI)         | [![Build Status](https://travis-ci.org/larsrh/libisabelle.svg?branch=master)](https://travis-ci.org/larsrh/libisabelle) |
 | Maven Central             | [![Maven Central](https://img.shields.io/maven-central/v/info.hupel/libisabelle_2.11.svg?label=latest%20release%20for%202.11)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22info.hupel%22%20AND%20a%3A%22libisabelle_2.11%22) |
-| Scaladoc                  | [![Scaladoc](http://javadoc-badge.appspot.com/info.hupel/libisabelle_2.11.svg?label=scaladoc)](http://javadoc-badge.appspot.com/info.hupel/libisabelle_2.11) |
+| Scaladoc                  | [![Scaladoc](http://javadoc-badge.appspot.com/info.hupel/libisabelle-docs_2.11.svg?label=scaladoc)](http://javadoc-badge.appspot.com/info.hupel/libisabelle-docs_2.11) |
 
 ## Setup
 
@@ -57,8 +57,8 @@ Drop the following lines into your `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "info.hupel" %% "libisabelle" % "0.1.2",
-  "info.hupel" %% "libisabelle-setup" % "0.1.2",
-  "info.hupel" %% "pide-interface" % "0.1.2"
+  "info.hupel" %% "libisabelle" % "0.2",
+  "info.hupel" %% "libisabelle-setup" % "0.2",
+  "info.hupel" %% "pide-interface" % "0.2"
 )
 ```
