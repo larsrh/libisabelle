@@ -52,7 +52,7 @@ class Implementations private(entries: Map[Version, Implementations.Entry]) {
   // FIXME error handling
 
   private def loadClass(entry: Implementations.Entry): Class[_ <: Environment] = {
-    val classLoader = new URLClassLoader(entry.urls.toArray, Thread.currentThread.getContextClassLoader)
+    val classLoader = new URLClassLoader(entry.urls.toArray, getClass.getClassLoader)
     val env = classLoader.loadClass(s"${entry.packageName}.Environment").asSubclass(classOf[Environment])
     val info = classLoader.loadClass(s"${entry.packageName}.BuildInfo").getDeclaredMethod("toString").invoke(null)
     if (BuildInfo.toString != info.toString)
