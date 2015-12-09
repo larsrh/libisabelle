@@ -25,7 +25,8 @@ object Configuration {
 
   /**
    * Creates a [[Configuration configuration]] with an empty path, that is,
-   * it must be a session included in the Isabelle distribution.
+   * it must be a session included in the Isabelle distribution or registered
+   * as a component.
    *
    * Unless using a custom Isabelle distribution, a
    * [[edu.tum.cs.isabelle.System.create system created]] with such a
