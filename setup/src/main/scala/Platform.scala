@@ -1,7 +1,8 @@
 package edu.tum.cs.isabelle.setup
 
 import java.net.URL
-import java.nio.file.{Path, Paths}
+import java.nio.channels.FileChannel
+import java.nio.file._
 
 import org.apache.commons.lang3.SystemUtils
 
@@ -62,6 +63,24 @@ sealed abstract class Platform(val name: String) {
 
   final def versionedStorage: Path =
     localStorage.resolve(s"v${BuildInfo.version}")
+
+  final def lockFile: Path =
+    localStorage.resolve(".lock")
+
+  def withLock[A](f: () => A): A = {
+    Files.createDirectories(localStorage)
+    Option(FileChannel.open(lockFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE).tryLock()) match {
+      case None =>
+        sys.error("lock could not be acquired")
+      case Some(lock) =>
+        try {
+          f()
+        }
+        finally {
+          lock.close()
+        }
+    }
+  }
 
 }
 

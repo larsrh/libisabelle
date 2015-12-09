@@ -49,10 +49,12 @@ object Setup {
         logger.info(s"Downloading setup $version to ${platform.setupStorage}")
         val stream = Tar.download(url)
         Files.createDirectories(platform.setupStorage)
-        Tar.extractTo(platform.setupStorage, stream).map(Setup(_, platform, version))
+        platform.withLock { () =>
+          Tar.extractTo(platform.setupStorage, stream).map(Setup(_, platform, version))
+        }
     }
 
-  def detectSetup(platform: Platform, version: Version): Option[Setup] = {
+  def detectSetup(platform: Platform, version: Version): Option[Setup] = platform.withLock { () =>
     val path = platform.setupStorage(version)
     if (Files.isDirectory(path)) {
       logger.info(s"Using default setup; detected $version at $path")
@@ -123,14 +125,16 @@ object Setup {
       }
     }
 
-    for {
-      i <- resolve("interface")
-      v <- resolve(version.identifier)
-      artifacts = v -- i
-      res <- Future.traverse(artifacts.toList)(files.file(_, cachePolicy).run.toScalaFuture)
+    platform.withLock { () =>
+      for {
+        i <- resolve("interface")
+        v <- resolve(version.identifier)
+        artifacts = v -- i
+        res <- Future.traverse(artifacts.toList)(files.file(_, cachePolicy).run.toScalaFuture)
+      }
+      yield
+        res.map(_.fold(sys.error, _.toPath))
     }
-    yield
-      res.map(_.fold(sys.error, _.toPath))
   }
 
 }
