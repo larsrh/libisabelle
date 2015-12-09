@@ -16,8 +16,8 @@ import acyclic.file
 trait ProverResult[+T]
 
 object ProverResult {
-  case class Success[+T](t: T) extends ProverResult[T]
-  case class Failure(exn: Exception) extends ProverResult[Nothing]
+  final case class Success[+T](t: T) extends ProverResult[T]
+  final case class Failure(exn: Exception) extends ProverResult[Nothing]
 }
 
 /**
@@ -47,7 +47,7 @@ object Observer {
    * For the precise error semantics, see
    * `[[edu.tum.cs.isabelle.System#invoke System#invoke]]`.
    */
-  case class Success[T](t: ProverResult[T]) extends Observer[T]
+  final case class Success[T](t: ProverResult[T]) extends Observer[T]
 
   /**
    * Represents an unexpected failure during communication with the prover.
@@ -58,7 +58,7 @@ object Observer {
    * For the precise error semantics, see
    * `[[edu.tum.cs.isabelle.System#invoke System#invoke]]`.
    */
-  case class Failure[T](error: Exception) extends Observer[T]
+  final case class Failure[T](error: Exception) extends Observer[T]
 
   /**
    * An [[Observer observer]] waiting for more intermediate data (`step`) or
@@ -69,7 +69,7 @@ object Observer {
    * doing so will most likely result in hanging
    * [[edu.tum.cs.isabelle.Operation operations]].
    */
-  case class More[T](step: XML.Tree => Observer[T], done: XML.Tree => Observer[T]) extends Observer[T]
+  final case class More[T](step: XML.Tree => Observer[T], done: XML.Tree => Observer[T]) extends Observer[T]
 
   /**
    * Combinator for producing an [[Observer observer]] which ignores

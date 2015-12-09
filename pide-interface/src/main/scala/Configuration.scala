@@ -52,7 +52,7 @@ object Configuration {
  * through one of the constructors in the
  * [[Configuration$ companion object]].
  */
-case class Configuration(path: Option[Path], session: String) {
+final case class Configuration(path: Option[Path], session: String) {
   override def toString: String =
     s"session $session" + path.map(p => s" at $p").getOrElse("")
 }

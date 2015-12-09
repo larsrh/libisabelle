@@ -1,7 +1,8 @@
-package edu.tum.cs.isabelle
+package edu.tum.cs.isabelle.std
 
 import scala.math.BigInt
 
+import edu.tum.cs.isabelle.Codec
 import edu.tum.cs.isabelle.api._
 
 import acyclic.file
@@ -30,9 +31,9 @@ object Typ {
 }
 
 sealed abstract class Typ
-case class Type(name: String, args: List[Typ] = Nil) extends Typ
-case class TFree(name: String, sort: Sort) extends Typ
-case class TVar(name: Indexname, sort: Sort) extends Typ
+final case class Type(name: String, args: List[Typ] = Nil) extends Typ
+final case class TFree(name: String, sort: Sort) extends Typ
+final case class TVar(name: Indexname, sort: Sort) extends Typ
 
 object Term {
   implicit lazy val termCodec: Codec[Term] = new Codec.Variant[Term]("Pure.term") {
@@ -65,9 +66,9 @@ object Term {
 }
 
 sealed abstract class Term
-case class Const(name: String, typ: Typ) extends Term
-case class Free(name: String, typ: Typ) extends Term
-case class Var(name: Indexname, typ: Typ) extends Term
-case class Bound(index: BigInt) extends Term
-case class Abs(name: String, typ: Typ, body: Term) extends Term
-case class App(fun: Term, arg: Term) extends Term
+final case class Const(name: String, typ: Typ) extends Term
+final case class Free(name: String, typ: Typ) extends Term
+final case class Var(name: Indexname, typ: Typ) extends Term
+final case class Bound(index: BigInt) extends Term
+final case class Abs(name: String, typ: Typ, body: Term) extends Term
+final case class App(fun: Term, arg: Term) extends Term

@@ -151,7 +151,7 @@ object Setup {
  *
  * The file system location is called ''home'' throughout `libisabelle`.
  */
-case class Setup(home: Path, platform: Platform, version: Version) {
+final case class Setup(home: Path, platform: Platform, version: Version) {
 
   /**
    * Convenience method aliasing

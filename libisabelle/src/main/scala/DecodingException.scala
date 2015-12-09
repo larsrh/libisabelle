@@ -11,4 +11,4 @@ import acyclic.file
  * sent from the prover fails, this exception is fed into the corresponding
  * [[Observer observer]].
  */
-case class DecodingException(msg: String, body: XML.Body) extends RuntimeException(msg)
+final case class DecodingException(msg: String, body: XML.Body) extends RuntimeException(msg)

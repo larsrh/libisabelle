@@ -9,9 +9,6 @@ import acyclic.file
 
 package object isabelle {
 
-  type Indexname = (String, BigInt)
-  type Sort = List[String]
-
   /**
    * The result type for [[Codec#decode decoding values]] from
    * [[edu.tum.cs.isabelle.api.XML.Tree XML trees]]. Failure values

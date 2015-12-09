@@ -26,7 +26,7 @@ object Implementations {
    * `[[edu.tum.cs.isabelle.api.Environment Environment]]`. Furthermore, the
    * class path should contain all required dependencies.
    */
-  case class Entry(urls: List[URL], packageName: String)
+  final case class Entry(urls: List[URL], packageName: String)
 
   /**
    * Construct a [[edu.tum.cs.isabelle.api.Environment environment]] in the

@@ -9,7 +9,7 @@ import acyclic.file
  *
  * Repository snapshots are not supported.
  */
-case class Version(identifier: String) {
+final case class Version(identifier: String) {
   final override def toString: String =
     s"<Isabelle$identifier>"
 }

@@ -204,13 +204,13 @@ object Codec {
  *
  * For the opposite direction, it is generally expected that a value which
  * cannot be produced via `[[encode]]` should not [[decode]] cleanly. This is
- * generally achieved by adding _tags_ to the trees. For example, if the codec
- * for type `Foo` for a given value would produce an XML document `t` before
- * tagging, the XML document after tagging would be `<tag name="foo">t</tag>`.
- * The `[[tagged]]` method transforms a raw codec into a tagged codec. Nested
- * tags are allowed (for example, when chaining multiple calls of
- * `[[tagged]]`), but produce additional overhead in the resulting XML
- * documents.
+ * generally achieved by adding ''tags'' to the trees. For example, if the
+ * codec for type `Foo` for a given value would produce an XML document `t`
+ * before tagging, the XML document after tagging would be
+ * `<tag name="foo">t</tag>`. The `[[tagged]]` method transforms a raw codec
+ * into a tagged codec. Nested tags are allowed (for example, when chaining
+ * multiple calls of `[[tagged]]`), but produce additional overhead in the
+ * resulting XML documents.
  */
 trait Codec[T] { self =>
 

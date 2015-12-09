@@ -13,7 +13,7 @@ import acyclic.file
 /**
  * Detection of the machine's [[Platform platform]].
  *
- * Currently, only Linux is supported.
+ * Currently, only Linux and Windows are supported.
  */
 object Platform {
 
@@ -38,20 +38,21 @@ object Platform {
     else
       None
 
-  def genericPlatform(name: String, localStorage0: Path): Platform =
-    new Platform(name) {
+  def genericPlatform(localStorage0: Path): Platform =
+    new Platform {
       val localStorage = localStorage0.toAbsolutePath
     }
 
 }
 
 /**
- * Wrapper around Isabelle's platform identifiers.
+ * The underlying operating system platform with knowlege of a local storage
+ * path.
  *
  * It is recommended to obtain instances via the
  * [[Platform$ companion object]].
  */
-sealed abstract class Platform(val name: String) {
+sealed abstract class Platform {
 
   def localStorage: Path
 
@@ -84,7 +85,13 @@ sealed abstract class Platform(val name: String) {
 
 }
 
-sealed abstract class OfficialPlatform private[isabelle](name: String) extends Platform(name) {
+/**
+ * A `[[Platform]]` with known archive location.
+ *
+ * Official platforms can be installed and bootstrapped automatically via the
+ * appropriate methods in [[Setup$ `Setup`]].
+ */
+sealed abstract class OfficialPlatform private[isabelle](val name: String) extends Platform {
 
   /** Default base URL pointing to the standard Isabelle server. */
   protected def baseURL(version: Version) =

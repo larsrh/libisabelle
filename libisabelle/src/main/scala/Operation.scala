@@ -16,7 +16,7 @@ object Operation {
    * There is no stack traces available, because instance are only created when
    * the prover throws an exception.
    */
-  case class ProverException private[isabelle](operation: String, msg: String, input: Any) extends RuntimeException(msg) with NoStackTrace {
+  final case class ProverException private[isabelle](operation: String, msg: String, input: Any) extends RuntimeException(msg) with NoStackTrace {
     def fullMessage =
       s"Prover error in operation $operation: $msg\nOffending input: $input"
   }
