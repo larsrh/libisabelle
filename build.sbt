@@ -4,6 +4,7 @@ lazy val standardSettings = Seq(
   organization := "info.hupel",
   scalaVersion := "2.11.7",
   crossScalaVersions := Seq("2.10.5", "2.11.7"),
+  resolvers += Resolver.sonatypeRepo("staging"),
   javacOptions += "-Xlint:unchecked",
   homepage := Some(url("http://lars.hupel.info/libisabelle/")),
   licenses := Seq(
@@ -122,8 +123,8 @@ lazy val setup = project.in(file("setup"))
   .settings(acyclicSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "com.github.alexarchambault" %% "coursier" % "0.1.0-M1",
-      "com.github.alexarchambault" %% "coursier-files" % "0.1.0-M1",
+      "com.github.alexarchambault" %% "coursier" % "0.1.0-M2",
+      "com.github.alexarchambault" %% "coursier-files" % "0.1.0-M2",
       "com.github.fge" % "java7-fs-more" % "0.2.0",
       "com.google.code.findbugs" % "jsr305" % "1.3.9" % "compile",
       "org.apache.commons" % "commons-compress" % "1.9",
