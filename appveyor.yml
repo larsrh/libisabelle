@@ -10,4 +10,3 @@ build_script:
   - sbt publishLocal
 test_script:
   - sbt "appBootstrap/run --version %ISABELLE_VERSION%"
-  - sbt test
