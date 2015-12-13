@@ -6,7 +6,9 @@ install:
 os:
   - osx
 script:
-  - ./bin/travis.sh
+  - ./sbt "++$SCALA_VERSION" publishLocal
+  - ./sbt "++$SCALA_VERSION" "appBootstrap/run --version $ISABELLE_VERSION"
+  - ./sbt "++$SCALA_VERSION" test
 matrix:
   include:
     - env: ISABELLE_VERSION=2014 SCALA_VERSION=2.11.7
