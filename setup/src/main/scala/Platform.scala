@@ -29,12 +29,20 @@ object Platform {
       Paths.get(System.getenv("LOCALAPPDATA")).resolve("libisabelle").toAbsolutePath
   }
 
+  /** Universal OS X platform for both 32- and 64-bit machines. */
+  case object OSX extends OfficialPlatform("macos") {
+    def localStorage =
+      Paths.get(System.getProperty("user.home")).resolve("Library/Preferences/libisabelle").toAbsolutePath
+  }
+
   /** Make an educated guess at the platform, not guaranteed to be correct. */
   def guess: Option[Platform] =
     if (SystemUtils.IS_OS_LINUX)
       Some(Linux)
     else if (SystemUtils.IS_OS_WINDOWS)
       Some(Windows)
+    else if (SystemUtils.IS_OS_MAC_OSX)
+      Some(OSX)
     else
       None
 
