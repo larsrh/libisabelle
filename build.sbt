@@ -4,7 +4,6 @@ lazy val standardSettings = Seq(
   organization := "info.hupel",
   scalaVersion := "2.11.7",
   crossScalaVersions := Seq("2.10.5", "2.11.7"),
-  resolvers += Resolver.sonatypeRepo("staging"),
   javacOptions += "-Xlint:unchecked",
   homepage := Some(url("http://lars.hupel.info/libisabelle/")),
   licenses := Seq(
