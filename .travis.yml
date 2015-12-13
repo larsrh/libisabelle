@@ -1,19 +1,20 @@
-language: scala
-jdk:
-  - oraclejdk8
+language: java
 env:
-  - ISABELLE_VERSION=2015
-scala:
-  - 2.10.5
-  - 2.11.7
+  - ISABELLE_VERSION=2015 SCALA_VERSION=2.11.7
 install:
   - git submodule update --init --recursive
+os:
+  - osx
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION publishLocal
-  - sbt ++$TRAVIS_SCALA_VERSION "appBootstrap/run --version $ISABELLE_VERSION"
-  - sbt ++$TRAVIS_SCALA_VERSION test
+  - ./bin/travis.sh
 matrix:
   include:
-    - jdk: openjdk7
-      scala: 2.10.5
-      env: ISABELLE_VERSION=2014
+    - env: ISABELLE_VERSION=2014 SCALA_VERSION=2.11.7
+      os: linux
+      jdk: oraclejdk7
+    - env: ISABELLE_VERSION=2015 SCALA_VERSION=2.10.5
+      os: linux
+      jdk: oraclejdk8
+    - env: ISABELLE_VERSION=2015 SCALA_VERSION=2.11.7
+      os: linux
+      jdk: oraclejdk8
