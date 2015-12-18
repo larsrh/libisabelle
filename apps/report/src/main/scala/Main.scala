@@ -1,6 +1,6 @@
 package edu.tum.cs.isabelle.app.report
 
-import java.nio.file.Paths
+import java.nio.file.{Path, Paths}
 
 import scala.concurrent._
 import scala.concurrent.duration._
@@ -13,10 +13,10 @@ object Main extends Template {
 
   def duration = Duration.Inf
 
-  val UseThysMarkup = new Operation[List[String], Unit]("use_thys") {
+  def UseThysMarkup(home: Path) = new Operation[List[String], Unit]("use_thys") {
     def prepare(args: List[String]): (XML.Tree, Observer[Unit]) = {
       val tree = Codec[List[String]].encode(args)
-      println("<?xml version='1.0' ?>\n<dump>\n")
+      println(s"<?xml version='1.0' ?>\n<dump home='$home'>\n")
       lazy val observer: Observer[Unit] = Observer.More(msg => {
         println(msg.pretty())
         observer
@@ -37,7 +37,7 @@ object Main extends Template {
 
     for {
       s <- System.create(bundle.env, config)
-      _ <- s.invoke(UseThysMarkup)(bundle.args)
+      _ <- s.invoke(UseThysMarkup(bundle.env.home))(bundle.args)
       _ <- s.dispose
     }
     yield ()

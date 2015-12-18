@@ -98,7 +98,7 @@ object Environment {
  * principle it could do so, it would require the introduction of even more
  * global mutable state. It might do so in the future.
  */
-abstract class Environment protected[isabelle](home: Path) { self =>
+abstract class Environment protected[isabelle](val home: Path) { self =>
 
   Environment.checkInstance(getClass(), home)
 
