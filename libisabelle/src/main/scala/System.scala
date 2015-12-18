@@ -131,7 +131,7 @@ final class System private(val env: Environment, config: Configuration, callback
    * @see [[dispose]]
    */
   implicit val executionContext: ExecutionContext = env.executionContext
-  
+
 
   private val initPromise = Promise[Unit]
   private val exitPromise = Promise[Unit]

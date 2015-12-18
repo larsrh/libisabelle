@@ -20,7 +20,7 @@ class EnvironmentSpec(val specs2Env: Env) extends Specification with DefaultSetu
     can be instantiated twice with the same path          ${same must exist.awaitFor(30.seconds)}
     cannot be instantiated with a different path          ${diff must throwAn[Exception].awaitFor(30.seconds)}"""
 
-  
+
   // FIXME code duplication
 
   val context = Thread.currentThread.getContextClassLoader
@@ -28,11 +28,8 @@ class EnvironmentSpec(val specs2Env: Env) extends Specification with DefaultSetu
     new URLClassLoader(paths.map(_.toUri.toURL).toArray, context)
   }
 
-  def instantiate(home: Path) = classLoader.map { classLoader =>
-    val constructor = classLoader.loadClass("edu.tum.cs.isabelle.impl.Environment").getDeclaredConstructor(classOf[Path])
-    constructor.setAccessible(true)
-    constructor.newInstance(home)
-  }
+  def instantiate(home: Path) =
+    classLoader.map(_.loadClass("edu.tum.cs.isabelle.impl.Environment").getDeclaredConstructor(classOf[Path]).newInstance(home))
 
   val first = instantiate(platform.setupStorage(version))
 
