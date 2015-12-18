@@ -4,6 +4,7 @@ install:
   - cmd: git submodule update --init --recursive
 platform:
   - x86
+  - x64
 environment:
   ISABELLE_VERSION: 2015
 build_script:
