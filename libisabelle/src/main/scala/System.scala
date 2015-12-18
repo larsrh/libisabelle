@@ -35,6 +35,50 @@ object System {
   def build(env: Environment, config: Configuration): Boolean =
     env.build(config) == 0
 
+  private final case class OperationState[T](
+    env: Environment,
+    observer: Observer[T],
+    firehose: Boolean = false,
+    promise: Promise[ProverResult[T]] = Promise[ProverResult[T]]
+  ) { self =>
+    class Output(name: String) {
+      def unapply(markup: Markup): Option[Long] = markup match {
+        case (env.protocolTag, (env.functionTag, `name`) :: ("id", id) :: Nil) =>
+          catching(classOf[NumberFormatException]) opt id.toLong
+        case _ =>
+          None
+      }
+    }
+
+    object Response extends Output("libisabelle_response")
+    object Start extends Output("libisabelle_start")
+    object Stop extends Output("libisabelle_stop")
+
+    def tryComplete() = observer match {
+      case Observer.Success(t) => promise.success(t); true
+      case Observer.Failure(err) => promise.failure(err); true
+      case _  => false
+    }
+
+    def advance(id: Long, markup: Markup, body: XML.Body) = observer match {
+      case Observer.More(step, finish) =>
+        (markup, body) match {
+          case (Response(id1), List(tree)) if id == id1 =>
+            copy(observer = finish(tree))
+          case (Start(id1), _) if id == id1 && !firehose =>
+            copy(firehose = true)
+          case (Stop(id1), _) if id == id1 && firehose =>
+            copy(firehose = false)
+          case _ if firehose =>
+            copy(observer = step(XML.elem(markup, body)))
+          case _ =>
+            this
+        }
+      case _ =>
+        this
+    }
+  }
+
   /**
    * Asynchronously create a new [[System system]] based on the specified
    * [[edu.tum.cs.isabelle.api.Configuration configuration]].
@@ -52,126 +96,9 @@ object System {
    * Build products will be read from `~/.isabelle` on the file system.
    */
   def create(env: Environment, config: Configuration): Future[System] = {
-    class Output(name: String) {
-      def unapply(markup: Markup): Option[Long] = markup match {
-        case (env.protocolTag, (env.functionTag, `name`) :: ("id", id) :: Nil) =>
-          catching(classOf[NumberFormatException]) opt id.toLong
-        case _ =>
-          None
-      }
-    }
-
-    object Response extends Output("libisabelle_response")
-    object Start extends Output("libisabelle_start")
-    object Stop extends Output("libisabelle_stop")
-
-    trait OperationState { self =>
-      type T
-      val firehose: Boolean
-      val observer: Observer[T]
-      val promise: Promise[ProverResult[T]]
-
-      def withFirehose(firehose0: Boolean) = new OperationState {
-        type T = self.T
-        val firehose = firehose0
-        val observer = self.observer
-        val promise = self.promise
-      }
-
-      def withObserver(observer0: Observer[T]) = new OperationState {
-        type T = self.T
-        val firehose = self.firehose
-        val observer = observer0
-        val promise = self.promise
-      }
-
-      def tryComplete() = observer match {
-        case Observer.Success(t) => promise.success(t); true
-        case Observer.Failure(err) => promise.failure(err); true
-        case _  => false
-      }
-
-      def advance(id: Long, markup: Markup, body: XML.Body) = observer match {
-        case Observer.More(step, finish) =>
-          (markup, body) match {
-            case (Response(id1), List(tree)) if id == id1 =>
-              withObserver(finish(tree))
-            case (Start(id1), _) if id == id1 && !firehose =>
-              withFirehose(true)
-            case (Stop(id1), _) if id == id1 && firehose =>
-              withFirehose(false)
-            case _ if firehose =>
-              withObserver(step(XML.elem(markup, body)))
-            case _ =>
-              this
-          }
-        case _ =>
-          this
-      }
-    }
-
-    def makeOperationState[T0](observer0: Observer[T0]) = {
-      val state = new OperationState {
-        type T = T0
-        val firehose = false
-        val observer = observer0
-        val promise = Promise[ProverResult[T]]
-      }
-      state.tryComplete()
-      state
-    }
-
-    val initPromise = Promise[Unit]
-    val exitPromise = Promise[Unit]
-
-    new System { self =>
-      implicit val executionContext = env.executionContext
-
-      private def consumer(markup: Markup, body: XML.Body): Unit = (markup, body) match {
-        case ((env.initTag, _), _) => initPromise.success(()); ()
-        case ((env.exitTag, _), _) => exitPromise.success(()); ()
-        case _ =>
-          self.synchronized {
-            pending =
-              pending.map { case (id, state) => id -> state.advance(id, markup, body) }
-                     .filterNot(_._2.tryComplete())
-          }
-      }
-
-      private[isabelle] val promise = Promise[System]
-
-      @volatile private var count = 0L
-      @volatile private var pending = Map.empty[Long, OperationState]
-
-      private val session = env.create(config, consumer)
-      initPromise.future foreach { _ =>
-        env.sendOptions(session)
-        promise.success(self)
-      }
-
-      def dispose = {
-        env.dispose(session)
-        exitPromise.future
-      }
-
-      def cancel(id: Long) =
-        env.sendCommand(session, "libisabelle_cancel", List(id.toString))
-
-      def cancellableInvoke[I, O](operation: Operation[I, O])(arg: I) = {
-        val (encoded, observer) = operation.prepare(arg)
-        val state = makeOperationState(observer)
-        val count0 = self.synchronized {
-          val count0 = count
-          pending += (count -> state)
-          count += 1
-          count0
-        }
-
-        val args = List(count0.toString, operation.name, encoded.toYXML)
-        env.sendCommand(session, "libisabelle", args)
-        new CancellableFuture(state.promise, () => cancel(count0))
-      }
-    }.promise.future
+    val started = Promise[Unit]
+    val system = new System(env, config, { () => started.success(()); () })
+    started.future.map(_ => system)(env.executionContext)
   }
 
 }
@@ -184,9 +111,7 @@ object System {
  *
  * @see [[edu.tum.cs.isabelle.setup.Setup]]
  */
-sealed abstract class System {
-
-  private[isabelle] val promise: Promise[System]
+final class System private(val env: Environment, config: Configuration, callback: () => Unit) {
 
   /**
    * The [[scala.concurrent.ExecutionContext execution context]] used
@@ -205,7 +130,33 @@ sealed abstract class System {
    *
    * @see [[dispose]]
    */
-  implicit val executionContext: ExecutionContext
+  implicit val executionContext: ExecutionContext = env.executionContext
+  
+
+  private val initPromise = Promise[Unit]
+  private val exitPromise = Promise[Unit]
+
+  @volatile private var count = 0L
+  @volatile private var pending = Map.empty[Long, System.OperationState[_]]
+
+  private def consumer(markup: Markup, body: XML.Body): Unit = (markup, body) match {
+    case ((env.initTag, _), _) => initPromise.success(()); ()
+    case ((env.exitTag, _), _) => exitPromise.success(()); ()
+    case _ =>
+      synchronized {
+        pending =
+          pending.map { case (id, state) => id -> state.advance(id, markup, body) }
+                 .filterNot(_._2.tryComplete())
+                 .toMap
+      }
+  }
+
+  private val session = env.create(config, consumer)
+
+  initPromise.future foreach { _ =>
+    env.sendOptions(session)
+    callback()
+  }
 
   /**
    * Instruct the prover to shutdown.
@@ -230,7 +181,10 @@ sealed abstract class System {
    *
    * @see [[executionContext]]
    */
-  def dispose: Future[Unit]
+  def dispose: Future[Unit] = {
+    env.dispose(session)
+    exitPromise.future
+  }
 
   /**
    * Invoke an [[Operation operation]] on the prover, that is,
@@ -254,7 +208,21 @@ sealed abstract class System {
    * successful future may contain expected errors (e.g. due to a wrong input
    * argument or a failing proof).
    */
-  def cancellableInvoke[I, O](operation: Operation[I, O])(arg: I): CancellableFuture[ProverResult[O]]
+  def cancellableInvoke[I, O](operation: Operation[I, O])(arg: I): CancellableFuture[ProverResult[O]] = {
+    val (encoded, observer) = operation.prepare(arg)
+    val state = new System.OperationState(env, observer)
+    state.tryComplete()
+    val count0 = synchronized {
+      val count0 = count
+      pending += (count -> state)
+      count += 1
+      count0
+    }
+
+    val args = List(count0.toString, operation.name, encoded.toYXML)
+    env.sendCommand(session, "libisabelle", args)
+    new CancellableFuture(state.promise, () => env.sendCommand(session, "libisabelle_cancel", List(count0.toString)))
+  }
 
   final def invoke[I, O](operation: Operation[I, O])(arg: I): Future[ProverResult[O]] =
     cancellableInvoke(operation)(arg).future

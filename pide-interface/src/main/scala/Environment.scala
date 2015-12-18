@@ -14,11 +14,12 @@ object Environment {
 
   private val logger = getLogger
 
-  private[isabelle] def getVersion(clazz: Class[_ <: Environment]): Version = {
-    val identifier = clazz.getAnnotation(classOf[Implementation]).identifier
-    if (identifier == null)
-      sys.error("malformed implementation")
-    Version(identifier)
+  private[isabelle] def getVersion(clazz: Class[_ <: Environment]): Version =
+    Option(clazz.getAnnotation(classOf[Implementation]).identifier) match {
+      case None =>
+        sys.error("malformed implementation")
+      case Some(identifier) =>
+        Version(identifier)
   }
 
   private val instances: java.util.Map[Class[_ <: Environment], Path] =
