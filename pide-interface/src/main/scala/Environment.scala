@@ -54,7 +54,7 @@ object Environment {
  * an environment knows how to manage Isabelle processes. It can also manage
  * multiple running processes at the same time.
  *
- * A subclass of this class is called ''implementation'' througout
+ * A subclass of this class is called ''implementation'' throughout
  * `libisabelle`. The `[[edu.tum.cs.isabelle.Implementations Implementations]]`
  * class serves as a registry of those and using it is strongly recommended.
  * (Since subclasses should `protect` their constructors, manual instantiation
