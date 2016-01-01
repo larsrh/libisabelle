@@ -16,5 +16,6 @@ ML.instance \<open>Codec.triple\<close> :: codec
 ML.instance \<open>Codec.sort\<close> :: codec
 ML.instance \<open>Codec.typ\<close> :: codec
 ML.instance \<open>Codec.term\<close> :: codec
+ML.instance \<open>Codec.tree\<close> :: codec
 
 end

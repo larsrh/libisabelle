@@ -28,6 +28,7 @@ signature CODEC = sig
   val triple: 'a codec -> 'b codec -> 'c codec -> ('a * 'b * 'c) codec
   val either: 'a codec -> 'b codec -> ('a, 'b) either codec
   val option: 'a codec -> 'a option codec
+  val tree: XML.tree codec
 
   val sort: sort codec
   val typ: typ codec
@@ -149,6 +150,8 @@ end
 val int = tagged "int" (text Markup.print_int (Exn.get_res o Exn.capture Markup.parse_int))
 val bool = tagged "bool" (text Markup.print_bool (Exn.get_res o Exn.capture Markup.parse_bool))
 val string = tagged "string" (text I SOME)
+
+val tree = tagged "XML.tree" id
 
 fun option a =
   let
