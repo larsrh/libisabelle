@@ -1,0 +1,7 @@
+session "Protocol2016-RC0" = Codec +
+  theories
+    Protocol
+
+session "HOL-Protocol2016-RC0" = "HOL-Codec" +
+  theories
+    Protocol
