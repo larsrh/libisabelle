@@ -177,6 +177,11 @@ object Codec {
     }
   }
 
+  implicit def tree: Codec[XML.Tree] = new Codec[XML.Tree] {
+    def encode(t: XML.Tree) = t
+    def decode(tree: XML.Tree) = Right(tree)
+  }.tagged("XML.tree")
+
   /**
    * Obtain an instance of a codec from the implicit scope.
    *
