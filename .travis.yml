@@ -20,3 +20,6 @@ matrix:
     - env: ISABELLE_VERSION=2015 SCALA_VERSION=2.11.7
       os: linux
       jdk: oraclejdk8
+    - env: ISABELLE_VERSION=2016-RC0 SCALA_VERSION=2.11.7
+      os: linux
+      jdk: oraclejdk8

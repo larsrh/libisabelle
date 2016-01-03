@@ -17,7 +17,7 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
   An Isabelle session
     can be started          ${system must exist.awaitFor(timeout)}
     can load theories       ${loaded must beSuccess(()).awaitFor(timeout)}
-    reacts to requests      ${response must beSuccess("prop => prop => prop").awaitFor(timeout)}
+    reacts to requests      ${response must beSuccess(startWith("prop")).awaitFor(timeout)}
     handles errors          ${error must beFailure.awaitFor(timeout)}
     can cancel requests     ${cancelled.failed must beAnInstanceOf[CancellationException].awaitFor(timeout)}
     can be torn down        ${teardown must exist.awaitFor(timeout)}"""
