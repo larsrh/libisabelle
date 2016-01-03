@@ -1,3 +1,4 @@
 [submodule "isabelle-2015/lib/classy"]
 	path = isabelle-2015/lib/classy
 	url = https://github.com/larsrh/classy.git
+  branch = isabelle/2015
