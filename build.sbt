@@ -82,14 +82,18 @@ lazy val apiBuildInfoKeys = Seq[BuildInfoKey](
 lazy val root = project.in(file("."))
   .settings(standardSettings)
   .settings(noPublishSettings)
-  .aggregate(pideInterface, libisabelle, setup, pide2014, pide2015, tests, docs, appTemplate, appBootstrap, appReport)
+  .aggregate(
+    pideInterface, libisabelle, setup,
+    tests, docs, appTemplate, appBootstrap, appReport,
+    pide2014, pide2015, pide2016
+  )
 
 lazy val docs = project.in(file("docs"))
   .settings(moduleName := "libisabelle-docs")
   .settings(standardSettings)
   .settings(unidocSettings)
   .settings(
-    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(pide2014, pide2015, tests, appBootstrap, appReport),
+    unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(pideInterface, libisabelle, appTemplate, setup),
     doc in Compile := (doc in ScalaUnidoc).value,
     target in unidoc in ScalaUnidoc := crossTarget.value / "api"
   )
@@ -149,11 +153,7 @@ def pide(version: String) = Project(s"pide$version", file(s"pide/$version"))
 
 lazy val pide2014 = pide("2014")
 lazy val pide2015 = pide("2015")
-
-lazy val versions = Map(
-  "2014" -> pide2014,
-  "2015" -> pide2015
-)
+lazy val pide2016 = pide("2016-RC0")
 
 lazy val tests = project.in(file("tests"))
   .dependsOn(libisabelle, setup)
