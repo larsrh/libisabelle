@@ -84,7 +84,7 @@ lazy val root = project.in(file("."))
   .settings(noPublishSettings)
   .aggregate(
     pideInterface, libisabelle, setup,
-    tests, docs, appTemplate, appBootstrap, appReport,
+    tests, docs, appTemplate, appBootstrap, appReport, examples,
     pide2014, pide2015, pide2016
   )
 
@@ -175,7 +175,7 @@ lazy val tests = project.in(file("tests"))
 // Standalone applications
 
 lazy val appTemplate = project.in(file("app-template"))
-  .dependsOn(libisabelle, setup)
+  .dependsOn(setup)
   .settings(noPublishSettings)
   .settings(standardSettings)
   .settings(warningSettings)
@@ -192,6 +192,18 @@ def app(identifier: String) = Project(s"app${identifier.capitalize}", file(s"app
 
 lazy val appBootstrap = app("bootstrap")
 lazy val appReport = app("report")
+
+
+// Examples
+
+lazy val examples = project.in(file("examples"))
+  .dependsOn(setup)
+  .settings(noPublishSettings)
+  .settings(standardSettings)
+  .settings(warningSettings)
+  .settings(
+    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.1"
+  )
 
 
 // Release stuff

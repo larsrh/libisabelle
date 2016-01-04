@@ -1,5 +1,6 @@
 package edu.tum.cs.isabelle
 
+import scala.collection.JavaConverters._
 import scala.util.control.NoStackTrace
 
 import edu.tum.cs.isabelle.api.XML
@@ -73,6 +74,11 @@ object Operation {
    * be loaded again.
    */
   val UseThys = implicitly[List[String], Unit]("use_thys")
+
+  protected[isabelle] val UseThys_Java =
+    Operation.simple("use_thys",
+      Codec[List[String]].transform[java.util.List[String]](_.asJava, _.asScala.toList),
+      Codec[Unit].transform[Void](_ => null, _ => ()))
 
 }
 

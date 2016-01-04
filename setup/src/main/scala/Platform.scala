@@ -36,7 +36,7 @@ object Platform {
   }
 
   /** Make an educated guess at the platform, not guaranteed to be correct. */
-  def guess: Option[Platform] =
+  def guess: Option[OfficialPlatform] =
     if (SystemUtils.IS_OS_LINUX)
       Some(Linux)
     else if (SystemUtils.IS_OS_WINDOWS)
