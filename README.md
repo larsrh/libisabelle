@@ -13,6 +13,7 @@ Minimal wrapper around Isabelle/PIDE for non-IDE applications
 
 `libisabelle` is a Scala library which talks to Isabelle.
 It currently works with Isabelle2014 and Isabelle2015.
+Experimental support for Isabelle2016-RC0 is available.
 
 To get started, follow these steps:
 
@@ -64,8 +65,8 @@ Drop the following lines into your `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "info.hupel" %% "libisabelle" % "0.2.1",
-  "info.hupel" %% "libisabelle-setup" % "0.2.1",
-  "info.hupel" %% "pide-interface" % "0.2.1"
+  "info.hupel" %% "libisabelle" % "0.2.2",
+  "info.hupel" %% "libisabelle-setup" % "0.2.2",
+  "info.hupel" %% "pide-interface" % "0.2.2"
 )
 ```
