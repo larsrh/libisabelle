@@ -78,6 +78,8 @@ lazy val apiBuildInfoKeys = Seq[BuildInfoKey](
   git.gitHeadCommit
 )
 
+lazy val logback = "ch.qos.logback" % "logback-classic" % "1.1.1"
+
 
 lazy val root = project.in(file("."))
   .settings(standardSettings)
@@ -166,7 +168,7 @@ lazy val tests = project.in(file("tests"))
       "org.specs2" %% "specs2-core" % "3.6.5" % "test",
       "org.specs2" %% "specs2-scalacheck" % "3.6.5" % "test",
       "org.scalacheck" %% "scalacheck" % "1.12.5" % "test",
-      "ch.qos.logback" % "logback-classic" % "1.1.1" % "test"
+      logback % "test"
     ),
     parallelExecution in Test := false
   )
@@ -180,9 +182,7 @@ lazy val appTemplate = project.in(file("app-template"))
   .settings(standardSettings)
   .settings(warningSettings)
   .settings(acyclicSettings)
-  .settings(
-    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.1"
-  )
+  .settings(libraryDependencies += logback)
 
 def app(identifier: String) = Project(s"app${identifier.capitalize}", file(s"apps/$identifier"))
   .dependsOn(appTemplate)
@@ -201,9 +201,7 @@ lazy val examples = project.in(file("examples"))
   .settings(noPublishSettings)
   .settings(standardSettings)
   .settings(warningSettings)
-  .settings(
-    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.1"
-  )
+  .settings(libraryDependencies += logback)
 
 
 // Release stuff
