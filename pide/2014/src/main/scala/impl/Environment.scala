@@ -14,6 +14,8 @@ final class Environment protected(home: Path) extends api.Environment(home) {
     cygwin_root = home.resolve("contrib/cygwin").toAbsolutePath.toString
   )
 
+  api.Environment.patchSettings(isabelle.Isabelle_System, variables)
+
   private def destMarkup(markup: isabelle.Markup) =
     (markup.name, markup.properties)
 

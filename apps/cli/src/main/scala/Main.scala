@@ -20,7 +20,7 @@ object Main extends Template {
 
         logger.info(s"Starting Isabelle/jEdit with logic $logic ...")
 
-        Seq(binary.toString, "jedit", "-l", logic).run(nullLogger)
+        Process(Seq(binary.toString, "jedit", "-l", logic), None, bundle.env.variables.toList: _*).run(nullLogger)
         ()
       }
     case Platform.Windows =>
