@@ -22,5 +22,5 @@ trait DefaultSetup { self: Specification =>
   lazy val platform: Platform = Setup.defaultPlatform.get
   lazy val setup: Setup = Setup.detectSetup(platform, version).get
   lazy val env: Future[Environment] = setup.makeEnvironment
-  lazy val config: Configuration = Configuration.fromPath(Paths.get("."), s"Protocol${version.identifier}")
+  lazy val config: Configuration = Configuration.fromPath(Paths.get("."), "Protocol")
 }
