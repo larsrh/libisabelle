@@ -46,6 +46,8 @@ object Cygwin
           case link :: content :: rest =>
             val path = (new JFile(isabelle_root, link)).toPath
 
+            /* change from official sources */ Files.delete(path) /* end change */
+
             val writer = Files.newBufferedWriter(path, UTF8.charset)
             try { writer.write("!<symlink>" + content + "\u0000") }
             finally { writer.close }
