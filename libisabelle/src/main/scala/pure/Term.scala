@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle.std
+package edu.tum.cs.isabelle.pure
 
 import scala.math.BigInt
 
