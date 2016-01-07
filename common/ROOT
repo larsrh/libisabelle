@@ -1,7 +1,7 @@
-session Codec = Pure +
+session Common = Pure +
   theories
     Codec_Test
 
-session "HOL-Codec" = HOL +
+session "HOL-Common" = HOL +
   theories
     Codec_Test

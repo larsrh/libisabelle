@@ -1,9 +1,7 @@
 theory Protocol
-imports "../isabelle-common/Codec"
+imports "../../common/Common"
 keywords "operation_setup" :: thy_decl % "ML"
 begin
-
-ML_file "../isabelle-common/protocol.ML"
 
 ML\<open>
 val _ =

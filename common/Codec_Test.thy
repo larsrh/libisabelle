@@ -1,5 +1,5 @@
 theory Codec_Test
-imports Codec "~~/src/Tools/Spec_Check/Spec_Check"
+imports Common "~~/src/Tools/Spec_Check/Spec_Check"
 begin
 
 ML\<open>

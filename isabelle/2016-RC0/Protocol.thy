@@ -3,8 +3,6 @@ imports Codec_Class
 keywords "operation_setup" :: thy_decl % "ML"
 begin
 
-ML_file "../isabelle-common/protocol.ML"
-
 ML\<open>
 val _ =
   let

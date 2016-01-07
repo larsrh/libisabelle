@@ -1,7 +1,0 @@
-session Protocol2014 = Codec +
-  theories
-    Protocol
-
-session "HOL-Protocol2014" = "HOL-Codec" +
-  theories
-    Protocol
