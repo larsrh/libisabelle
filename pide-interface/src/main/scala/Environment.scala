@@ -43,6 +43,13 @@ object Environment {
     }
   }
 
+  private[isabelle] def patchSettings(instance: Any, patch: Map[String, String]) = {
+    val field = instance.getClass.getDeclaredField("_settings")
+    field.setAccessible(true)
+    val old = field.get(instance).asInstanceOf[Option[Map[String, String]]].get
+    field.set(instance, Some(old ++ patch))
+  }
+
 }
 
 
@@ -103,7 +110,13 @@ abstract class Environment protected[isabelle](val home: Path) { self =>
 
   Environment.checkInstance(getClass(), home)
 
-  final val version = Environment.getVersion(getClass())
+  final val version: Version = Environment.getVersion(getClass())
+
+  final val variables: Map[String, String] = Map(
+    "ISABELLE_VERSION" -> version.identifier,
+    "LIBISABELLE_GIT" -> BuildInfo.gitHeadCommit.getOrElse(""),
+    "LIBISABELLE_VERSION" -> BuildInfo.version
+  )
 
   override def toString: String =
     s"$version at $home"

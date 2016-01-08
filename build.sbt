@@ -86,7 +86,8 @@ lazy val root = project.in(file("."))
   .settings(noPublishSettings)
   .aggregate(
     pideInterface, libisabelle, setup,
-    tests, docs, appTemplate, appBootstrap, appReport, examples,
+    tests, docs, examples,
+    appTemplate, appBootstrap, appReport, appCli,
     pide2014, pide2015, pide2016
   )
 
@@ -191,6 +192,7 @@ def app(identifier: String) = Project(s"app${identifier.capitalize}", file(s"app
   .settings(warningSettings)
 
 lazy val appBootstrap = app("bootstrap")
+lazy val appCli = app("cli")
 lazy val appReport = app("report")
 
 

@@ -30,7 +30,7 @@ object Main extends Template {
   }
 
   def run(bundle: Bundle) = {
-    val config = Configuration.fromPath(Paths.get("."), s"HOL-Protocol${bundle.version.identifier}")
+    val config = Configuration.fromPath(Paths.get("."), "HOL-Protocol")
     val built = System.build(bundle.env, config)
     if (!built)
       sys.error("build error")

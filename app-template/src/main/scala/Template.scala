@@ -6,6 +6,8 @@ import scala.concurrent._
 import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits
 
+import org.log4s._
+
 import edu.tum.cs.isabelle.api._
 import edu.tum.cs.isabelle.setup.Setup
 
@@ -42,11 +44,11 @@ object Template {
 }
 
 /**
- * Simple bundle of an Isabelle [[edu.tum.cs.isabelle.api.Version version]], a
+ * Simple bundle of an Isabelle [[edu.tum.cs.isabelle.setup.Setup setup]], a
  * matching [[edu.tum.cs.isabelle.api.Environment environment]] and a list of
  * command line arguments.
  */
-final case class Bundle(env: Environment, version: Version, args: List[String])
+final case class Bundle(env: Environment, setup: Setup, args: List[String])
 
 /**
  * Convenience trait for providing standalone `libisabelle`-powered
@@ -61,6 +63,8 @@ final case class Bundle(env: Environment, version: Version, args: List[String])
  */
 trait Template {
 
+  protected val logger = getLogger(getClass)
+
   /**
    * Execute an asynchronous action, optionally using the
    * [[executionContext provided `ExecutionContext`]].
@@ -74,9 +78,14 @@ trait Template {
 
   final def main(args: Array[String]): Unit = Template.getVersion(args.toList) match {
     case (Some(version), args) =>
-      val app = Setup.defaultSetup(version).flatMap(_.makeEnvironment).flatMap { env =>
-        run(Bundle(env, version, args))
-      }
+      val app =
+        for {
+          setup <- Setup.defaultSetup(version)
+          env <- setup.makeEnvironment
+          bundle = Bundle(env, setup, args)
+          _ <- run(bundle)
+        }
+        yield ()
 
       Await.result(app, duration)
     case (None, _) =>

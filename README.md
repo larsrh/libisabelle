@@ -1,4 +1,5 @@
 # libisabelle
+
 Minimal wrapper around Isabelle/PIDE for non-IDE applications
 
 | Service                   | Status |
@@ -8,6 +9,7 @@ Minimal wrapper around Isabelle/PIDE for non-IDE applications
 | Codacy (code quality)     | [![Codacy Badge](https://api.codacy.com/project/badge/grade/3db2f4794f2046c4b7efb256bf138678)](https://www.codacy.com/app/larsrh/libisabelle) |
 | Maven Central             | [![Maven Central](https://img.shields.io/maven-central/v/info.hupel/libisabelle_2.11.svg?label=latest%20release%20for%202.11)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22info.hupel%22%20AND%20a%3A%22libisabelle_2.11%22) |
 | Scaladoc                  | [![Scaladoc](http://javadoc-badge.appspot.com/info.hupel/libisabelle-docs_2.11.svg?label=scaladoc)](http://javadoc-badge.appspot.com/info.hupel/libisabelle-docs_2.11) |
+
 
 ## Setup
 
@@ -28,6 +30,7 @@ On some systems, you might need to install Perl, Python, and/or some additional 
 Note to proficient Isabelle users:
 `libisabelle` does not respect `ISABELLE_HOME`.
 Bootstrapping will create a new installation in your home folder (Linux: `~/.local/share`, Windows: `%LOCALAPPDATA%`, OS X: `~/Library/Preferences`).
+
 
 ## Operating system support
 
@@ -57,6 +60,22 @@ $ ./sbt
 ```
 
 Make sure to have bootstrapped the installation as described above for the appropriate Isabelle version, otherwise the tests will fail.
+
+
+## Command line interface
+
+The `cli` application launches an Isabelle/jEdit instance with a specified logic.
+
+```
+$ cd libisabelle
+$ ./sbt
+...
+> appCli/run --version 2015 HOL-Probability
+```
+
+By default, the `HOL` session is selected.
+The version has to be specified always.
+
 
 ## Including libisabelle into your project
 

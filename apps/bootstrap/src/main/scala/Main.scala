@@ -14,7 +14,7 @@ object Main extends Template {
   def duration = Duration.Inf
 
   def run(bundle: Bundle) = {
-    val config = Configuration.fromPath(Paths.get("."), s"Protocol${bundle.version.identifier}")
+    val config = Configuration.fromPath(Paths.get("."), "Protocol")
     val built = System.build(bundle.env, config)
     if (!built)
       sys.error("build error")

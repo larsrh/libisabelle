@@ -15,6 +15,8 @@ final class Environment protected(home: Path) extends api.Environment(home) {
     cygwin_root = home.resolve("contrib/cygwin").toAbsolutePath.toString
   )
 
+  api.Environment.patchSettings(isabelle.Isabelle_System, variables)
+
   private val defaultThreadFactory = isabelle.Simple_Thread.default_pool.getThreadFactory()
 
   isabelle.Simple_Thread.default_pool.setThreadFactory(new ThreadFactory {
