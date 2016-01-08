@@ -206,6 +206,35 @@ lazy val examples = project.in(file("examples"))
   .settings(libraryDependencies += logback)
 
 
+// Workbench
+
+lazy val workbench = project.in(file("workbench"))
+  .dependsOn(setup)
+  .settings(noPublishSettings)
+  .settings(standardSettings)
+  .settings(
+    libraryDependencies += logback,
+    initialCommands in console := """
+      import edu.tum.cs.isabelle._
+      import edu.tum.cs.isabelle.api._
+      import edu.tum.cs.isabelle.pure._
+      import edu.tum.cs.isabelle.hol._
+      import edu.tum.cs.isabelle.setup._
+      import scala.concurrent.duration.Duration
+      import scala.concurrent.Await
+      import scala.concurrent.ExecutionContext.Implicits.global
+      import java.nio.file.Paths
+
+      val setup = Await.result(Setup.defaultSetup(Version("2015")), Duration.Inf)
+      val env = Await.result(setup.makeEnvironment, Duration.Inf)
+      val config = Configuration.fromPath(Paths.get("."), "HOL-Protocol")
+      System.build(env, config)
+      val system = Await.result(System.create(env, config), Duration.Inf)
+
+      val main = Theory(system, "Main")"""
+  )
+
+
 // Release stuff
 
 import ReleaseTransformations._
