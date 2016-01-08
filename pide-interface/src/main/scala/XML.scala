@@ -21,6 +21,7 @@ object XML {
   sealed abstract class Tree {
     def toYXML: String = bodyToYXML(List(this))
     def pretty(indent: Int = 0): String
+    final def pretty: String = pretty()
   }
 
   final case class Elem(markup: Markup, body: Body) extends Tree {
