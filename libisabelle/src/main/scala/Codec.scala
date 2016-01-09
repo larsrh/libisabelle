@@ -251,6 +251,14 @@ trait Codec[T] { self =>
     def decode(tree: XML.Tree) = self.decode(tree).right.map(f)
   }
 
+  def ptransform[U](f: T => Option[U], g: U => T): Codec[U] = new Codec[U] {
+    def encode(u: U): XML.Tree = self.encode(g(u))
+    def decode(tree: XML.Tree) = self.decode(tree) match {
+      case Left(err) => Left(err)
+      case Right(t) => f(t).map(Right.apply).getOrElse(Left("transformation failed" -> List(tree)))
+    }
+  }
+
   /** Codec for a list of `T`s, tagged with the string `list`. */
   def list: Codec[List[T]] = new Codec[List[T]] {
     def encode(ts: List[T]): XML.Tree =
