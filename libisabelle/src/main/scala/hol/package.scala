@@ -36,7 +36,7 @@ package object hol extends LowPriorityImplicits {
     def embed(thy: Theory, t: Boolean)(implicit ec: ExecutionContext): Future[Term] = Future.successful {
       t match {
         case true => Const("HOL.True", typ)
-        case false => Const("HOL.True", typ)
+        case false => Const("HOL.False", typ)
       }
     }
   }
