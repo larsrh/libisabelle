@@ -33,7 +33,10 @@ object Embeddable {
   def apply[T](implicit T: Embeddable[T]) = T
 }
 
-case class Expr[T] private(term: Term)
+case class Expr[T] private(term: Term) {
+  def |>[U](that: Expr[T => U]): Expr[U] =
+    Expr(App(that.term, this.term))
+}
 
 object Expr {
 

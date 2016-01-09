@@ -138,6 +138,28 @@ lazy val setup = project.in(file("setup"))
     )
   )
 
+
+// Tests
+
+lazy val tests = project.in(file("tests"))
+  .dependsOn(libisabelle, setup)
+  .settings(noPublishSettings)
+  .settings(standardSettings)
+  .settings(warningSettings)
+  .settings(acyclicSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.specs2" %% "specs2-core" % "3.6.5" % "test",
+      "org.specs2" %% "specs2-scalacheck" % "3.6.5" % "test",
+      "org.scalacheck" %% "scalacheck" % "1.12.5" % "test",
+      logback % "test"
+    ),
+    parallelExecution in Test := false
+  )
+
+
+// PIDE implementations
+
 def pide(version: String) = Project(s"pide$version", file(s"pide/$version"))
   .dependsOn(pideInterface)
   .settings(moduleName := s"pide-$version")
@@ -158,28 +180,11 @@ lazy val pide2014 = pide("2014")
 lazy val pide2015 = pide("2015")
 lazy val pide2016 = pide("2016-RC0")
 
-lazy val tests = project.in(file("tests"))
-  .dependsOn(libisabelle, setup)
-  .settings(noPublishSettings)
-  .settings(standardSettings)
-  .settings(warningSettings)
-  .settings(acyclicSettings)
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.specs2" %% "specs2-core" % "3.6.5" % "test",
-      "org.specs2" %% "specs2-scalacheck" % "3.6.5" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.12.5" % "test",
-      logback % "test"
-    ),
-    parallelExecution in Test := false
-  )
-
 
 // Standalone applications
 
 lazy val appTemplate = project.in(file("app-template"))
   .dependsOn(setup)
-  .settings(noPublishSettings)
   .settings(standardSettings)
   .settings(warningSettings)
   .settings(acyclicSettings)
