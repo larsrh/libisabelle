@@ -43,20 +43,17 @@ object Expr {
       { case Expr(term) => (term, Typeable.typ[T]) }
     )
 
-  private val ParseTerm = Operation.implicitly[(String, String), Option[Term]]("parse_term")
+  private val ReadTerm = Operation.implicitly[(String, Typ, String), Option[Term]]("read_term")
   private val CheckTerm = Operation.implicitly[(Term, Typ, String), Option[Term]]("check_term")
 
-  def ofString[T : Typeable](thy: Theory, rawTerm: String)(implicit ec: ExecutionContext): OptionT[Future, Expr[T]] =
-    OptionT(thy.system.invoke(ParseTerm)((rawTerm, thy.name)) map {
-      case ProverResult.Failure(exn) => throw exn
-      case ProverResult.Success(opt) => opt
-    }).flatMap(ofTerm(thy, _))
+  private def fromProver[T](result: ProverResult[Option[Term]]): Option[Expr[T]] =
+    result.unsafeGet.map(Expr[T](_))
 
-  def ofTerm[T : Typeable](thy: Theory, term: Term)(implicit ec: ExecutionContext): OptionT[Future, Expr[T]] =
-    OptionT(thy.system.invoke(CheckTerm)((term, Typeable[T].typ, thy.name)) map {
-      case ProverResult.Failure(exn) => throw exn
-      case ProverResult.Success(opt) => opt.map(Expr[T](_))
-    })
+  def ofString[T : Typeable](thy: Theory, rawTerm: String)(implicit ec: ExecutionContext): Future[Option[Expr[T]]] =
+    thy.system.invoke(ReadTerm)((rawTerm, Typeable[T].typ, thy.name)).map(fromProver)
+
+  def ofTerm[T : Typeable](thy: Theory, term: Term)(implicit ec: ExecutionContext): Future[Option[Expr[T]]] =
+    thy.system.invoke(CheckTerm)((term, Typeable[T].typ, thy.name)).map(fromProver)
 
   def embed[T : Embeddable](thy: Theory, t: T)(implicit ec: ExecutionContext): Future[Expr[T]] =
     Embeddable[T].embed(thy, t).map(Expr[T](_))

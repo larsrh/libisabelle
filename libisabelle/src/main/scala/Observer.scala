@@ -13,7 +13,12 @@ import acyclic.file
  *
  * @see [[edu.tum.cs.isabelle.System#invoke]]
  */
-trait ProverResult[+T]
+trait ProverResult[+T] {
+  def unsafeGet: T = this match {
+    case ProverResult.Success(t) => t
+    case ProverResult.Failure(exn) => throw exn
+  }
+}
 
 object ProverResult {
   final case class Success[+T](t: T) extends ProverResult[T]

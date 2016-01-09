@@ -38,8 +38,8 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
 
   val theory = system.map(Theory(_, "Pure"))
 
-  val parsed = theory.flatMap(Expr.ofString[Prop](_, "TERM x").value)
-  val parseFailed = theory.flatMap(Expr.ofString[Prop](_, "+").value)
+  val parsed = theory.flatMap(Expr.ofString[Prop](_, "TERM x"))
+  val parseFailed = theory.flatMap(Expr.ofString[Prop](_, "+"))
 
 
   // Loading auxiliary files
