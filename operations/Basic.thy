@@ -13,9 +13,9 @@ operation_setup (sequential, bracket) use_thys = \<open>
    action = Thy_Info.use_thys o map (rpair Position.none)}\<close>
 
 text \<open>
-  The @{verbatim read_term} operation performs both parsing and checking at once, because we do not
-  want to send back parsed, but un-checked terms to the JVM. They may contain weird position
-  information which are difficult to get rid of and confuse the codecs.
+  The read_term operation performs both parsing and checking at once, because we do not want to
+  send back parsed, but un-checked terms to the JVM. They may contain weird position information
+  which are difficult to get rid of and confuse the codecs.
 \<close>
 
 operation_setup read_term = \<open>
