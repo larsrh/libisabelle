@@ -9,6 +9,7 @@ Minimal wrapper around Isabelle/PIDE for non-IDE applications
 | Maven Central             | [![Maven Central](https://img.shields.io/maven-central/v/info.hupel/libisabelle_2.11.svg?label=latest%20release%20for%202.11)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22info.hupel%22%20AND%20a%3A%22libisabelle_2.11%22) |
 | Scaladoc                  | [![Scaladoc](http://javadoc-badge.appspot.com/info.hupel/libisabelle-docs_2.11.svg?label=scaladoc)](http://javadoc-badge.appspot.com/info.hupel/libisabelle-docs_2.11) |
 | Zenodo (DOI)              | [![DOI](https://zenodo.org/badge/19880/larsrh/libisabelle.svg)](https://zenodo.org/badge/latestdoi/19880/larsrh/libisabelle) |
+| Gitter (Chat)             | [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/larsrh/libisabelle) |
 
 
 ## Setup
@@ -89,3 +90,11 @@ libraryDependencies ++= Seq(
   "info.hupel" %% "pide-interface" % "0.2.3"
 )
 ```
+
+
+## Participation
+
+This project supports the [Typelevel][typelevel] [code of conduct][codeofconduct] and wants all of its channels (at the moment: GitHub and Gitter) to be welcoming environments for everyone.
+
+[typelevel]: http://typelevel.org/
+[codeofconduct]: http://typelevel.org/conduct.html
