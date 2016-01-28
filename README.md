@@ -1,5 +1,7 @@
 # libisabelle
 
+[![Join the chat at https://gitter.im/larsrh/libisabelle](https://badges.gitter.im/larsrh/libisabelle.svg)](https://gitter.im/larsrh/libisabelle?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Minimal wrapper around Isabelle/PIDE for non-IDE applications
 
 | Service                   | Status |
