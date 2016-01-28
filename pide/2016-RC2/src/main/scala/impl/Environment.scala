@@ -7,7 +7,7 @@ import scala.concurrent.ExecutionContext
 
 import edu.tum.cs.isabelle.api
 
-@api.Implementation(identifier = "2016-RC0")
+@api.Implementation(identifier = "2016-RC2")
 final class Environment protected(home: Path) extends api.Environment(home) {
 
   isabelle.Isabelle_System.init(
@@ -16,16 +16,6 @@ final class Environment protected(home: Path) extends api.Environment(home) {
   )
 
   api.Environment.patchSettings(isabelle.Isabelle_System, variables)
-
-  private val defaultThreadFactory = isabelle.Standard_Thread.pool.getThreadFactory()
-
-  isabelle.Standard_Thread.pool.setThreadFactory(new ThreadFactory {
-    def newThread(r: Runnable) = {
-      val thread = defaultThreadFactory.newThread(r)
-      thread.setDaemon(true)
-      thread
-    }
-  })
 
   private def destMarkup(markup: isabelle.Markup) =
     (markup.name, markup.properties)

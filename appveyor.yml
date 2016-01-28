@@ -8,7 +8,7 @@ platform:
 environment:
   matrix:
     - ISABELLE_VERSION: 2015
-    - ISABELLE_VERSION: 2016-RC0
+    - ISABELLE_VERSION: 2016-RC2
 build_script:
   - sbt publishLocal
 test_script:

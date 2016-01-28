@@ -178,7 +178,7 @@ def pide(version: String) = Project(s"pide$version", file(s"pide/$version"))
 
 lazy val pide2014 = pide("2014")
 lazy val pide2015 = pide("2015")
-lazy val pide2016 = pide("2016-RC0")
+lazy val pide2016 = pide("2016-RC2")
 
 
 // Standalone applications

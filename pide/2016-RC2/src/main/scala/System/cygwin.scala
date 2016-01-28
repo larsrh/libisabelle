@@ -1,4 +1,4 @@
-/*  Title:      Pure/Tools/cygwin.scala
+/*  Title:      Pure/System/cygwin.scala
     Author:     Makarius
 
 Cygwin as POSIX emulation on Windows.
@@ -45,8 +45,6 @@ object Cygwin
           case Nil | List("") =>
           case link :: content :: rest =>
             val path = (new JFile(isabelle_root, link)).toPath
-
-            /* change from official sources */ Files.delete(path) /* end change */
 
             val writer = Files.newBufferedWriter(path, UTF8.charset)
             try { writer.write("!<symlink>" + content + "\u0000") }
