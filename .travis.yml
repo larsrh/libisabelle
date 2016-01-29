@@ -1,7 +1,7 @@
 language: java
 env:
   - ISABELLE_VERSION=2015 SCALA_VERSION=2.11.7
-  - ISABELLE_VERSION=2016-RC0 SCALA_VERSION=2.11.7
+  - ISABELLE_VERSION=2016-RC2 SCALA_VERSION=2.11.7
 install:
   - git submodule update --init --recursive
 os:
@@ -18,6 +18,6 @@ matrix:
     - env: ISABELLE_VERSION=2015 SCALA_VERSION=2.11.7
       os: linux
       jdk: oraclejdk8
-    - env: ISABELLE_VERSION=2016-RC0 SCALA_VERSION=2.11.7
+    - env: ISABELLE_VERSION=2016-RC2 SCALA_VERSION=2.11.7
       os: linux
       jdk: oraclejdk8
