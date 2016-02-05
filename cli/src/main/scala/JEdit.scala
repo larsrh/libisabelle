@@ -1,26 +1,23 @@
-package edu.tum.cs.isabelle.app.cli
+package edu.tum.cs.isabelle.cli
 
-import scala.concurrent.Future
-import scala.concurrent.duration._
+import scala.concurrent._
 import scala.sys.process._
 
-import edu.tum.cs.isabelle.app._
 import edu.tum.cs.isabelle.setup.Platform
 
-object Main extends Template {
+object JEdit extends Command {
 
-  def duration = Duration.Inf
-
-  def run(bundle: Bundle) = bundle.setup.platform match {
+  def run(bundle: Bundle, args: List[String])(implicit ec: ExecutionContext): Future[Unit] = bundle.setup.platform match {
     case Platform.Linux | Platform.OSX =>
       Future {
-        val logic = bundle.args.headOption.getOrElse("HOL")
         val binary = bundle.env.home.resolve("bin").resolve("isabelle")
         val nullLogger = ProcessLogger(_ => ())
+        val logic = bundle.configuration.session
+        val dir = bundle.configuration.path.map(p => List("-d", p.toString)).getOrElse(Nil)
 
         logger.info(s"Starting Isabelle/jEdit with logic $logic ...")
 
-        Process(Seq(binary.toString, "jedit", "-l", logic), None, bundle.env.variables.toList: _*).run(nullLogger)
+        Process(List(binary.toString, "jedit", "-l", logic) ::: dir, None, bundle.env.variables.toList: _*).run(nullLogger)
         ()
       }
     case Platform.Windows =>

@@ -8,7 +8,7 @@ os:
   - osx
 script:
   - ./sbt "++$SCALA_VERSION" publishLocal
-  - ./sbt "++$SCALA_VERSION" "appBootstrap/run --version $ISABELLE_VERSION"
+  - ./sbt "++$SCALA_VERSION" "cli/run --version $ISABELLE_VERSION build"
   - ./sbt "++$SCALA_VERSION" test
 matrix:
   include:

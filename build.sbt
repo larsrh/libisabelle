@@ -87,7 +87,7 @@ lazy val root = project.in(file("."))
   .aggregate(
     pideInterface, libisabelle, setup,
     tests, docs, examples,
-    appTemplate, appBootstrap, appReport, appCli,
+    cli,
     pide2014, pide2015, pide2016
   )
 
@@ -96,7 +96,7 @@ lazy val docs = project.in(file("docs"))
   .settings(standardSettings)
   .settings(unidocSettings)
   .settings(
-    unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(pideInterface, libisabelle, appTemplate, setup),
+    unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(pideInterface, libisabelle, setup),
     doc in Compile := (doc in ScalaUnidoc).value,
     target in unidoc in ScalaUnidoc := crossTarget.value / "api"
   )
@@ -183,22 +183,13 @@ lazy val pide2016 = pide("2016-RC2")
 
 // Standalone applications
 
-lazy val appTemplate = project.in(file("app-template"))
+lazy val cli = project.in(file("cli"))
   .dependsOn(setup)
+  .settings(moduleName := "libisabelle-cli")
   .settings(standardSettings)
   .settings(warningSettings)
   .settings(acyclicSettings)
   .settings(libraryDependencies += logback)
-
-def app(identifier: String) = Project(s"app${identifier.capitalize}", file(s"apps/$identifier"))
-  .dependsOn(appTemplate)
-  .settings(noPublishSettings)
-  .settings(standardSettings)
-  .settings(warningSettings)
-
-lazy val appBootstrap = app("bootstrap")
-lazy val appCli = app("cli")
-lazy val appReport = app("report")
 
 
 // Examples
