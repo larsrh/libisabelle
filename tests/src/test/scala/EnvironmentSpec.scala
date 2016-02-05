@@ -24,12 +24,14 @@ class EnvironmentSpec(val specs2Env: Env) extends Specification with DefaultSetu
   // FIXME code duplication
 
   val context = Thread.currentThread.getContextClassLoader
-  val classLoader = Setup.fetchImplementation(platform, version).map { paths =>
-    new URLClassLoader(paths.map(_.toUri.toURL).toArray, context)
+  val constructor = Setup.fetchImplementation(platform, version).map { paths =>
+    val clazz = new URLClassLoader(paths.map(_.toUri.toURL).toArray, context).loadClass(s"${Setup.defaultPackageName}.Environment")
+    val constructor = clazz.getDeclaredConstructor(classOf[Path])
+    constructor.setAccessible(true)
+    constructor
   }
 
-  def instantiate(home: Path) =
-    classLoader.map(_.loadClass("edu.tum.cs.isabelle.impl.Environment").getDeclaredConstructor(classOf[Path]).newInstance(home))
+  def instantiate(home: Path) = constructor.map(_.newInstance(home))
 
   val first = instantiate(platform.setupStorage(version))
 
