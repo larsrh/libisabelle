@@ -1,6 +1,7 @@
 package edu.tum.cs.isabelle.setup
 
 import java.io.File
+import java.net.{URL, URLClassLoader}
 import java.nio.file.{Files, Path, Paths}
 
 import scala.concurrent.{Future, ExecutionContext}
@@ -10,7 +11,6 @@ import coursier.{Fetch, MavenRepository}
 
 import org.log4s._
 
-import edu.tum.cs.isabelle.Implementations
 import edu.tum.cs.isabelle.api.{BuildInfo, Environment, Version}
 
 import acyclic.file
@@ -39,6 +39,8 @@ object Setup {
     guess
   }
 
+  val defaultPackageName: String = "edu.tum.cs.isabelle.impl"
+
   // FIXME this whole thing needs proper error handling
 
   def install(platform: OfficialPlatform, version: Version)(implicit ec: ExecutionContext): Future[Setup] =
@@ -50,7 +52,7 @@ object Setup {
         val stream = Tar.download(url)
         Files.createDirectories(platform.setupStorage)
         platform.withLock { () =>
-          Tar.extractTo(platform.setupStorage, stream).map(Setup(_, platform, version))
+          Tar.extractTo(platform.setupStorage, stream).map(Setup(_, platform, version, defaultPackageName))
         }
     }
 
@@ -58,7 +60,7 @@ object Setup {
     val path = platform.setupStorage(version)
     if (Files.isDirectory(path)) {
       logger.info(s"Using default setup; detected $version at $path")
-      Some(Setup(path, platform, version))
+      Some(Setup(path, platform, version, defaultPackageName))
     }
     else {
       logger.info(s"Using default setup; no setup found in ${platform.setupStorage}")
@@ -157,7 +159,24 @@ object Setup {
  *
  * The file system location is called ''home'' throughout `libisabelle`.
  */
-final case class Setup(home: Path, platform: Platform, version: Version) {
+final case class Setup(home: Path, platform: Platform, version: Version, packageName: String) {
+
+  private def instantiate(urls: List[URL]): Environment = {
+    val classLoader = new URLClassLoader(urls.toArray, getClass.getClassLoader)
+    val env = classLoader.loadClass(s"$packageName.Environment").asSubclass(classOf[Environment])
+
+    val actualVersion = Environment.getVersion(env)
+    if (actualVersion != version)
+      sys.error(s"expected version $version, got version $actualVersion")
+
+    val info = classLoader.loadClass(s"$packageName.BuildInfo").getDeclaredMethod("toString").invoke(null)
+    if (BuildInfo.toString != info.toString)
+      sys.error(s"build info does not match")
+
+    val constructor = env.getDeclaredConstructor(classOf[Path])
+    constructor.setAccessible(true)
+    constructor.newInstance(home)
+  }
 
   /**
    * Convenience method aliasing
@@ -166,9 +185,6 @@ final case class Setup(home: Path, platform: Platform, version: Version) {
    * the required classpath.
    */
   def makeEnvironment(implicit ec: ExecutionContext): Future[Environment] =
-    Setup.fetchImplementation(platform, version).map { paths =>
-      val entry = Implementations.Entry(paths.map(_.toUri.toURL), "edu.tum.cs.isabelle.impl")
-      Implementations.empty.add(entry).makeEnvironment(home, version).get
-    }
+    Setup.fetchImplementation(platform, version).map(paths => instantiate(paths.map(_.toUri.toURL)))
 
 }

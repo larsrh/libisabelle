@@ -62,31 +62,25 @@ object Environment {
  * multiple running processes at the same time.
  *
  * A subclass of this class is called ''implementation'' throughout
- * `libisabelle`. The `[[edu.tum.cs.isabelle.Implementations Implementations]]`
- * class serves as a registry of those and using it is strongly recommended.
- * (Since subclasses should `protect` their constructors, manual instantiation
- * would not work anyway.)
+ * `libisabelle`.
  *
- * For multi-home or multi-version scenarios, it is highly recommended that
- * users create environments through
- * [[edu.tum.cs.isabelle.Implementations#makeEnvironment the appropriate function]]
- * of a registry. See its documentation for an explanation.
- *
- * If in doubt, users should prefer the direct (manual) instantiation.
+ * It is highly recommended to use
+ * [[edu.tum.cs.isabelle.setup.Setup#makeEnvironment]] to instantiate
+ * implementations.
  *
  * While implementations may be created freely by users, it is recommended to
  * only use the bundled implementations for the supported Isabelle versions.
- * By convention, they live in the package `edu.tum.cs.isabelle.impl` and their
- * class name is also `Environment`.
+ * By convention, they live in the package `edu.tum.cs.isabelle.impl`. See also
+ * `[[edu.tum.cs.isabelle.setup.Setup.defaultPackageName Setup.defaultPackageName]]`.
  *
  * ''Contract''
  *
  *   - An implementation is a subclass of this class.
+ *   - The class name of the implementation must be `Environment`. There must
+ *     be a `BuildInfo` class in the same package.
  *   - Implementations must be final and provide a constructor with exactly one
- *    argument (of type `java.nio.file.Path`). There must be no other
- *    constructors. The constructor should be `protected`, but must be
- *    accessible from any class in the [[edu.tum.cs.isabelle isabelle]]
- *    package.
+ *     argument (of type `java.nio.file.Path`). There must be no other
+ *     constructors. The constructor should be `private`.
  *   - Implementations must be annotated with
  *     `[[edu.tum.cs.isabelle.api.Implementation Implementation]]`, where the
  *     given [[edu.tum.cs.isabelle.api.Implementation.identifier identifier]]
@@ -99,14 +93,8 @@ object Environment {
  * to have multiple environments for different versions in the same class
  * loader. This is the primary reason why this class exists in the first place,
  * to enable seamless abstraction over multiple PIDEs.
- *
- * As the caveat above states, not even multi-home scenarios are supported
- * without going through a registry. The user has to ensure that this happens,
- * since this class does not attempt to detect such a situation. While in
- * principle it could do so, it would require the introduction of even more
- * global mutable state. It might do so in the future.
  */
-abstract class Environment protected[isabelle](val home: Path) { self =>
+abstract class Environment protected(val home: Path) { self =>
 
   Environment.checkInstance(getClass(), home)
 

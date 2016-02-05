@@ -12,7 +12,7 @@ import edu.tum.cs.isabelle.setup._
 object JSetup {
 
   def makeEnvironment(home: Path, platform: Platform, version: Version, timeout: Duration): Environment =
-    Await.result(Setup(home, platform, version).makeEnvironment, timeout)
+    Await.result(Setup(home, platform, version, Setup.defaultPackageName).makeEnvironment, timeout)
 
   def makeEnvironment(home: Path, platform: Platform, version: Version): Environment =
     makeEnvironment(home, platform, version, Duration.Inf)
