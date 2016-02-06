@@ -1,17 +1,13 @@
-package edu.tum.cs.isabelle.app.report
+package edu.tum.cs.isabelle.cli
 
 import java.nio.file.{Path, Paths}
 
 import scala.concurrent._
-import scala.concurrent.duration._
 
 import edu.tum.cs.isabelle._
 import edu.tum.cs.isabelle.api._
-import edu.tum.cs.isabelle.app._
 
-object Main extends Template {
-
-  def duration = Duration.Inf
+object Report extends Command {
 
   def UseThysMarkup(home: Path) = new Operation[List[String], Unit]("use_thys") {
     def prepare(args: List[String]): (XML.Tree, Observer[Unit]) = {
@@ -29,15 +25,10 @@ object Main extends Template {
     }
   }
 
-  def run(bundle: Bundle) = {
-    val config = Configuration.fromPath(Paths.get("."), "HOL-Protocol")
-    val built = System.build(bundle.env, config)
-    if (!built)
-      sys.error("build error")
-
+  def run(bundle: Bundle, args: List[String])(implicit ec: ExecutionContext): Future[Unit] = {
     for {
-      s <- System.create(bundle.env, config)
-      _ <- s.invoke(UseThysMarkup(bundle.env.home))(bundle.args)
+      s <- System.create(bundle.env, bundle.configuration)
+      _ <- s.invoke(UseThysMarkup(bundle.env.home))(args)
       _ <- s.dispose
     }
     yield ()
