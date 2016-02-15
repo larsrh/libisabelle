@@ -3,6 +3,6 @@
 	url = https://github.com/larsrh/classy.git
   branch = isabelle/2015
 [submodule "isabelle-2016/lib/classy"]
-	path = isabelle/2016-RC2/lib/classy
+	path = isabelle/2016-RC5/lib/classy
 	url = https://github.com/larsrh/classy.git
 	branch = isabelle/2016
