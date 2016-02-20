@@ -44,7 +44,7 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
 
   // Loading auxiliary files
 
-  val loaded = system.flatMap(_.invoke(Operation.UseThys)(List("tests/src/test/isabelle/Test")))
+  val loaded = system.flatMap(_.invoke(Operation.UseThys)(List("tests/src/test/isabelle/Sleepy")))
 
   val Sleepy = Operation.implicitly[BigInt, Unit]("sleepy")
 

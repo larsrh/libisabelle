@@ -1,4 +1,4 @@
-theory Test
+theory Sleepy
 imports Protocol
 begin
 
