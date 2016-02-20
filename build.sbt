@@ -88,7 +88,7 @@ lazy val root = project.in(file("."))
     pideInterface, libisabelle, setup,
     tests, docs, examples,
     cli,
-    pide2014, pide2015, pide2016
+    pide2015, pide2016
   )
 
 lazy val docs = project.in(file("docs"))
@@ -176,7 +176,6 @@ def pide(version: String) = Project(s"pide$version", file(s"pide/$version"))
     }
   ))
 
-lazy val pide2014 = pide("2014")
 lazy val pide2015 = pide("2015")
 lazy val pide2016 = pide("2016-RC5")
 

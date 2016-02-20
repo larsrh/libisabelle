@@ -12,12 +12,9 @@ script:
   - ./sbt "++$SCALA_VERSION" test
 matrix:
   include:
-    - env: ISABELLE_VERSION=2014 SCALA_VERSION=2.10.5
+    - env: ISABELLE_VERSION=2015 SCALA_VERSION=2.10.5
       os: linux
       jdk: oraclejdk7
-    - env: ISABELLE_VERSION=2015 SCALA_VERSION=2.11.7
-      os: linux
-      jdk: oraclejdk8
     - env: ISABELLE_VERSION=2016-RC5 SCALA_VERSION=2.11.7
       os: linux
       jdk: oraclejdk8
