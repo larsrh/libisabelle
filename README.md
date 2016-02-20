@@ -15,8 +15,7 @@ Minimal wrapper around Isabelle/PIDE for non-IDE applications
 ## Setup
 
 `libisabelle` is a Scala library which talks to Isabelle.
-It currently works with Isabelle2014 and Isabelle2015.
-Experimental support for Isabelle2016-RC0 is available.
+It currently works with Isabelle2015 and Isabelle2016.
 
 To get started, follow these steps:
 
@@ -24,7 +23,7 @@ To get started, follow these steps:
    After this is done, you are in the SBT shell.
 2. Compile the sources with `compile`.
 3. If you have used an arbitrary snapshot of the sources (e.g. via `git clone`), run `publishLocal`.
-4. Bootstrap an Isabelle installation using `appBootstrap/run --version 2015`, which will download and extract the latest supported Isabelle version for you.
+4. Bootstrap an Isabelle installation using `appBootstrap/run --version 2016`, which will download and extract the latest supported Isabelle version for you.
 
 On some systems, you might need to install Perl, Python, and/or some additional libraries.
 
@@ -57,7 +56,7 @@ Example:
 $ cd libisabelle
 $ ./sbt
 ...
-> testOnly * -- isabelle.version 2015
+> testOnly * -- isabelle.version 2016
 ```
 
 Make sure to have bootstrapped the installation as described above for the appropriate Isabelle version, otherwise the tests will fail.
@@ -71,7 +70,7 @@ The `cli` application launches an Isabelle/jEdit instance with a specified logic
 $ cd libisabelle
 $ ./sbt
 ...
-> appCli/run --version 2015 HOL-Probability
+> appCli/run --version 2016 HOL-Probability
 ```
 
 By default, the `HOL` session is selected.
