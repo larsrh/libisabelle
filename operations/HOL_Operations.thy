@@ -1,5 +1,5 @@
 theory HOL_Operations
-imports "../isabelle/$ISABELLE_VERSION/Protocol" Main
+imports "../protocol/Protocol" Main
 begin
 
 operation_setup mk_int = \<open>

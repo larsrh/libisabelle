@@ -1,5 +1,5 @@
 theory Basic
-imports "../isabelle/$ISABELLE_VERSION/Protocol"
+imports "../protocol/Protocol"
 begin
 
 operation_setup hello = \<open>

@@ -1,10 +1,12 @@
-session Protocol = Common +
+session Protocol = Classy +
   theories
-    "isabelle/$ISABELLE_VERSION/Protocol"
+    "protocol/Protocol"
+    "protocol/Codec_Test"
     "operations/Basic"
 
-session "HOL-Protocol" = "HOL-Common" +
+session "HOL-Protocol" = "HOL-Classy" +
   theories
-    "isabelle/$ISABELLE_VERSION/Protocol"
+    "protocol/Protocol"
+    "protocol/Codec_Test"
     "operations/Basic"
     "operations/HOL_Operations"
