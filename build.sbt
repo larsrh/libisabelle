@@ -220,7 +220,7 @@ lazy val workbench = project.in(file("workbench"))
       import scala.concurrent.ExecutionContext.Implicits.global
       import java.nio.file.Paths
 
-      val setup = Await.result(Setup.defaultSetup(Version("2015")), Duration.Inf)
+      val setup = Await.result(Setup.defaultSetup(Version("2016")), Duration.Inf)
       val env = Await.result(setup.makeEnvironment, Duration.Inf)
       val config = Configuration.fromPath(Paths.get("."), "HOL-Protocol")
       System.build(env, config)
