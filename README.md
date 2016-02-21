@@ -23,7 +23,7 @@ To get started, follow these steps:
    After this is done, you are in the SBT shell.
 2. Compile the sources with `compile`.
 3. If you have used an arbitrary snapshot of the sources (e.g. via `git clone`), run `publishLocal`.
-4. Bootstrap an Isabelle installation using `appBootstrap/run --version 2016`, which will download and extract the latest supported Isabelle version for you.
+4. Bootstrap an Isabelle installation using `cli/run --version 2016 build`, which will download and extract the latest supported Isabelle version for you.
 
 On some systems, you might need to install Perl, Python, and/or some additional libraries.
 
@@ -64,17 +64,14 @@ Make sure to have bootstrapped the installation as described above for the appro
 
 ## Command line interface
 
-The `cli` application launches an Isabelle/jEdit instance with a specified logic.
+The `cli` application is able to launch an Isabelle/jEdit instance with a specified logic.
 
 ```
 $ cd libisabelle
 $ ./sbt
 ...
-> appCli/run --version 2016 HOL-Probability
+> cli/run --version 2016 --session HOL-Probability jedit
 ```
-
-By default, the `HOL` session is selected.
-The version has to be specified always.
 
 
 ## Including libisabelle into your project
@@ -84,9 +81,9 @@ Drop the following lines into your `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "info.hupel" %% "libisabelle" % "0.2.3",
-  "info.hupel" %% "libisabelle-setup" % "0.2.3",
-  "info.hupel" %% "pide-interface" % "0.2.3"
+  "info.hupel" %% "libisabelle" % "0.2.4",
+  "info.hupel" %% "libisabelle-setup" % "0.2.4",
+  "info.hupel" %% "pide-interface" % "0.2.4"
 )
 ```
 
