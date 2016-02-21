@@ -1,11 +1,12 @@
 package edu.tum.cs.isabelle.api
 
-import java.nio.file.Path
+import java.nio.file.{Files, Path}
 
 import acyclic.file
 
 /** Convenience constructors for [[Configuration configurations]]. */
 object Configuration {
+
   /**
    * Creates a [[Configuration configuration]] from an additional path, that
    * is, the specified session is declared in a `ROOT` file in that path
@@ -35,6 +36,10 @@ object Configuration {
    */
   def fromBuiltin(session: String) =
     Configuration(Nil, session)
+
+  def isSessionRoot(path: Path): Boolean =
+    Files.exists(path.resolve("ROOT")) || Files.exists(path.resolve("ROOTS"))
+
 }
 
 /**

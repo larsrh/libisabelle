@@ -37,7 +37,30 @@ lazy val standardSettings = Seq(
   credentials += Credentials(
     Option(System.getProperty("build.publish.credentials")) map (new File(_)) getOrElse (Path.userHome / ".ivy2" / ".credentials")
   ),
-  autoAPIMappings := true
+  autoAPIMappings := true,
+
+  // Isabelle resources
+  resourceGenerators in Compile += Def.task {
+    val log = streams.value.log
+    val name = moduleName.value
+    val source = (sourceDirectory in Compile).value / "isabelle"
+    val target = (resourceManaged in Compile).value / "isabelle"
+    if (source.exists()) {
+      log.info(s"Copying Isabelle sources from $source to $target")
+      IO.delete(target)
+      IO.copyDirectory(source, target / name)
+      val files = (target ** "*").get.filter(_.isFile)
+      val mapper = Path.rebase(target / name, "")
+      val contents = files.map(mapper).map(_.get).mkString("\n")
+      val list = target / ".libisabelle_files"
+      IO.write(list, s"$name\n$contents")
+      list +: files
+    }
+    else {
+      Nil
+    }
+  }.taskValue
+  // FIXME merge strategy!
 )
 
 lazy val warningSettings = Seq(
@@ -134,7 +157,8 @@ lazy val setup = project.in(file("setup"))
       "com.github.fge" % "java7-fs-more" % "0.2.0",
       "com.google.code.findbugs" % "jsr305" % "1.3.9" % "compile",
       "org.apache.commons" % "commons-compress" % "1.9",
-      "org.apache.commons" % "commons-lang3" % "3.3.2"
+      "org.apache.commons" % "commons-lang3" % "3.3.2",
+      "commons-io" % "commons-io" % "2.4"
     )
   )
 

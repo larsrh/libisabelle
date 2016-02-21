@@ -1,5 +1,7 @@
 package edu.tum.cs.isabelle.tests
 
+import java.nio.file.Paths
+
 import scala.concurrent._
 import scala.concurrent.duration._
 import scala.math.BigInt
@@ -44,7 +46,7 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
 
   // Loading auxiliary files
 
-  val loaded = system.flatMap(_.invoke(Operation.UseThys)(List("tests/src/test/isabelle/Sleepy")))
+  val loaded = system.flatMap(_.invoke(Operation.UseThys)(List(resources.findTheory(Paths.get("Sleepy.thy")).get)))
 
   val Sleepy = Operation.implicitly[BigInt, Unit]("sleepy")
 

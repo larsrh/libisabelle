@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import org.log4s._
 
 import edu.tum.cs.isabelle.api._
-import edu.tum.cs.isabelle.setup.Setup
+import edu.tum.cs.isabelle.setup.{Resources, Setup}
 
 import acyclic.file
 
@@ -76,9 +76,11 @@ object Main {
         sys.error("no version specified")
       }
 
+      val resources = Resources.dumpIsabelleResources()
+
       val configuration = args.session match {
-        case Some(session) => Configuration(args.include, session)
-        case None => Configuration.fromPath(Paths.get("."), "Protocol")
+        case Some(session) => resources.makeConfiguration(args.include, session)
+        case None => resources.makeConfiguration(Nil, "Protocol")
       }
 
       logger.info(s"Using $configuration")
