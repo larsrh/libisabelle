@@ -17,7 +17,7 @@ object Args {
 
   private def parse(args: Args, rest: List[String]): Option[Args] = rest match {
     case "--version" :: version :: rest if args.version.isEmpty => parse(args.copy(version = Some(Version(version))), rest)
-    case "--include" :: path :: rest if args.include.isEmpty => parse(args.copy(include = Some(Paths.get(path))), rest)
+    case "--include" :: path :: rest => parse(args.copy(include = Paths.get(path) :: args.include), rest)
     case "--session" :: session :: rest if args.session.isEmpty => parse(args.copy(session = Some(session)), rest)
     case cmd :: rest if !cmd.startsWith("-") => Some(args.copy(command = Some(cmd), rest = rest))
     case Nil => Some(args)
@@ -25,10 +25,10 @@ object Args {
   }
 
   def parse(args: List[String]): Option[Args] =
-    parse(Args(None, None, None, None, Nil), args)
+    parse(Args(None, Nil, None, None, Nil), args)
 
   val usage = """
-    | Usage: [--version VERSION] [--include PATH] [--session SESSION] [CMD [extra options ...]]
+    | Usage: [--version VERSION] [--include PATH]* [--session SESSION] [CMD [extra options ...]]
     |
     | Available commands:
     |   build
@@ -40,7 +40,7 @@ object Args {
 
 case class Args(
   version: Option[Version],
-  include: Option[Path],
+  include: List[Path],
   session: Option[String],
   command: Option[String],
   rest: List[String]
@@ -78,7 +78,7 @@ object Main {
 
       val configuration = args.session match {
         case Some(session) => Configuration(args.include, session)
-        case None => Configuration(Some(Paths.get(".")), "Protocol")
+        case None => Configuration.fromPath(Paths.get("."), "Protocol")
       }
 
       logger.info(s"Using $configuration")

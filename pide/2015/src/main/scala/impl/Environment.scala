@@ -42,8 +42,8 @@ final class Environment private(home: Path) extends api.Environment(home) {
 
   private lazy val options = isabelle.Options.init()
 
-  private def mkPaths(path: Option[Path]) =
-    path.map(p => isabelle.Path.explode(isabelle.Isabelle_System.posix_path(p.toAbsolutePath.toString))).toList
+  private def mkPaths(paths: List[Path]) =
+    paths.map(p => isabelle.Path.explode(isabelle.Isabelle_System.posix_path(p.toAbsolutePath.toString)))
 
   private def progress(config: api.Configuration) = new isabelle.Build.Progress {
     logger.info(s"Building $config ...")
@@ -56,13 +56,13 @@ final class Environment private(home: Path) extends api.Environment(home) {
       options = options,
       progress = progress(config),
       build_heap = true,
-      dirs = mkPaths(config.path),
+      dirs =  mkPaths(config.paths),
       verbose = true,
       sessions = List(config.session)
     )
 
   protected[isabelle] def create(config: api.Configuration, consumer: (api.Markup, api.XML.Body) => Unit) = {
-    val content = isabelle.Build.session_content(options, false, mkPaths(config.path), config.session)
+    val content = isabelle.Build.session_content(options, false, mkPaths(config.paths), config.session)
     val resources = new isabelle.Resources(content.loaded_theories, content.known_theories, content.syntax)
     val session = new isabelle.Session(resources)
 

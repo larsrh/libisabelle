@@ -13,11 +13,11 @@ object JEdit extends Command {
         val binary = bundle.env.home.resolve("bin").resolve("isabelle")
         val nullLogger = ProcessLogger(_ => ())
         val logic = bundle.configuration.session
-        val dir = bundle.configuration.path.map(p => List("-d", p.toString)).getOrElse(Nil)
+        val dirs = bundle.configuration.paths.flatMap(p => List("-d", p.toString))
 
         logger.info(s"Starting Isabelle/jEdit with logic $logic ...")
 
-        Process(List(binary.toString, "jedit", "-l", logic) ::: dir, None, bundle.env.variables.toList: _*).run(nullLogger)
+        Process(List(binary.toString, "jedit", "-l", logic) ::: dirs, None, bundle.env.variables.toList: _*).run(nullLogger)
         ()
       }
     case Platform.Windows =>

@@ -21,7 +21,7 @@ object Configuration {
    * `ROOTS` file, contain declarations for all ancestor sessions.
    */
   def fromPath(path: Path, session: String) =
-    Configuration(Some(path), session)
+    Configuration(List(path), session)
 
   /**
    * Creates a [[Configuration configuration]] with an empty path, that is,
@@ -34,7 +34,7 @@ object Configuration {
    * [[edu.tum.cs.isabelle.Operation operation]].
    */
   def fromBuiltin(session: String) =
-    Configuration(None, session)
+    Configuration(Nil, session)
 }
 
 /**
@@ -52,7 +52,10 @@ object Configuration {
  * through one of the constructors in the
  * [[Configuration$ companion object]].
  */
-final case class Configuration(path: Option[Path], session: String) {
+final case class Configuration(paths: List[Path], session: String) {
   override def toString: String =
-    s"session $session" + path.map(p => s" at $p").getOrElse("")
+    s"session $session" + (paths match {
+      case Nil => ""
+      case ps => " at " + ps.mkString(":")
+    })
 }
