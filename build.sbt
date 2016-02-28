@@ -37,30 +37,7 @@ lazy val standardSettings = Seq(
   credentials += Credentials(
     Option(System.getProperty("build.publish.credentials")) map (new File(_)) getOrElse (Path.userHome / ".ivy2" / ".credentials")
   ),
-  autoAPIMappings := true,
-
-  // Isabelle resources
-  resourceGenerators in Compile += Def.task {
-    val log = streams.value.log
-    val name = moduleName.value
-    val source = (sourceDirectory in Compile).value / "isabelle"
-    val target = (resourceManaged in Compile).value / "isabelle"
-    if (source.exists()) {
-      log.info(s"Copying Isabelle sources from $source to $target")
-      IO.delete(target)
-      IO.copyDirectory(source, target / name)
-      val files = (target ** "*").get.filter(_.isFile)
-      val mapper = Path.rebase(target / name, "")
-      val contents = files.map(mapper).map(_.get).mkString("\n")
-      val list = target / ".libisabelle_files"
-      IO.write(list, s"$name\n$contents")
-      list +: files
-    }
-    else {
-      Nil
-    }
-  }.taskValue
-  // FIXME merge strategy!
+  autoAPIMappings := true
 )
 
 lazy val warningSettings = Seq(
