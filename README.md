@@ -81,9 +81,9 @@ Drop the following lines into your `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "info.hupel" %% "libisabelle" % "0.2.4",
-  "info.hupel" %% "libisabelle-setup" % "0.2.4",
-  "info.hupel" %% "pide-interface" % "0.2.4"
+  "info.hupel" %% "libisabelle" % "0.3",
+  "info.hupel" %% "libisabelle-setup" % "0.3",
+  "info.hupel" %% "pide-interface" % "0.3"
 )
 ```
 
