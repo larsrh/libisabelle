@@ -20,12 +20,12 @@ object XML {
 
   sealed abstract class Tree {
     def toYXML: String = bodyToYXML(List(this))
-    def pretty(indent: Int = 0): String
-    final def pretty: String = pretty()
+    def pretty(indent: Int): String
+    final def pretty: String = pretty(0)
   }
 
   final case class Elem(markup: Markup, body: Body) extends Tree {
-    def pretty(indent: Int = 0) = {
+    def pretty(indent: Int) = {
       val attrs = (if (markup._2.isEmpty) "" else " ") + markup._2.map { case (k, v) => s"$k='${prettyEscape(v)}'" }.mkString(" ")
       if (body.isEmpty) {
         " " * indent + "<" + markup._1 + attrs + " />"
@@ -40,7 +40,7 @@ object XML {
   }
 
   final case class Text(content: String) extends Tree {
-    def pretty(indent: Int = 0) =
+    def pretty(indent: Int) =
       " " * indent + prettyEscape(content)
   }
 

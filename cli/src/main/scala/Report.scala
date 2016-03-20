@@ -14,7 +14,7 @@ object Report extends Command {
       val tree = Codec[List[String]].encode(args)
       println(s"<?xml version='1.0' ?>\n<dump home='$home'>\n")
       lazy val observer: Observer[Unit] = Observer.More(msg => {
-        println(msg.pretty())
+        println(msg.pretty)
         observer
       }, _ => {
         println("\n</dump>")
