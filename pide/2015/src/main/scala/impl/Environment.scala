@@ -7,6 +7,9 @@ import scala.concurrent.ExecutionContext
 
 import edu.tum.cs.isabelle.api
 
+import shapeless._
+import shapeless.tag._
+
 @api.Implementation(identifier = "2015")
 final class Environment private(home: Path) extends api.Environment(home) {
 
@@ -90,5 +93,8 @@ final class Environment private(home: Path) extends api.Environment(home) {
     session.protocol_command("Prover.options", isabelle.YXML.string_of_body(options.encode))
 
   protected[isabelle] def dispose(session: Session) = session.stop()
+
+  def decode(text: String @@ api.Environment.Raw): String @@ api.Environment.Unicode = tag.apply(isabelle.Symbol.decode(text))
+  def encode(text: String @@ api.Environment.Unicode): String @@ api.Environment.Raw = tag.apply(isabelle.Symbol.encode(text))
 
 }

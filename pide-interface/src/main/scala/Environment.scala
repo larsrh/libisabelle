@@ -6,9 +6,9 @@ import java.nio.file.Path
 import scala.concurrent.ExecutionContext
 
 import org.log4s._
+import shapeless.tag._
 
 import acyclic.file
-
 
 object Environment {
 
@@ -49,6 +49,9 @@ object Environment {
     val old = field.get(instance).asInstanceOf[Option[Map[String, String]]].get
     field.set(instance, Some(old ++ patch))
   }
+
+  sealed trait Raw
+  sealed trait Unicode
 
 }
 
@@ -125,6 +128,9 @@ abstract class Environment protected(val home: Path) { self =>
   protected[isabelle] def sendOptions(session: Session): Unit
   protected[isabelle] def sendCommand(session: Session, name: String, args: List[String]): Unit
   protected[isabelle] def dispose(session: Session): Unit
+
+  def decode(text: String @@ Environment.Raw): String @@ Environment.Unicode
+  def encode(text: String @@ Environment.Unicode): String @@ Environment.Raw
 
   /**
    * The [[scala.concurrent.ExecutionContext execution context]] internally

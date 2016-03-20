@@ -109,7 +109,8 @@ lazy val pideInterface = project.in(file("pide-interface"))
   .enablePlugins(GitVersioning, BuildInfoPlugin)
   .settings(
     buildInfoKeys := apiBuildInfoKeys,
-    buildInfoPackage := "edu.tum.cs.isabelle.api"
+    buildInfoPackage := "edu.tum.cs.isabelle.api",
+    libraryDependencies += "com.chuusai" %% "shapeless" % "2.2.5"
   )
 
 lazy val libisabelle = project
