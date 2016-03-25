@@ -23,7 +23,7 @@ object Resources {
 
   def dumpIsabelleResources(path: Path, classLoader: ClassLoader): Resources = {
     def getList(url: URL): (String, List[String]) = {
-      logger.info(s"Found Isabelle resource set at $url")
+      logger.debug(s"Found Isabelle resource set at $url")
       val lines = Source.fromURL(url, "UTF-8").getLines.toList
       (lines.head, lines.tail)
     }
@@ -36,7 +36,7 @@ object Resources {
         val base = path resolve name
         Files.createDirectories(base)
 
-        logger.info(s"Dumping Isabelle resource set $name to $base ...")
+        logger.debug(s"Dumping Isabelle resource set $name to $base ...")
 
         for (item <- items) {
           val path = base resolve item

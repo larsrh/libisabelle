@@ -30,7 +30,7 @@ object Setup {
   /** Default platform: [[Platform.guess guessing]]. */
   def defaultPlatform: Option[Platform] = {
     val guess = Platform.guess
-    logger.info(
+    logger.debug(
       guess match {
         case Some(p) => s"Using default platform; detected $p"
         case None    => s"Using default platform; platform could not be detected"
@@ -48,7 +48,7 @@ object Setup {
       case None =>
         sys.error("couldn't determine URL")
       case Some(url) =>
-        logger.info(s"Downloading setup $version to ${platform.setupStorage}")
+        logger.debug(s"Downloading setup $version to ${platform.setupStorage}")
         val stream = Tar.download(url)
         Files.createDirectories(platform.setupStorage)
         platform.withLock { () =>
@@ -59,11 +59,11 @@ object Setup {
   def detectSetup(platform: Platform, version: Version): Option[Setup] = platform.withLock { () =>
     val path = platform.setupStorage(version)
     if (Files.isDirectory(path)) {
-      logger.info(s"Using default setup; detected $version at $path")
+      logger.debug(s"Using default setup; detected $version at $path")
       Some(Setup(path, platform, version, defaultPackageName))
     }
     else {
-      logger.info(s"Using default setup; no setup found in ${platform.setupStorage}")
+      logger.debug(s"Using default setup; no setup found in ${platform.setupStorage}")
       None
     }
   }
@@ -94,11 +94,11 @@ object Setup {
     )
 
     val downloadLogger = new coursier.Files.Logger {
-      override def downloadingArtifact(url: String) = logger.info(s"Downloading artifact from $url ...")
+      override def downloadingArtifact(url: String) = logger.debug(s"Downloading artifact from $url ...")
       override def downloadedArtifact(url: String, success: Boolean) = {
         val file = url.split('/').last
         if (success)
-          logger.info(s"Successfully downloaded $file")
+          logger.debug(s"Successfully downloaded $file")
         else
           logger.error(s"Failed to download $file")
       }

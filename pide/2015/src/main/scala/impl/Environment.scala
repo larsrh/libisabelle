@@ -49,9 +49,9 @@ final class Environment private(home: Path) extends api.Environment(home) {
     paths.map(p => isabelle.Path.explode(isabelle.Isabelle_System.posix_path(p.toAbsolutePath.toString)))
 
   private def progress(config: api.Configuration) = new isabelle.Build.Progress {
-    logger.info(s"Building $config ...")
-    override def echo(msg: String) = logger.info(s"${config.session}: $msg")
-    override def theory(session: String, theory: String) = logger.info(s"${config.session}: theory $theory ($session)")
+    logger.debug(s"Building $config ...")
+    override def echo(msg: String) = logger.debug(s"${config.session}: $msg")
+    override def theory(session: String, theory: String) = logger.debug(s"${config.session}: theory $theory ($session)")
   }
 
   protected[isabelle] def build(config: api.Configuration) =

@@ -37,7 +37,7 @@ object Environment {
       }
     }
     else {
-      logger.info(s"Instantiating environment for $version at $home")
+      logger.debug(s"Instantiating environment for $version at $home")
       instances.put(clazz, home)
       ()
     }

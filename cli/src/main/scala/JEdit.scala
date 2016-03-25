@@ -18,7 +18,7 @@ object JEdit extends Command {
         val cli = List(binary.toString, "jedit", "-l", logic) ::: dirs ::: args
 
         logger.info(s"Starting Isabelle/jEdit with logic $logic ...")
-        logger.info(s"Executing ${cli.mkString(" ")}")
+        logger.debug(s"Executing ${cli.mkString(" ")}")
 
         Process(cli, None, bundle.env.variables.toList: _*).run(nullLogger)
         ()
