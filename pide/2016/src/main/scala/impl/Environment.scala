@@ -29,7 +29,7 @@ final class Environment private(home: Path) extends api.Environment(home) {
   protected[isabelle] val protocolTag = isabelle.Markup.PROTOCOL
 
   lazy val executionContext =
-    scala.concurrent.ExecutionContext.Implicits.global//isabelle.Future.execution_context
+    isabelle.Standard_Thread.execution_context
 
   protected[isabelle] type Session = isabelle.Session
 
