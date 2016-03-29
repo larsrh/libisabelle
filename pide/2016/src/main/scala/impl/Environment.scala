@@ -84,6 +84,11 @@ final class Environment private(home: Path) extends api.Environment(home) {
 
   protected[isabelle] def dispose(session: Session) = session.stop()
 
+  protected[isabelle] def destroy(): Unit = {
+    isabelle.Standard_Thread.pool.shutdownNow()
+    ()
+  }
+
   def decode(text: String @@ api.Environment.Raw): String @@ api.Environment.Unicode = tag.apply(isabelle.Symbol.decode(text))
   def encode(text: String @@ api.Environment.Unicode): String @@ api.Environment.Raw = tag.apply(isabelle.Symbol.encode(text))
 

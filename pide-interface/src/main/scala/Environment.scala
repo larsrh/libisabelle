@@ -128,6 +128,7 @@ abstract class Environment protected(val home: Path) { self =>
   protected[isabelle] def sendOptions(session: Session): Unit
   protected[isabelle] def sendCommand(session: Session, name: String, args: List[String]): Unit
   protected[isabelle] def dispose(session: Session): Unit
+  protected[isabelle] def destroy(): Unit
 
   def decode(text: String @@ Environment.Raw): String @@ Environment.Unicode
   def encode(text: String @@ Environment.Unicode): String @@ Environment.Raw
