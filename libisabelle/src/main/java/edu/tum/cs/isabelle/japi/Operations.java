@@ -13,7 +13,11 @@ public class Operations {
   public static final Operation<String, String> HELLO =
     Operation$.MODULE$.Hello();
 
+  public static final Operation<java.util.List<String>, Void> useThys(MarkupProcessor processor) {
+    return Operation$.MODULE$.UseThys_Java(processor);
+  }
+
   public static final Operation<java.util.List<String>, Void> USE_THYS =
-    Operation$.MODULE$.UseThys_Java();
+    useThys(MarkupProcessor.NULL_PROCESSOR);
 
 }

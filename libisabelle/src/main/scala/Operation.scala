@@ -1,9 +1,12 @@
 package edu.tum.cs.isabelle
 
+import java.util.{List => JList}
+
 import scala.collection.JavaConverters._
 import scala.util.control.NoStackTrace
 
 import edu.tum.cs.isabelle.api.XML
+import edu.tum.cs.isabelle.japi.MarkupProcessor
 
 import acyclic.file
 
@@ -73,12 +76,25 @@ object Operation {
    * of the [[edu.tum.cs.isabelle.api.Configuration configuration]] should not
    * be loaded again.
    */
-  val UseThys = implicitly[List[String], Unit]("use_thys")
+  def UseThys(markup: XML.Tree => Unit, finish: () => Unit): Operation[List[String], Unit] = new Operation[List[String], Unit]("use_thys") {
+    def prepare(args: List[String]): (XML.Tree, Observer[Unit]) = {
+      val tree = Codec[List[String]].encode(args)
+      lazy val observer: Observer[Unit] = Observer.More(msg => {
+        markup(msg)
+        observer
+      }, _ => {
+        finish()
+        Observer.Success(ProverResult.Success(()))
+      })
 
-  protected[isabelle] val UseThys_Java =
-    Operation.simple("use_thys",
-      Codec[List[String]].transform[java.util.List[String]](_.asJava, _.asScala.toList),
-      Codec[Unit].transform[Void](_ => null, _ => ()))
+      (tree, observer)
+    }
+  }
+
+  def UseThys: Operation[List[String], Unit] = UseThys(_ => (), () => ())
+
+  protected[isabelle] def UseThys_Java(processor: MarkupProcessor): Operation[JList[String], Void] =
+    UseThys(processor.markup, processor.finish).map(_.asScala.toList, _ => null)
 
 }
 
