@@ -104,7 +104,7 @@ object Operation {
  *
  * @see [[System#invoke]]
  */
-abstract class Operation[I, O](val name: String) {
+abstract class Operation[-I, +O](val name: String) { self =>
 
   /**
    * Prepare an input/output operation: Convert the input argument into an
@@ -112,5 +112,12 @@ abstract class Operation[I, O](val name: String) {
    * [[edu.tum.cs.isabelle.Observer observer]] to listen for results.
    */
   def prepare(i: I): (XML.Tree, Observer[O])
+
+  def map[J, P](f: J => I, g: O => P): Operation[J, P] = new Operation[J, P](name) {
+    def prepare(j: J) = {
+      val (tree, observer) = self.prepare(f(j))
+      (tree, observer map g)
+    }
+  }
 
 }

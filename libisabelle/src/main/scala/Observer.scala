@@ -18,6 +18,10 @@ trait ProverResult[+T] {
     case ProverResult.Success(t) => t
     case ProverResult.Failure(exn) => throw exn
   }
+  def map[U](f: T => U): ProverResult[U] = this match {
+    case ProverResult.Success(t) => ProverResult.Success(f(t))
+    case fail: ProverResult.Failure => fail
+  }
 }
 
 object ProverResult {
@@ -39,7 +43,13 @@ object ProverResult {
  * @see [[edu.tum.cs.isabelle.System#invoke]]
  * @see [[edu.tum.cs.isabelle.Operation]]
  */
-sealed abstract class Observer[T]
+sealed abstract class Observer[+T] {
+  def map[U](f: T => U): Observer[U] = this match {
+    case Observer.Success(result) => Observer.Success(result map f)
+    case fail: Observer.Failure => fail
+    case Observer.More(step, done) => Observer.More(step.andThen(_.map(f)), done.andThen(_.map(f)))
+  }
+}
 
 /** Cases of [[Observer observers]] and combinators. */
 object Observer {
@@ -52,7 +62,7 @@ object Observer {
    * For the precise error semantics, see
    * `[[edu.tum.cs.isabelle.System#invoke System#invoke]]`.
    */
-  final case class Success[T](t: ProverResult[T]) extends Observer[T]
+  final case class Success[+T](t: ProverResult[T]) extends Observer[T]
 
   /**
    * Represents an unexpected failure during communication with the prover.
@@ -63,7 +73,7 @@ object Observer {
    * For the precise error semantics, see
    * `[[edu.tum.cs.isabelle.System#invoke System#invoke]]`.
    */
-  final case class Failure[T](error: Exception) extends Observer[T]
+  final case class Failure(error: Exception) extends Observer[Nothing]
 
   /**
    * An [[Observer observer]] waiting for more intermediate data (`step`) or
@@ -74,7 +84,7 @@ object Observer {
    * doing so will most likely result in hanging
    * [[edu.tum.cs.isabelle.Operation operations]].
    */
-  final case class More[T](step: XML.Tree => Observer[T], done: XML.Tree => Observer[T]) extends Observer[T]
+  final case class More[+T](step: XML.Tree => Observer[T], done: XML.Tree => Observer[T]) extends Observer[T]
 
   /**
    * Combinator for producing an [[Observer observer]] which ignores
