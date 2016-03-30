@@ -57,7 +57,7 @@ object Resources {
 
 final case class Resources(paths: List[Path]) {
 
-  def makeConfiguration(auxPaths: List[Path], name: String) = {
+  def makeConfiguration(auxPaths: List[Path], name: String): Configuration = {
     Configuration(auxPaths ::: paths.filter(Configuration.isSessionRoot), name)
   }
 

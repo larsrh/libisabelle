@@ -1,6 +1,5 @@
 package edu.tum.cs.isabelle.japi
 
-import scala.collection.JavaConverters._
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 
