@@ -1,4 +1,5 @@
 import java.nio.file.Paths;
+import java.util.Arrays;
 import edu.tum.cs.isabelle.api.*;
 import edu.tum.cs.isabelle.japi.*;
 import edu.tum.cs.isabelle.setup.*;
@@ -6,10 +7,12 @@ import edu.tum.cs.isabelle.setup.*;
 public class Hello_PIDE {
 
   public static void main(String args[]) {
-    Environment env = JSetup.makeEnvironment(Paths.get(System.getenv("ISABELLE_HOME")), JPlatform.guess(), new Version("2015"));
-    Configuration config = Configuration.fromPath(Paths.get("."), "Protocol2015");
+    Environment env = JSetup.makeEnvironment(JSetup.defaultSetup(new Version("2015")));
+    JResources res = JResources.dumpIsabelleResources();
+    Configuration config = res.makeConfiguration(Arrays.asList(), "Protocol");
     JSystem sys = JSystem.create(env, config);
-    System.out.println(sys.invoke(Operations.HELLO, "world"));
+    String response = sys.invoke(Operations.HELLO, "world");
+    System.out.println(response);
     sys.dispose();
   }
 
