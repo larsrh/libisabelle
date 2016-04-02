@@ -2,8 +2,8 @@ import UnidocKeys._
 
 lazy val standardSettings = Seq(
   organization := "info.hupel",
-  scalaVersion := "2.11.7",
-  crossScalaVersions := Seq("2.10.5", "2.11.7"),
+  scalaVersion := "2.11.8",
+  crossScalaVersions := Seq("2.10.6", "2.11.8"),
   javacOptions += "-Xlint:unchecked",
   homepage := Some(url("http://lars.hupel.info/libisabelle/")),
   licenses := Seq(
@@ -65,9 +65,9 @@ lazy val noPublishSettings = Seq(
 )
 
 lazy val acyclicSettings = Seq(
-  libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.3" % "provided",
+  libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.4" % "provided",
   autoCompilerPlugins := true,
-  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.3")
+  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.4")
 )
 
 lazy val apiBuildInfoKeys = Seq[BuildInfoKey](
@@ -78,7 +78,7 @@ lazy val apiBuildInfoKeys = Seq[BuildInfoKey](
   git.gitHeadCommit
 )
 
-lazy val logback = "ch.qos.logback" % "logback-classic" % "1.1.1"
+lazy val logback = "ch.qos.logback" % "logback-classic" % "1.1.7"
 
 
 lazy val root = project.in(file("."))
@@ -110,7 +110,7 @@ lazy val pideInterface = project.in(file("pide-interface"))
   .settings(
     buildInfoKeys := apiBuildInfoKeys,
     buildInfoPackage := "edu.tum.cs.isabelle.api",
-    libraryDependencies += "com.chuusai" %% "shapeless" % "2.2.5"
+    libraryDependencies += "com.chuusai" %% "shapeless" % "2.3.0"
   )
 
 lazy val libisabelle = project
@@ -119,7 +119,7 @@ lazy val libisabelle = project
   .settings(warningSettings)
   .settings(acyclicSettings)
   .settings(Seq(
-    libraryDependencies += "org.spire-math" %% "cats-core" % "0.3.0"
+    libraryDependencies += "org.typelevel" %% "cats-core" % "0.4.1"
   ))
 
 lazy val setup = project.in(file("setup"))
@@ -133,9 +133,9 @@ lazy val setup = project.in(file("setup"))
       "com.github.alexarchambault" %% "coursier" % "0.1.0-M2",
       "com.github.alexarchambault" %% "coursier-files" % "0.1.0-M2",
       "com.github.fge" % "java7-fs-more" % "0.2.0",
-      "com.google.code.findbugs" % "jsr305" % "1.3.9" % "compile",
-      "org.apache.commons" % "commons-compress" % "1.9",
-      "org.apache.commons" % "commons-lang3" % "3.3.2",
+      "com.google.code.findbugs" % "jsr305" % "3.0.1" % "compile",
+      "org.apache.commons" % "commons-compress" % "1.10",
+      "org.apache.commons" % "commons-lang3" % "3.4",
       "commons-io" % "commons-io" % "2.4"
     )
   )
