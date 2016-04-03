@@ -7,14 +7,14 @@ import edu.tum.cs.isabelle.pure._
 
 import acyclic.file
 
-private class ListTypeable[T : Typeable] extends Typeable[List[T]] {
-  def typ: Typ = Type("List.list", List(Typeable.typ[T]))
-}
+package hol {
+  private class ListTypeable[T : Typeable] extends Typeable[List[T]] {
+    def typ: Typ = Type("List.list", List(Typeable.typ[T]))
+  }
 
-trait LowPriorityImplicits {
-
-  implicit def listTypeable[T : Typeable]: Typeable[List[T]] = new ListTypeable[T]
-
+  private[isabelle] trait LowPriorityImplicits {
+    implicit def listTypeable[T : Typeable]: Typeable[List[T]] = new ListTypeable[T]
+  }
 }
 
 package object hol extends LowPriorityImplicits {
