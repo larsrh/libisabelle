@@ -33,7 +33,7 @@ object Setup {
     logger.debug(
       guess match {
         case Some(p) => s"Using default platform; detected $p"
-        case None    => s"Using default platform; platform could not be detected"
+        case None    => "Using default platform; platform could not be detected"
       }
     )
     guess
