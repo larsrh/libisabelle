@@ -19,11 +19,13 @@ It currently works with Isabelle2015 and Isabelle2016.
 
 To get started, follow these steps:
 
-1. Run the `sbt` script to fetch all required Scala dependencies.
+1. Make sure you have checked out and/or updated all submodules.
+   This can be done easily by running `git submodule update --init --recursive`.
+2. Run the `sbt` script to fetch all required Scala dependencies.
    After this is done, you are in the SBT shell.
-2. Compile the sources with `compile`.
-3. If you have used an arbitrary snapshot of the sources (e.g. via `git clone`), run `publishLocal`.
-4. Bootstrap an Isabelle installation using `cli/run --version 2016 build`, which will download and extract the latest supported Isabelle version for you.
+3. Compile the sources with `compile`.
+4. If you have used an arbitrary snapshot of the sources (e.g. via `git clone`), run `publishLocal`.
+5. Bootstrap an Isabelle installation using `cli/run --version 2016 build`, which will download and extract the latest supported Isabelle version for you.
 
 On some systems, you might need to install Perl, Python, and/or some additional libraries.
 
