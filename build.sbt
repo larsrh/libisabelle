@@ -130,8 +130,8 @@ lazy val setup = project.in(file("setup"))
   .settings(acyclicSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "com.github.alexarchambault" %% "coursier" % "0.1.0-M2",
-      "com.github.alexarchambault" %% "coursier-files" % "0.1.0-M2",
+      "io.get-coursier" %% "coursier" % "1.0.0-M11",
+      "io.get-coursier" %% "coursier-cache" % "1.0.0-M11",
       "com.github.fge" % "java7-fs-more" % "0.2.0",
       "com.google.code.findbugs" % "jsr305" % "3.0.1" % "compile",
       "org.apache.commons" % "commons-compress" % "1.10",
