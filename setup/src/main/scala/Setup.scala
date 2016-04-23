@@ -188,7 +188,7 @@ object Setup {
  */
 final case class Setup(home: Path, platform: Platform, version: Version, packageName: String) {
 
-  private def instantiate(urls: List[URL]): Environment = {
+  private def instantiate(urls: List[URL])(implicit ec: ExecutionContext): Environment = {
     val classLoader = new URLClassLoader(urls.toArray, getClass.getClassLoader)
     val env = classLoader.loadClass(s"$packageName.Environment").asSubclass(classOf[Environment])
 
@@ -200,16 +200,17 @@ final case class Setup(home: Path, platform: Platform, version: Version, package
     if (BuildInfo.toString != info.toString)
       sys.error(s"build info does not match")
 
-    val constructor = env.getDeclaredConstructor(classOf[Path])
+    val constructor = env.getDeclaredConstructor(classOf[Environment.Context])
+    val context = Environment.Context(home, ec)
     constructor.setAccessible(true)
-    constructor.newInstance(home)
+    constructor.newInstance(context)
   }
 
   /**
-   * Convenience method aliasing
-   * [[edu.tum.cs.isabelle.Implementations#makeEnvironment]] with the
-   * appropriate parameters. It calls [[Setup.fetchImplementation]] to download
-   * the required classpath.
+   * Prepares a fresh [[edu.tum.cs.isabelle.api.Environment]].
+   *
+   * Uses [[Setup.fetchImplementation]] to download the required classpath. It
+   * also checks for matching [[BuildInfo]].
    */
   def makeEnvironment(implicit ec: ExecutionContext): Future[Environment] =
     Setup.fetchImplementation(platform, version).map(paths => instantiate(paths.map(_.toUri.toURL)))

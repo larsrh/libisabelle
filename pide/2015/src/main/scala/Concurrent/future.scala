@@ -10,15 +10,14 @@ package isabelle
 
 
 import scala.util.{Success, Failure}
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor,
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService,
   Future => Scala_Future, Promise => Scala_Promise, Await}
 import scala.concurrent.duration.Duration
 
 
 object Future
 {
-  lazy val execution_context: ExecutionContextExecutor =
-    ExecutionContext.fromExecutorService(Simple_Thread.default_pool)
+  var execution_context: ExecutionContextExecutorService = null
 
   def value[A](x: A): Future[A] = new Finished_Future(x)
 
