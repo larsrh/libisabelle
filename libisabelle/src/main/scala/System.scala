@@ -11,6 +11,8 @@ import acyclic.file
 /** Functions to build and create [[System systems]]. */
 object System {
 
+  class StartupException() extends RuntimeException("System startup failed")
+
   /**
    * Synchronously build a
    * [[edu.tum.cs.isabelle.api.Configuration configuration]].
@@ -96,9 +98,8 @@ object System {
    * Build products will be read from `~/.isabelle` on the file system.
    */
   def create(env: Environment, config: Configuration): Future[System] = {
-    val started = Promise[Unit]
-    val system = new System(env, config, { () => started.success(()); () })
-    started.future.map(_ => system)(env.executionContext)
+    val system = new System(env, config)
+    system.initPromise.future.map(_ => system)(env.executionContext)
   }
 
 }
@@ -111,7 +112,7 @@ object System {
  *
  * @see [[edu.tum.cs.isabelle.setup.Setup]]
  */
-final class System private(val env: Environment, config: Configuration, callback: () => Unit) {
+final class System private(val env: Environment, config: Configuration) {
 
   /**
    * The [[scala.concurrent.ExecutionContext execution context]] used
@@ -140,8 +141,14 @@ final class System private(val env: Environment, config: Configuration, callback
   @volatile private var pending = Map.empty[Long, System.OperationState[_]]
 
   private def consumer(markup: Markup, body: XML.Body): Unit = (markup, body) match {
-    case ((env.initTag, _), _) => initPromise.success(()); ()
-    case ((env.exitTag, _), _) => exitPromise.success(()); ()
+    case ((env.initTag, _), _) =>
+      env.sendOptions(session)
+      initPromise.success(())
+      ()
+    case ((env.exitTag, _), _) =>
+      initPromise.tryFailure(new System.StartupException())
+      exitPromise.success(())
+      ()
     case _ =>
       synchronized {
         pending =
@@ -152,11 +159,6 @@ final class System private(val env: Environment, config: Configuration, callback
   }
 
   private val session = env.create(config, consumer)
-
-  initPromise.future foreach { _ =>
-    env.sendOptions(session)
-    callback()
-  }
 
   /**
    * Instruct the prover to shutdown.

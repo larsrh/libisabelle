@@ -1,10 +1,15 @@
 package edu.tum.cs.isabelle.setup
 
 import java.net.URL
-import java.nio.channels.FileChannel
+import java.nio.channels.{FileChannel, FileLock}
 import java.nio.file._
 
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
+
 import org.apache.commons.lang3.SystemUtils
+
+import org.log4s._
 
 import edu.tum.cs.isabelle.api.{BuildInfo, Version}
 
@@ -62,6 +67,8 @@ object Platform {
  */
 sealed abstract class Platform {
 
+  private val logger = getLogger
+
   def localStorage: Path
 
   final def setupStorage: Path =
@@ -76,20 +83,35 @@ sealed abstract class Platform {
   final def lockFile: Path =
     localStorage.resolve(".lock")
 
-  def withLock[A](f: () => A): A = {
+  private def acquireLock(): Option[FileLock] = {
     Files.createDirectories(localStorage)
-    Option(FileChannel.open(lockFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE).tryLock()) match {
-      case None =>
-        sys.error("lock could not be acquired")
-      case Some(lock) =>
-        try {
-          f()
-        }
-        finally {
-          lock.close()
-        }
+    FileChannel.open(lockFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE).tryLock() match {
+      case null =>
+        logger.warn("lock could not be acquired")
+        None
+      case lock =>
+        Some(lock)
     }
   }
+
+  def withLock[A](f: () => A): Option[A] = acquireLock().map { lock =>
+    try {
+      f()
+    }
+    finally {
+      lock.close()
+    }
+  }
+
+  def withAsyncLock[A](f: () => Future[A])(implicit ec: ExecutionContext): Future[A] = acquireLock() match {
+    case None =>
+      Future.failed(new RuntimeException("lock could not be acquired"))
+    case Some(lock) =>
+      f().map { a =>
+        try { lock.close() } catch { case NonFatal(_) => }
+        a
+      }
+    }
 
 }
 
@@ -106,11 +128,10 @@ sealed abstract class OfficialPlatform private[isabelle](val name: String) exten
     s"https://isabelle.in.tum.de/website-Isabelle${version.identifier}/dist/Isabelle${version.identifier}"
 
   /**
-   * Internet location containing an archive of the requested
-   * [[edu.tum.cs.isabelle.api.Version version]] for this platform, if
-   * available.
+   * HTTP location containing an archive of the requested
+   * [[edu.tum.cs.isabelle.api.Version version]] for this platform.
    */
-  def url(version: Version): Option[URL] =
-    Some(new URL(s"${baseURL(version)}_$name.tar.gz"))
+  def url(version: Version): URL =
+    new URL(s"${baseURL(version)}_$name.tar.gz")
 
 }

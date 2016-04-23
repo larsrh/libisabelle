@@ -5,6 +5,7 @@ import java.net.URL
 import java.nio.file._
 
 import scala.concurrent._
+import scala.util.Try
 
 import org.apache.commons.compress.archivers.tar.{TarArchiveEntry, TarArchiveInputStream}
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
@@ -17,13 +18,11 @@ import acyclic.file
 /** Downloading and unpacking `tar` archives. */
 object Tar {
 
-  def download(url: URL): TarArchiveInputStream =
-    new TarArchiveInputStream(new GzipCompressorInputStream(url.openStream()))
+  def download(url: URL): Try[TarArchiveInputStream] =
+    Try(new TarArchiveInputStream(new GzipCompressorInputStream(url.openStream())))
 
   def extractTo(path: Path, tar: TarArchiveInputStream)(implicit ec: ExecutionContext): Future[Path] = Future {
-    def next() = blocking {
-      Option(tar.getNextTarEntry())
-    }
+    def next() = Option(tar.getNextTarEntry())
 
     @annotation.tailrec
     def go(entry: Option[TarArchiveEntry], paths: List[Path]): List[Path] = entry match {
@@ -41,12 +40,11 @@ object Tar {
             Files.createSymbolicLink(subpath, Paths.get(entry.getLinkName))
           else if (entry.isLink)
             Files.createLink(subpath, path.resolve(Paths.get(entry.getLinkName)))
-          else if (entry.isFile)
-            blocking {
-              Files.copy(tar, subpath)
-              if (!SystemUtils.IS_OS_WINDOWS)
-                MoreFiles.setMode(subpath, entry.getMode)
-            }
+          else if (entry.isFile) {
+            Files.copy(tar, subpath)
+            if (!SystemUtils.IS_OS_WINDOWS)
+              MoreFiles.setMode(subpath, entry.getMode)
+          }
           else
             sys.error("unknown tar file entry")
         }
@@ -58,7 +56,7 @@ object Tar {
         go(next(), p ::: paths)
     }
 
-    go(next(), Nil).foldLeft(List.empty[Path]) { (roots, path) =>
+    blocking { go(next(), Nil) }.foldLeft(List.empty[Path]) { (roots, path) =>
       if (roots.exists(path.startsWith))
         roots
       else

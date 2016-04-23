@@ -8,6 +8,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import org.log4s._
 
+import cats.data.Xor
+
 import edu.tum.cs.isabelle.api._
 import edu.tum.cs.isabelle.setup._
 
@@ -101,7 +103,11 @@ object Main {
       logger.info(s"Using $configuration")
 
       def mkSetup = args.home match {
-        case None => Setup.defaultSetup(version)
+        case None =>
+          Setup.defaultSetup(version) match {
+            case Xor.Right(setup) => setup
+            case Xor.Left(reason) => sys.error(reason.explain)
+          }
         case Some(home) => Future.successful(Setup(home, guessPlatform, version, Setup.defaultPackageName))
       }
 

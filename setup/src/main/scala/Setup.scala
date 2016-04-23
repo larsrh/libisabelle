@@ -5,6 +5,9 @@ import java.net.{URL, URLClassLoader}
 import java.nio.file.{Files, Path, Paths}
 
 import scala.concurrent.{Future, ExecutionContext}
+import scala.util._
+
+import cats.data.Xor
 
 import coursier._
 
@@ -24,62 +27,84 @@ import acyclic.file
  */
 object Setup {
 
+  sealed trait NoSetupReason
+  sealed trait SetupImpossibleReason { def explain: String }
+  case object Absent extends NoSetupReason
+  case class Corrupted(path: Path) extends NoSetupReason with SetupImpossibleReason {
+    def explain = s"Possibly corrupted setup detected at $path; try deleting that folder and running again"
+  }
+  case class Busy(path: Path) extends NoSetupReason with SetupImpossibleReason {
+    def explain = s"File lock $path could not be acquired (busy)"
+  }
+  case object UnknownPlatform extends SetupImpossibleReason {
+    def explain = "Impossible to download setup on unknown platform"
+  }
+
   private val logger = getLogger
 
   /** Default platform: [[Platform.guess guessing]]. */
-  def defaultPlatform: Option[Platform] = {
-    val guess = Platform.guess
-    logger.debug(
-      guess match {
-        case Some(p) => s"Using default platform; detected $p"
-        case None    => "Using default platform; platform could not be detected"
-      }
-    )
-    guess
-  }
+  def defaultPlatform: Option[OfficialPlatform] = Platform.guess
 
+  /**
+   * Default package name of PIDE jars.
+   *
+   * @see [[edu.tum.cs.isabelle.api.Environment]]
+   */
   val defaultPackageName: String = "edu.tum.cs.isabelle.impl"
 
-  // FIXME this whole thing needs proper error handling
+  /**
+   * Location of the success marker file.
+   *
+   * Detection of setups works by looking for the success marker file in the
+   * path of the setup. If the root path of the setup is present, but not the
+   * file, the setup is considered corrupted, for example because of a partial
+   * download.
+   */
+  def successMarker(path: Path): Path =
+    path.resolve(".success")
 
-  def install(platform: OfficialPlatform, version: Version)(implicit ec: ExecutionContext): Future[Setup] =
-    platform.url(version) match {
-      case None =>
-        sys.error("couldn't determine URL")
-      case Some(url) =>
-        logger.debug(s"Downloading setup $version to ${platform.setupStorage}")
-        val stream = Tar.download(url)
-        Files.createDirectories(platform.setupStorage)
-        platform.withLock { () =>
-          Tar.extractTo(platform.setupStorage, stream).map(Setup(_, platform, version, defaultPackageName))
+  def install(platform: OfficialPlatform, version: Version)(implicit ec: ExecutionContext): Future[Setup] = {
+    Files.createDirectories(platform.setupStorage)
+    val url = platform.url(version)
+    logger.debug(s"Downloading setup $version from $url to ${platform.setupStorage}")
+    Tar.download(url) match {
+      case Success(stream) =>
+        val future = platform.withAsyncLock { () =>
+          Tar.extractTo(platform.setupStorage, stream).map { path =>
+            Files.createFile(successMarker(path))
+            Setup(path, platform, version, defaultPackageName)
+          }
         }
-    }
-
-  def detectSetup(platform: Platform, version: Version): Option[Setup] = platform.withLock { () =>
-    val path = platform.setupStorage(version)
-    if (Files.isDirectory(path)) {
-      logger.debug(s"Using default setup; detected $version at $path")
-      Some(Setup(path, platform, version, defaultPackageName))
-    }
-    else {
-      logger.debug(s"Using default setup; no setup found in ${platform.setupStorage}")
-      None
+        future.onComplete { _ => stream.close() }
+        future
+      case Failure(ex) =>
+        logger.error(ex)(s"Failed to download $url")
+        Future.failed(ex)
     }
   }
 
-  def defaultSetup(version: Version)(implicit ec: ExecutionContext): Future[Setup] =
+  def detectSetup(platform: Platform, version: Version): Xor[NoSetupReason, Setup] = platform.withLock { () =>
+    val path = platform.setupStorage(version)
+    if (Files.isDirectory(path)) {
+      if (Files.isRegularFile(successMarker(path)))
+        Xor.right(Setup(path, platform, version, defaultPackageName))
+      else
+        Xor.left(Corrupted(path))
+    }
+    else
+      Xor.left(Absent)
+  }.getOrElse(Xor.left(Busy(platform.lockFile)))
+
+  def defaultSetup(version: Version)(implicit ec: ExecutionContext): Xor[SetupImpossibleReason, Future[Setup]] =
     defaultPlatform match {
       case None =>
-        sys.error("couldn't determine platform")
+        Xor.left(UnknownPlatform)
       case Some(platform) =>
         detectSetup(platform, version) match {
-          case Some(install) =>
-            Future.successful(install)
-          case None =>
-            platform match {
-              case o: OfficialPlatform => install(o, version)
-              case _ => sys.error("unofficial platform can't be automatically installed")
-            }
+          case Xor.Right(install) =>     Xor.right(Future.successful(install))
+          case Xor.Left(Absent) =>       Xor.right(install(platform, version))
+          case Xor.Left(Busy(p)) =>      Xor.left(Busy(p))
+          case Xor.Left(Corrupted(p)) => Xor.left(Corrupted(p))
         }
     }
 
@@ -131,7 +156,7 @@ object Setup {
     def fetchArtifact(artifact: Artifact, cachePolicy: CachePolicy) =
       Cache.file(artifact, logger = Some(downloadLogger), cachePolicy = cachePolicy)
 
-    platform.withLock { () =>
+    platform.withAsyncLock { () =>
       for {
         i <- resolve("interface")
         v <- resolve(version.identifier)
