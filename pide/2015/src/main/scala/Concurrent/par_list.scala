@@ -45,7 +45,8 @@ object Par_List
     }
 
   def map[A, B](f: A => B, xs: List[A]): List[B] =
-    Exn.release_first(managed_results(f, xs))
+    xs.map(f)
+    //Exn.release_first(managed_results(f, xs))
 
   def get_some[A, B](f: A => Option[B], xs: List[A]): Option[B] =
   {

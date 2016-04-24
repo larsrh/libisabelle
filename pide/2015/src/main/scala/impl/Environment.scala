@@ -11,24 +11,15 @@ import shapeless._
 import shapeless.tag._
 
 @api.Implementation(identifier = "2015")
-final class Environment private(home: Path) extends api.Environment(home) {
+final class Environment private(context: api.Environment.Context) extends api.Environment(context) {
 
+	isabelle.Future.execution_context = context.executorService
   isabelle.Isabelle_System.init(
     isabelle_home = home.toAbsolutePath.toString,
     cygwin_root = home.resolve("contrib/cygwin").toAbsolutePath.toString
   )
 
   api.Environment.patchSettings(isabelle.Isabelle_System, variables)
-
-  private val defaultThreadFactory = isabelle.Simple_Thread.default_pool.getThreadFactory()
-
-  isabelle.Simple_Thread.default_pool.setThreadFactory(new ThreadFactory {
-    def newThread(r: Runnable) = {
-      val thread = defaultThreadFactory.newThread(r)
-      thread.setDaemon(true)
-      thread
-    }
-  })
 
   private def destMarkup(markup: isabelle.Markup) =
     (markup.name, markup.properties)
@@ -37,9 +28,6 @@ final class Environment private(home: Path) extends api.Environment(home) {
   protected[isabelle] val functionTag = isabelle.Markup.FUNCTION
   protected[isabelle] val initTag = isabelle.Markup.INIT
   protected[isabelle] val protocolTag = isabelle.Markup.PROTOCOL
-
-  lazy val executionContext =
-    isabelle.Future.execution_context
 
   protected[isabelle] type Session = isabelle.Session
 
@@ -59,7 +47,7 @@ final class Environment private(home: Path) extends api.Environment(home) {
       options = options,
       progress = progress(config),
       build_heap = true,
-      dirs =  mkPaths(config.paths),
+      dirs = mkPaths(config.paths),
       verbose = true,
       sessions = List(config.session)
     )
@@ -93,11 +81,6 @@ final class Environment private(home: Path) extends api.Environment(home) {
     session.protocol_command("Prover.options", isabelle.YXML.string_of_body(options.encode))
 
   protected[isabelle] def dispose(session: Session) = session.stop()
-
-  protected[isabelle] def destroy(): Unit = {
-    isabelle.Simple_Thread.default_pool.shutdownNow()
-    ()
-  }
 
   def decode(text: String @@ api.Environment.Raw): String @@ api.Environment.Unicode = tag.apply(isabelle.Symbol.decode(text))
   def encode(text: String @@ api.Environment.Unicode): String @@ api.Environment.Raw = tag.apply(isabelle.Symbol.encode(text))

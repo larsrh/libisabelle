@@ -1,9 +1,10 @@
 package edu.tum.cs.isabelle.api
 
+import java.util.concurrent.{AbstractExecutorService, TimeUnit}
 import java.util.{Collections, WeakHashMap}
 import java.nio.file.Path
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService}
 
 import org.log4s._
 import shapeless.tag._
@@ -53,6 +54,23 @@ object Environment {
   sealed trait Raw
   sealed trait Unicode
 
+  case class Context(home: Path, ec: ExecutionContext) {
+    // based on <https://gist.github.com/viktorklang/5245161>, see CREDITS
+    def executorService: ExecutionContextExecutorService = ec match {
+      case eces: ExecutionContextExecutorService => eces
+      case other => new AbstractExecutorService with ExecutionContextExecutorService {
+        override def prepare(): ExecutionContext = other
+        override def isShutdown = false
+        override def isTerminated = false
+        override def shutdown() = ()
+        override def shutdownNow() = Collections.emptyList[Runnable]
+        override def execute(runnable: Runnable): Unit = other execute runnable
+        override def reportFailure(t: Throwable): Unit = other reportFailure t
+        override def awaitTermination(length: Long,unit: TimeUnit): Boolean = false
+      }
+    }
+  }
+
 }
 
 
@@ -82,7 +100,7 @@ object Environment {
  *   - The class name of the implementation must be `Environment`. There must
  *     be a `BuildInfo` class in the same package.
  *   - Implementations must be final and provide a constructor with exactly one
- *     argument (of type `java.nio.file.Path`). There must be no other
+ *     argument (of type `[[Environment.Context]]`). There must be no other
  *     constructors. The constructor should be `private`.
  *   - Implementations must be annotated with
  *     `[[edu.tum.cs.isabelle.api.Implementation Implementation]]`, where the
@@ -97,7 +115,10 @@ object Environment {
  * loader. This is the primary reason why this class exists in the first place,
  * to enable seamless abstraction over multiple PIDEs.
  */
-abstract class Environment protected(val home: Path) { self =>
+abstract class Environment protected(val context: Environment.Context) { self =>
+
+  final val home = context.home
+  final implicit val executionContext: ExecutionContext = context.ec
 
   Environment.checkInstance(getClass(), home)
 
@@ -128,28 +149,8 @@ abstract class Environment protected(val home: Path) { self =>
   protected[isabelle] def sendOptions(session: Session): Unit
   protected[isabelle] def sendCommand(session: Session, name: String, args: List[String]): Unit
   protected[isabelle] def dispose(session: Session): Unit
-  protected[isabelle] def destroy(): Unit
 
   def decode(text: String @@ Environment.Raw): String @@ Environment.Unicode
   def encode(text: String @@ Environment.Unicode): String @@ Environment.Raw
-
-  /**
-   * The [[scala.concurrent.ExecutionContext execution context]] internally
-   * used by the underlying PIDE implementation.
-   *
-   * It is allowed to override the execution context of internal PIDE
-   * implementation during initialization, but it must remain fixed afterwards.
-   * This field must be set to that execution context.
-   *
-   * Implementations should ensure that the underlying thread pool consists of
-   * daemon threads, rendering [[edu.tum.cs.isabelle.System#dispose disposing]]
-   * of running systems unnecessary. (The secondary reason is to avoid a
-   * hanging JVM when user code did not handle an exception, the main thread
-   * gets terminated, but worker threads are keeping the JVM alive.)
-   *
-   * This is exposed to the user via
-   * `[[edu.tum.cs.isabelle.System#executionContext System#executionContext]]`.
-   */
-  implicit val executionContext: ExecutionContext
 
 }

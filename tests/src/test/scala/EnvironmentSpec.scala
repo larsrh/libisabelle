@@ -26,12 +26,12 @@ class EnvironmentSpec(val specs2Env: Env) extends Specification with DefaultSetu
   val context = Thread.currentThread.getContextClassLoader
   val constructor = Setup.fetchImplementation(platform, version).map { paths =>
     val clazz = new URLClassLoader(paths.map(_.toUri.toURL).toArray, context).loadClass(s"${Setup.defaultPackageName}.Environment")
-    val constructor = clazz.getDeclaredConstructor(classOf[Path])
+    val constructor = clazz.getDeclaredConstructor(classOf[Environment.Context])
     constructor.setAccessible(true)
     constructor
   }
 
-  def instantiate(home: Path) = constructor.map(_.newInstance(home))
+  def instantiate(home: Path) = constructor.map(_.newInstance(Environment.Context(home, implicitly)))
 
   val first = instantiate(platform.setupStorage(version))
 

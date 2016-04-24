@@ -11,8 +11,9 @@ import shapeless._
 import shapeless.tag._
 
 @api.Implementation(identifier = "2016")
-final class Environment private(home: Path) extends api.Environment(home) {
+final class Environment private(context: api.Environment.Context) extends api.Environment(context) {
 
+	isabelle.Standard_Thread.pool = context.executorService
   isabelle.Isabelle_System.init(
     isabelle_root = home.toAbsolutePath.toString,
     cygwin_root = home.resolve("contrib/cygwin").toAbsolutePath.toString
@@ -27,9 +28,6 @@ final class Environment private(home: Path) extends api.Environment(home) {
   protected[isabelle] val functionTag = isabelle.Markup.FUNCTION
   protected[isabelle] val initTag = isabelle.Markup.INIT
   protected[isabelle] val protocolTag = isabelle.Markup.PROTOCOL
-
-  lazy val executionContext =
-    isabelle.Standard_Thread.execution_context
 
   protected[isabelle] type Session = isabelle.Session
 
@@ -83,11 +81,6 @@ final class Environment private(home: Path) extends api.Environment(home) {
     session.protocol_command("Prover.options", isabelle.YXML.string_of_body(options.encode))
 
   protected[isabelle] def dispose(session: Session) = session.stop()
-
-  protected[isabelle] def destroy(): Unit = {
-    isabelle.Standard_Thread.pool.shutdownNow()
-    ()
-  }
 
   def decode(text: String @@ api.Environment.Raw): String @@ api.Environment.Unicode = tag.apply(isabelle.Symbol.decode(text))
   def encode(text: String @@ api.Environment.Unicode): String @@ api.Environment.Raw = tag.apply(isabelle.Symbol.encode(text))
