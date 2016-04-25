@@ -210,7 +210,7 @@ final case class Setup(home: Path, platform: Platform, version: Version, package
    * Prepares a fresh [[edu.tum.cs.isabelle.api.Environment]].
    *
    * Uses [[Setup.fetchImplementation]] to download the required classpath. It
-   * also checks for matching [[BuildInfo]].
+   * also checks for matching [[edu.tum.cs.isabelle.api.BuildInfo build info]].
    */
   def makeEnvironment(implicit ec: ExecutionContext): Future[Environment] =
     Setup.fetchImplementation(platform, version).map(paths => instantiate(paths.map(_.toUri.toURL)))
