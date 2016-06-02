@@ -1,3 +1,5 @@
+package edu.tum.cs.isabelle.examples.java;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
