@@ -248,3 +248,8 @@ releaseProcess := Seq[ReleaseStep](
   commitNextVersion,
   ReleaseStep(action = Command.process("sonatypeReleaseAll", _), enableCrossBuild = true)
 )
+
+
+// Miscellaneous
+
+cancelable in Global := true
