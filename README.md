@@ -1,6 +1,6 @@
 # libisabelle
 
-Minimal wrapper around Isabelle/PIDE for non-IDE applications
+ A Scala library which talks to Isabelle
 
 | Service                   | Status |
 | ------------------------- | ------ |
