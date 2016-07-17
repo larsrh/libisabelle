@@ -7,7 +7,6 @@ platform:
   - x64
 environment:
   matrix:
-    - ISABELLE_VERSION: 2015
     - ISABELLE_VERSION: 2016
 build_script:
   - sbt publishLocal
