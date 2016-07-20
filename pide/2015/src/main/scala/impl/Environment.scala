@@ -13,7 +13,7 @@ import shapeless.tag._
 @api.Implementation(identifier = "2015")
 final class Environment private(context: api.Environment.Context) extends api.Environment(context) {
 
-	isabelle.Future.execution_context = context.executorService
+  isabelle.Future.execution_context = context.executorService
   isabelle.Isabelle_System.init(
     isabelle_home = home.toAbsolutePath.toString,
     cygwin_root = home.resolve("contrib/cygwin").toAbsolutePath.toString
