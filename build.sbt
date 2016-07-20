@@ -87,7 +87,8 @@ lazy val root = project.in(file("."))
     pideInterface, libisabelle, setup,
     tests, docs, examples,
     cli,
-    pide2015, pide2016
+    pide2015, pide2016,
+    pidePackage
   )
 
 lazy val docs = project.in(file("docs"))
@@ -143,25 +144,6 @@ lazy val setup = project.in(file("setup"))
   )
 
 
-// Tests
-
-lazy val tests = project.in(file("tests"))
-  .dependsOn(libisabelle, setup)
-  .settings(noPublishSettings)
-  .settings(standardSettings)
-  .settings(warningSettings)
-  .settings(acyclicSettings)
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.specs2" %% "specs2-core" % "3.6.5" % "test",
-      "org.specs2" %% "specs2-scalacheck" % "3.6.5" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.12.5" % "test",
-      logback % "test"
-    ),
-    parallelExecution in Test := false
-  )
-
-
 // PIDE implementations
 
 def pide(version: String) = Project(s"pide$version", file(s"pide/$version"))
@@ -177,17 +159,56 @@ def pide(version: String) = Project(s"pide$version", file(s"pide/$version"))
         Seq()
       else
         Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4")
-    }
+    },
+    assemblyJarName := s"${moduleName.value}-assembly.jar"
   ))
 
 lazy val pide2015 = pide("2015")
 lazy val pide2016 = pide("2016")
 
 
+def assemblyGenerator(p: Project): Def.Initialize[Task[Seq[File]]] =
+  (streams, assembly in p, resourceManaged) map { (streams, source, targetDir) =>
+    val target = targetDir / source.getName
+    val log = streams.log
+    log.info(s"Copying assembly $source to $target ...")
+    IO.copyFile(source, target, preserveLastModified = true)
+    Seq(target)
+  }
+
+lazy val pidePackage = project.in(file("pide-package"))
+  .dependsOn(pideInterface)
+  .settings(moduleName := "pide-package")
+  .settings(standardSettings)
+  .settings(
+    resourceGenerators in Compile <+= assemblyGenerator(pide2015),
+    resourceGenerators in Compile <+= assemblyGenerator(pide2016)
+  )
+
+
+// Tests
+
+lazy val tests = project.in(file("tests"))
+  .dependsOn(setup, pidePackage)
+  .settings(noPublishSettings)
+  .settings(standardSettings)
+  .settings(warningSettings)
+  .settings(acyclicSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.specs2" %% "specs2-core" % "3.6.5" % "test",
+      "org.specs2" %% "specs2-scalacheck" % "3.6.5" % "test",
+      "org.scalacheck" %% "scalacheck" % "1.12.5" % "test",
+      logback % "test"
+    ),
+    parallelExecution in Test := false
+  )
+
+
 // Standalone applications
 
 lazy val cli = project.in(file("cli"))
-  .dependsOn(setup)
+  .dependsOn(setup, pidePackage)
   .settings(moduleName := "libisabelle-cli")
   .settings(standardSettings)
   .settings(warningSettings)
@@ -198,7 +219,7 @@ lazy val cli = project.in(file("cli"))
 // Examples
 
 lazy val examples = project.in(file("examples"))
-  .dependsOn(setup)
+  .dependsOn(setup, pidePackage)
   .settings(noPublishSettings)
   .settings(standardSettings)
   .settings(warningSettings)
@@ -208,7 +229,7 @@ lazy val examples = project.in(file("examples"))
 // Workbench
 
 lazy val workbench = project.in(file("workbench"))
-  .dependsOn(setup)
+  .dependsOn(setup, pidePackage)
   .settings(noPublishSettings)
   .settings(standardSettings)
   .settings(
