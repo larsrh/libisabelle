@@ -7,7 +7,7 @@ install:
 os:
   - osx
 script:
-  - ./sbt "++$SCALA_VERSION" publishLocal
+  - ./sbt "++$SCALA_VERSION" compile
   - ./sbt "++$SCALA_VERSION" "cli/run --version $ISABELLE_VERSION build"
   - ./sbt "++$SCALA_VERSION" test
 matrix:

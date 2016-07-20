@@ -9,6 +9,6 @@ environment:
   matrix:
     - ISABELLE_VERSION: 2016
 build_script:
-  - sbt publishLocal
+  - sbt compile
 test_script:
   - sbt "cli/run --version %ISABELLE_VERSION% build"

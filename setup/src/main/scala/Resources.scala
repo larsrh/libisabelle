@@ -10,7 +10,7 @@ import org.apache.commons.io.IOUtils
 
 import org.log4s._
 
-import edu.tum.cs.isabelle.api.Configuration
+import edu.tum.cs.isabelle.api.{Configuration, Version}
 
 import acyclic.file
 

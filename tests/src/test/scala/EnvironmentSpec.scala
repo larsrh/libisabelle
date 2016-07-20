@@ -10,7 +10,7 @@ import org.specs2.specification.core.Env
 
 import edu.tum.cs.isabelle._
 import edu.tum.cs.isabelle.api._
-import edu.tum.cs.isabelle.setup.Setup
+import edu.tum.cs.isabelle.setup.{Resolver, Setup}
 
 class EnvironmentSpec(val specs2Env: Env) extends Specification with DefaultSetup with IsabelleMatchers { def is = s2"""
 
@@ -24,7 +24,7 @@ class EnvironmentSpec(val specs2Env: Env) extends Specification with DefaultSetu
   // FIXME code duplication
 
   val context = Thread.currentThread.getContextClassLoader
-  val constructor = Setup.fetchImplementation(platform, version).map { paths =>
+  val constructor = Resolver.Default.resolve(platform, version).map { paths =>
     val clazz = new URLClassLoader(paths.map(_.toUri.toURL).toArray, context).loadClass(s"${Setup.defaultPackageName}.Environment")
     val constructor = clazz.getDeclaredConstructor(classOf[Environment.Context])
     constructor.setAccessible(true)
