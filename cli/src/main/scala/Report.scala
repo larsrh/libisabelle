@@ -30,17 +30,12 @@ object Report extends Command {
       case _ => (RawXML, args)
     }
 
-    var reports = Reports.empty
-
-    def markup(tree: XML.Tree) = reports += tree
-    def finish() = ()
-
     for {
       s <- System.create(bundle.env, bundle.configuration)
-      _ <- s.invoke(Operation.UseThys(markup, finish))(files)
+      reports <- s.invoke(Operation.UseThys(Reports.empty)(_ + _, identity))(files)
       _ <- s.dispose
     }
-    yield print(reports, bundle.env.home, format)
+    yield print(reports.unsafeGet, bundle.env.home, format)
   }
 
 }

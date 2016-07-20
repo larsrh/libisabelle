@@ -76,25 +76,22 @@ object Operation {
    * of the [[edu.tum.cs.isabelle.api.Configuration configuration]] should not
    * be loaded again.
    */
-  def UseThys(markup: XML.Tree => Unit, finish: () => Unit): Operation[List[String], Unit] = new Operation[List[String], Unit]("use_thys") {
-    def prepare(args: List[String]): (XML.Tree, Observer[Unit]) = {
+  def UseThys[A, B](init: A)(markup: (A, XML.Tree) => A, finish: A => B): Operation[List[String], B] = new Operation[List[String], B]("use_thys") {
+    def prepare(args: List[String]): (XML.Tree, Observer[B]) = {
       val tree = Codec[List[String]].encode(args)
-      lazy val observer: Observer[Unit] = Observer.More(msg => {
-        markup(msg)
-        observer
-      }, _ => {
-        finish()
-        Observer.Success(ProverResult.Success(()))
-      })
+      def observer(a: A): Observer[B] = Observer.More(
+        step = msg => observer(markup(a, msg)),
+        done = _ => Observer.Success(ProverResult.Success(finish(a)))
+      )
 
-      (tree, observer)
+      (tree, observer(init))
     }
   }
 
-  def UseThys: Operation[List[String], Unit] = UseThys(_ => (), () => ())
+  def UseThys: Operation[List[String], Unit] = UseThys(())((_, _) => (), _ => ())
 
   protected[isabelle] def UseThys_Java(processor: MarkupProcessor): Operation[JList[String], Void] =
-    UseThys(processor.markup, processor.finish).map(_.asScala.toList, _ => null)
+    UseThys(())((_, tree) => processor.markup(tree), _ => processor.finish).map(_.asScala.toList, _ => null)
 
 }
 
