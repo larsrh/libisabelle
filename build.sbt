@@ -12,7 +12,6 @@ lazy val standardSettings = Seq(
   ),
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
-  libraryDependencies += "org.log4s" %% "log4s" % "1.2.1",
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (version.value.endsWith("SNAPSHOT"))
@@ -110,7 +109,10 @@ lazy val pideInterface = project.in(file("pide-interface"))
   .settings(
     buildInfoKeys := apiBuildInfoKeys,
     buildInfoPackage := "edu.tum.cs.isabelle.api",
-    libraryDependencies += "com.chuusai" %% "shapeless" % "2.3.0"
+    libraryDependencies ++= Seq(
+      "com.chuusai" %% "shapeless" % "2.3.0",
+      "org.log4s" %% "log4s" % "1.2.1"
+    )
   )
 
 lazy val libisabelle = project
@@ -163,7 +165,7 @@ lazy val tests = project.in(file("tests"))
 // PIDE implementations
 
 def pide(version: String) = Project(s"pide$version", file(s"pide/$version"))
-  .dependsOn(pideInterface)
+  .dependsOn(pideInterface % "provided")
   .settings(moduleName := s"pide-$version")
   .settings(standardSettings)
   .enablePlugins(GitVersioning, BuildInfoPlugin)

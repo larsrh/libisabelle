@@ -135,32 +135,28 @@ object Setup {
       Cache.fetch(logger = Some(downloadLogger), cachePolicy = CachePolicy.FetchMissing)
     )
 
-    def resolve(identifier: String) = {
-      val dependency =
-        Dependency(
-          Module(BuildInfo.organization, s"pide-${identifier}_${BuildInfo.scalaBinaryVersion}"),
-          BuildInfo.version
-        )
-      Resolution(Set(dependency)).process.run(fetch).toScalaFuture.map { res =>
-        if (!res.isDone)
-          sys.error("not converged")
-        else if (!res.errors.isEmpty)
-          sys.error(s"errors: ${res.errors}")
-        else if (!res.conflicts.isEmpty)
-          sys.error(s"conflicts: ${res.conflicts}")
-        else
-          res.artifacts.toSet
-      }
-    }
+    val dependency =
+      Dependency(
+        Module(BuildInfo.organization, s"pide-${version.identifier}_${BuildInfo.scalaBinaryVersion}"),
+        BuildInfo.version
+      )
 
     def fetchArtifact(artifact: Artifact, cachePolicy: CachePolicy) =
       Cache.file(artifact, logger = Some(downloadLogger), cachePolicy = cachePolicy)
 
     platform.withAsyncLock { () =>
       for {
-        i <- resolve("interface")
-        v <- resolve(version.identifier)
-        artifacts = v -- i
+        resolution <- Resolution(Set(dependency)).process.run(fetch).toScalaFuture
+        artifacts = {
+            if (!resolution.isDone)
+              sys.error("not converged")
+            else if (!resolution.errors.isEmpty)
+              sys.error(s"errors: ${resolution.errors}")
+            else if (!resolution.conflicts.isEmpty)
+              sys.error(s"conflicts: ${resolution.conflicts}")
+            else
+              resolution.artifacts.toSet
+          }
         res <- Future.traverse(artifacts.toList)(artifact =>
           (fetchArtifact(artifact, CachePolicy.LocalOnly)
              orElse fetchArtifact(artifact, CachePolicy.FetchMissing))
@@ -188,7 +184,11 @@ object Setup {
  */
 final case class Setup(home: Path, platform: Platform, version: Version, packageName: String) {
 
+  private val logger = getLogger
+
   private def instantiate(urls: List[URL])(implicit ec: ExecutionContext): Environment = {
+    logger.debug(s"Instantiating setup with classpath ${urls.mkString(":")} ...")
+
     val classLoader = new URLClassLoader(urls.toArray, getClass.getClassLoader)
     val env = classLoader.loadClass(s"$packageName.Environment").asSubclass(classOf[Environment])
 
