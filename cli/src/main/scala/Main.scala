@@ -39,7 +39,11 @@ object Args {
     |   build
     |   check
     |   jedit
-    |   report FILE [FILES ...]
+    |   report [--format FORMAT] FILE [FILES ...]
+    |
+    | Available formats:
+    |   raw-xml (default)
+    |   x-ray
     |""".stripMargin
 
 }
