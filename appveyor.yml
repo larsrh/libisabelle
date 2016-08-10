@@ -1,5 +1,5 @@
 install:
-  - cinst sbt
+  - cinst sbt -y
   - cmd: SET PATH=%PATH%;"C:\Program Files (x86)\sbt\bin"
   - cmd: git submodule update --init --recursive
 platform:
