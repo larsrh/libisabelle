@@ -62,7 +62,7 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
     for {
       s <- system
       _ <- loaded
-      res <- { val future = s.cancellableInvoke(Sleepy)(1); future.cancel(); future.future }
+      res <- { val future = s.cancelableInvoke(Sleepy)(1); future.cancel(); future }
     }
     yield ()
 

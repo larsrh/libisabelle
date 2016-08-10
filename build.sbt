@@ -122,7 +122,10 @@ lazy val libisabelle = project
   .settings(warningSettings)
   .settings(acyclicSettings)
   .settings(Seq(
-    libraryDependencies += "org.typelevel" %% "cats-core" % "0.4.1"
+    libraryDependencies ++= Seq(
+      "org.typelevel" %% "cats-core" % "0.4.1",
+      "io.monix" %% "monix" % "2.0-RC9"
+    )
   ))
 
 lazy val setup = project.in(file("setup"))
