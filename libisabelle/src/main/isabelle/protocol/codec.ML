@@ -167,7 +167,11 @@ val content_of =
 
 (* slightly fishy codec, doesn't preserve exception type *)
 exception GENERIC of string
-val exn = tagged "exn" (text (fn exn => (content_of (@{make_string} exn))) (SOME o GENERIC))
+
+fun string_of_exn (ERROR msg) = "ERROR " ^ content_of msg
+  | string_of_exn exn = content_of (@{make_string} exn)
+
+val exn = tagged "exn" (text string_of_exn (SOME o GENERIC))
 
 fun exn_result a =
   let
