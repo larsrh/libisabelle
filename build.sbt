@@ -111,8 +111,8 @@ lazy val pideInterface = project.in(file("pide-interface"))
     buildInfoKeys := apiBuildInfoKeys,
     buildInfoPackage := "edu.tum.cs.isabelle.api",
     libraryDependencies ++= Seq(
-      "com.chuusai" %% "shapeless" % "2.3.0",
-      "org.log4s" %% "log4s" % "1.2.1"
+      "com.chuusai" %% "shapeless" % "2.3.1",
+      "org.log4s" %% "log4s" % "1.3.0"
     )
   )
 
@@ -122,7 +122,10 @@ lazy val libisabelle = project
   .settings(warningSettings)
   .settings(acyclicSettings)
   .settings(Seq(
-    libraryDependencies += "org.typelevel" %% "cats-core" % "0.4.1"
+    libraryDependencies ++= Seq(
+      "org.typelevel" %% "cats-core" % "0.6.1",
+      "io.monix" %% "monix" % "2.0-RC9"
+    )
   ))
 
 lazy val setup = project.in(file("setup"))
@@ -133,13 +136,13 @@ lazy val setup = project.in(file("setup"))
   .settings(acyclicSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "io.get-coursier" %% "coursier" % "1.0.0-M11",
-      "io.get-coursier" %% "coursier-cache" % "1.0.0-M11",
+      "io.get-coursier" %% "coursier" % "1.0.0-M13",
+      "io.get-coursier" %% "coursier-cache" % "1.0.0-M13",
       "com.github.fge" % "java7-fs-more" % "0.2.0",
       "com.google.code.findbugs" % "jsr305" % "3.0.1" % "compile",
-      "org.apache.commons" % "commons-compress" % "1.10",
+      "org.apache.commons" % "commons-compress" % "1.12",
       "org.apache.commons" % "commons-lang3" % "3.4",
-      "commons-io" % "commons-io" % "2.4"
+      "commons-io" % "commons-io" % "2.5"
     )
   )
 

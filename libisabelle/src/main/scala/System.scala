@@ -1,8 +1,10 @@
 package edu.tum.cs.isabelle
 
-import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent._
 import scala.util.control.Exception._
 import scala.util.control.NoStackTrace
+
+import monix.execution.{Cancelable, CancelableFuture}
 
 import edu.tum.cs.isabelle.api._
 
@@ -210,7 +212,7 @@ final class System private(val env: Environment, config: Configuration) {
    * successful future may contain expected errors (e.g. due to a wrong input
    * argument or a failing proof).
    */
-  def cancellableInvoke[I, O](operation: Operation[I, O])(arg: I): CancellableFuture[ProverResult[O]] = {
+  def cancelableInvoke[I, O](operation: Operation[I, O])(arg: I): CancelableFuture[ProverResult[O]] = {
     val (encoded, observer) = operation.prepare(arg)
     val state = new System.OperationState(env, observer)
     state.tryComplete()
@@ -223,10 +225,15 @@ final class System private(val env: Environment, config: Configuration) {
 
     val args = List(count0.toString, operation.name, encoded.toYXML)
     env.sendCommand(session, "libisabelle", args)
-    new CancellableFuture(state.promise, () => env.sendCommand(session, "libisabelle_cancel", List(count0.toString)))
+    val promise = state.promise
+    val cancel = Cancelable { () =>
+      promise.tryFailure(new CancellationException())
+      env.sendCommand(session, "libisabelle_cancel", List(count0.toString))
+    }
+    CancelableFuture(promise.future, cancel)
   }
 
   final def invoke[I, O](operation: Operation[I, O])(arg: I): Future[ProverResult[O]] =
-    cancellableInvoke(operation)(arg).future
+    cancelableInvoke(operation)(arg)
 
 }
