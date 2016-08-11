@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle.cli
+package info.hupel.isabelle.cli
 
 import java.nio.file._
 
@@ -10,8 +10,8 @@ import org.log4s._
 
 import cats.data.Xor
 
-import edu.tum.cs.isabelle.api._
-import edu.tum.cs.isabelle.setup._
+import info.hupel.isabelle.api._
+import info.hupel.isabelle.setup._
 
 import acyclic.file
 
@@ -70,16 +70,16 @@ object Main {
   )
 
   /**
-   * Guesses an Isabelle [[edu.tum.cs.isabelle.api.Version version]] from
+   * Guesses an Isabelle [[info.hupel.isabelle.api.Version version]] from
    * the system environment.
    *
    * The following is tried, in order:
    * - the environment variable `ISABELLE_VERSION`
-   * - Java system property `edu.tum.cs.isabelle.version`
+   * - Java system property `info.hupel.isabelle.version`
    */
   def guessVersion: Option[Version] =
     Option(System.getenv("ISABELLE_VERSION")).orElse(
-      Option(System.getProperty("edu.tum.cs.isabelle.version"))
+      Option(System.getProperty("info.hupel.isabelle.version"))
     ).map(Version)
 
   def guessPlatform: Platform = Setup.defaultPlatform match {

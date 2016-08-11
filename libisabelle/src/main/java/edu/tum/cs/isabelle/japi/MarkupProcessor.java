@@ -1,6 +1,6 @@
-package edu.tum.cs.isabelle.japi;
+package info.hupel.isabelle.japi;
 
-import edu.tum.cs.isabelle.api.*;
+import info.hupel.isabelle.api.*;
 
 public interface MarkupProcessor {
 

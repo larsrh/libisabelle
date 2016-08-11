@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle.tests
+package info.hupel.isabelle.tests
 
 import java.nio.file.Paths
 
@@ -9,10 +9,10 @@ import scala.math.BigInt
 import org.specs2.Specification
 import org.specs2.specification.core.Env
 
-import edu.tum.cs.isabelle._
-import edu.tum.cs.isabelle.api._
-import edu.tum.cs.isabelle.pure._
-import edu.tum.cs.isabelle.hol._
+import info.hupel.isabelle._
+import info.hupel.isabelle.api._
+import info.hupel.isabelle.pure._
+import info.hupel.isabelle.hol._
 
 class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetup with IsabelleMatchers { def is = s2"""
 

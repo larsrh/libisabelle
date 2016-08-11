@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle.tests
+package info.hupel.isabelle.tests
 
 import scala.math.BigInt
 
@@ -7,8 +7,8 @@ import org.specs2.{ScalaCheck, Specification}
 import org.scalacheck._
 import org.scalacheck.Prop.forAll
 
-import edu.tum.cs.isabelle._
-import edu.tum.cs.isabelle.api._
+import info.hupel.isabelle._
+import info.hupel.isabelle.api._
 
 class CodecSpec extends Specification with ScalaCheck { def is = s2"""
 

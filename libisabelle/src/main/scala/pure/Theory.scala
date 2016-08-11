@@ -1,5 +1,5 @@
-package edu.tum.cs.isabelle.pure
+package info.hupel.isabelle.pure
 
-import edu.tum.cs.isabelle.System
+import info.hupel.isabelle.System
 
 case class Theory(system: System, name: String)

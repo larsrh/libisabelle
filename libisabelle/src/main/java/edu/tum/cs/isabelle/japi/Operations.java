@@ -1,6 +1,6 @@
-package edu.tum.cs.isabelle.japi;
+package info.hupel.isabelle.japi;
 
-import edu.tum.cs.isabelle.*;
+import info.hupel.isabelle.*;
 
 public class Operations {
 

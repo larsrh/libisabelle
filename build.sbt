@@ -109,7 +109,7 @@ lazy val pideInterface = project.in(file("pide-interface"))
   .enablePlugins(GitVersioning, BuildInfoPlugin)
   .settings(
     buildInfoKeys := apiBuildInfoKeys,
-    buildInfoPackage := "edu.tum.cs.isabelle.api",
+    buildInfoPackage := "info.hupel.isabelle.api",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.1",
       "org.log4s" %% "log4s" % "1.3.0"
@@ -156,7 +156,7 @@ def pide(version: String) = Project(s"pide$version", file(s"pide/$version"))
   .enablePlugins(GitVersioning, BuildInfoPlugin)
   .settings(Seq(
     buildInfoKeys := apiBuildInfoKeys,
-    buildInfoPackage := "edu.tum.cs.isabelle.impl",
+    buildInfoPackage := "info.hupel.isabelle.impl",
     libraryDependencies ++= {
       if (scalaVersion.value startsWith "2.10")
         Seq()
@@ -238,11 +238,11 @@ lazy val workbench = project.in(file("workbench"))
   .settings(
     libraryDependencies += logback,
     initialCommands in console := """
-      import edu.tum.cs.isabelle._
-      import edu.tum.cs.isabelle.api._
-      import edu.tum.cs.isabelle.pure._
-      import edu.tum.cs.isabelle.hol._
-      import edu.tum.cs.isabelle.setup._
+      import info.hupel.isabelle._
+      import info.hupel.isabelle.api._
+      import info.hupel.isabelle.pure._
+      import info.hupel.isabelle.hol._
+      import info.hupel.isabelle.setup._
       import scala.concurrent.duration.Duration
       import scala.concurrent.Await
       import scala.concurrent.ExecutionContext.Implicits.global

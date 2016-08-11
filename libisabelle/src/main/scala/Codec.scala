@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle
+package info.hupel.isabelle
 
 import scala.math.BigInt
 import scala.util.control.Exception._
@@ -7,7 +7,7 @@ import cats.std.either._
 import cats.std.list._
 import cats.syntax.traverse._
 
-import edu.tum.cs.isabelle.api._
+import info.hupel.isabelle.api._
 
 import acyclic.file
 
@@ -98,7 +98,7 @@ object Codec {
    *
    * Each constructor of `A` should get assigned a unique index when
    * implementing this class. It is used to tag
-   * [[edu.tum.cs.isabelle.api.XML.Tree XML trees]], so that the correct
+   * [[info.hupel.isabelle.api.XML.Tree XML trees]], so that the correct
    * decoding function can be chosen.
    *
    * In addition to the contract of `[[Codec]]`, instances of this class must
@@ -221,18 +221,18 @@ trait Codec[T] { self =>
 
   /**
    * Encode a value into an
-   * [[edu.tum.cs.isabelle.api.XML.Tree XML tree]].
+   * [[info.hupel.isabelle.api.XML.Tree XML tree]].
    *
    * You may want to use one of the two constructors
-   * `[[edu.tum.cs.isabelle.api.XML.elem elem]]` and
-   * `[[edu.tum.cs.isabelle.api.XML.text text]]`.
+   * `[[info.hupel.isabelle.api.XML.elem elem]]` and
+   * `[[info.hupel.isabelle.api.XML.text text]]`.
    *
    */
   def encode(t: T): XML.Tree
 
   /**
    * Decode a value from an
-   * [[edu.tum.cs.isabelle.api.XML.Tree XML tree]], or produce an
+   * [[info.hupel.isabelle.api.XML.Tree XML tree]], or produce an
    * error.
    *
    * @see [[XMLResult]]

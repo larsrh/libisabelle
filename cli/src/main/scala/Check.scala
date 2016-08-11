@@ -1,8 +1,8 @@
-package edu.tum.cs.isabelle.cli
+package info.hupel.isabelle.cli
 
 import scala.concurrent._
 
-import edu.tum.cs.isabelle.System
+import info.hupel.isabelle.System
 
 object Check extends Command {
 

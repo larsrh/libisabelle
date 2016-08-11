@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle.setup
+package info.hupel.isabelle.setup
 
 import java.io.InputStream
 import java.net.URL

@@ -1,10 +1,10 @@
-package edu.tum.cs.isabelle
+package info.hupel.isabelle
 
 import java.nio.file.{Path, Paths}
 
 import scala.util.Try
 
-import edu.tum.cs.isabelle.api._
+import info.hupel.isabelle.api._
 
 import acyclic.file
 

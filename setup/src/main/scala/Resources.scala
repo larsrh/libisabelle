@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle.setup
+package info.hupel.isabelle.setup
 
 import java.net.URL
 import java.nio.file._
@@ -10,7 +10,7 @@ import org.apache.commons.io.IOUtils
 
 import org.log4s._
 
-import edu.tum.cs.isabelle.api.{Configuration, Version}
+import info.hupel.isabelle.api.{Configuration, Version}
 
 import acyclic.file
 

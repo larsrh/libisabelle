@@ -1,12 +1,12 @@
-package edu.tum.cs.isabelle.examples.scala
+package info.hupel.isabelle.examples.scala
 
 import scala.concurrent._
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import edu.tum.cs.isabelle._
-import edu.tum.cs.isabelle.api._
-import edu.tum.cs.isabelle.setup._
+import info.hupel.isabelle._
+import info.hupel.isabelle.api._
+import info.hupel.isabelle.setup._
 
 object Hello_PIDE extends App {
 

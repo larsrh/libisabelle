@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle.setup
+package info.hupel.isabelle.setup
 
 import java.io.File
 import java.net.{URL, URLClassLoader}
@@ -11,7 +11,7 @@ import cats.data.Xor
 
 import org.log4s._
 
-import edu.tum.cs.isabelle.api.{BuildInfo, Environment, Version}
+import info.hupel.isabelle.api.{BuildInfo, Environment, Version}
 
 import acyclic.file
 
@@ -19,7 +19,7 @@ import acyclic.file
  * Detecting and creating [[Setup setups]].
  *
  * This object assumes that there is a ''base path'' in which all Isabelle
- * setups reside. Given a [[edu.tum.cs.isabelle.api.Version version]], the
+ * setups reside. Given a [[info.hupel.isabelle.api.Version version]], the
  * base path can either be searched for an existing setup, or an archive can
  * be downloaded from the Internet and extracted into the path.
  */
@@ -46,9 +46,9 @@ object Setup {
   /**
    * Default package name of PIDE jars.
    *
-   * @see [[edu.tum.cs.isabelle.api.Environment]]
+   * @see [[info.hupel.isabelle.api.Environment]]
    */
-  val defaultPackageName: String = "edu.tum.cs.isabelle.impl"
+  val defaultPackageName: String = "info.hupel.isabelle.impl"
 
   /**
    * Location of the success marker file.
@@ -112,7 +112,7 @@ object Setup {
 /**
  * A state-less, logic-less representation of a file system location containing
  * an Isabelle installation with a specified
- * [[edu.tum.cs.isabelle.api.Version version]].
+ * [[info.hupel.isabelle.api.Version version]].
  *
  * It is recommended to obtain instances via the [[Setup$ companion object]].
  * No guarantees are made when constructing instances manually.
@@ -149,10 +149,10 @@ final case class Setup(home: Path, platform: Platform, version: Version, package
     makeEnvironment(Resolver.Default)
 
   /**
-   * Prepares a fresh [[edu.tum.cs.isabelle.api.Environment]].
+   * Prepares a fresh [[info.hupel.isabelle.api.Environment]].
    *
    * If the [[Resolver resolver]] found an appropriate classpath, this method
-   * also checks for matching [[edu.tum.cs.isabelle.api.BuildInfo build info]].
+   * also checks for matching [[info.hupel.isabelle.api.BuildInfo build info]].
    */
   def makeEnvironment(resolver: Resolver)(implicit ec: ExecutionContext): Future[Environment] =
     resolver.resolve(platform, version).map(paths => instantiate(paths.map(_.toUri.toURL)))

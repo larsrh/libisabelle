@@ -1,9 +1,9 @@
-package edu.tum.cs.isabelle.pure
+package info.hupel.isabelle.pure
 
 import scala.math.BigInt
 
-import edu.tum.cs.isabelle.Codec
-import edu.tum.cs.isabelle.api._
+import info.hupel.isabelle.Codec
+import info.hupel.isabelle.api._
 
 import acyclic.file
 

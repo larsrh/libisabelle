@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle.japi
+package info.hupel.isabelle.japi
 
 import java.io.FileNotFoundException
 import java.nio.file.Path
@@ -6,8 +6,8 @@ import java.util.{List => JList}
 
 import scala.collection.JavaConverters._
 
-import edu.tum.cs.isabelle.api._
-import edu.tum.cs.isabelle.setup._
+import info.hupel.isabelle.api._
+import info.hupel.isabelle.setup._
 
 object JResources {
 

@@ -1,11 +1,11 @@
-package edu.tum.cs.isabelle.examples.java;
+package info.hupel.isabelle.examples.java;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import edu.tum.cs.isabelle.api.*;
-import edu.tum.cs.isabelle.japi.*;
-import edu.tum.cs.isabelle.setup.*;
+import info.hupel.isabelle.api.*;
+import info.hupel.isabelle.japi.*;
+import info.hupel.isabelle.setup.*;
 
 public class Hello_PIDE {
 

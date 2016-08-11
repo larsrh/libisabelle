@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle.setup
+package info.hupel.isabelle.setup
 
 import java.net.URL
 import java.nio.channels.{FileChannel, FileLock}
@@ -11,7 +11,7 @@ import org.apache.commons.lang3.SystemUtils
 
 import org.log4s._
 
-import edu.tum.cs.isabelle.api.{BuildInfo, Version}
+import info.hupel.isabelle.api.{BuildInfo, Version}
 
 import acyclic.file
 
@@ -129,7 +129,7 @@ sealed abstract class OfficialPlatform private[isabelle](val name: String) exten
 
   /**
    * HTTP location containing an archive of the requested
-   * [[edu.tum.cs.isabelle.api.Version version]] for this platform.
+   * [[info.hupel.isabelle.api.Version version]] for this platform.
    */
   def url(version: Version): URL =
     new URL(s"${baseURL(version)}_$name.tar.gz")
