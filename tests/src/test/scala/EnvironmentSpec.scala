@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle.tests
+package info.hupel.isabelle.tests
 
 import java.net.URLClassLoader
 import java.nio.file.{Path, Paths}
@@ -8,9 +8,9 @@ import scala.concurrent.duration._
 import org.specs2.Specification
 import org.specs2.specification.core.Env
 
-import edu.tum.cs.isabelle._
-import edu.tum.cs.isabelle.api._
-import edu.tum.cs.isabelle.setup.{Resolver, Setup}
+import info.hupel.isabelle._
+import info.hupel.isabelle.api._
+import info.hupel.isabelle.setup.{Resolver, Setup}
 
 class EnvironmentSpec(val specs2Env: Env) extends Specification with DefaultSetup with IsabelleMatchers { def is = s2"""
 

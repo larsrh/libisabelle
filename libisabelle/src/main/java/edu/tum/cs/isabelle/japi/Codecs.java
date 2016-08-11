@@ -1,9 +1,9 @@
-package edu.tum.cs.isabelle.japi;
+package info.hupel.isabelle.japi;
 
 import scala.math.BigInt;
 
-import edu.tum.cs.isabelle.*;
-import edu.tum.cs.isabelle.api.*;
+import info.hupel.isabelle.*;
+import info.hupel.isabelle.api.*;
 
 public class Codecs {
 

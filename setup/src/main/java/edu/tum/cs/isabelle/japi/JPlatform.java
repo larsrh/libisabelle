@@ -1,8 +1,8 @@
-package edu.tum.cs.isabelle.japi;
+package info.hupel.isabelle.japi;
 
 import scala.Option;
 
-import edu.tum.cs.isabelle.setup.*;
+import info.hupel.isabelle.setup.*;
 
 public class JPlatform {
 

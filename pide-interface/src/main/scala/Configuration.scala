@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle.api
+package info.hupel.isabelle.api
 
 import java.nio.file.{Files, Path}
 
@@ -30,9 +30,9 @@ object Configuration {
    * as a component.
    *
    * Unless using a custom Isabelle distribution, a
-   * [[edu.tum.cs.isabelle.System.create system created]] with such a
+   * [[info.hupel.isabelle.System.create system created]] with such a
    * configuration will be unable to reply to any
-   * [[edu.tum.cs.isabelle.Operation operation]].
+   * [[info.hupel.isabelle.Operation operation]].
    */
   def fromBuiltin(session: String) =
     Configuration(Nil, session)
@@ -51,9 +51,9 @@ object Configuration {
  *
  * Creation of configurations is completely unchecked. Errors such as
  * non-existing paths will only manifest themselves when attempting to
- * [[edu.tum.cs.isabelle.System.build build]] a configuration or
- * [[edu.tum.cs.isabelle.System.create create]] a
- * [[edu.tum.cs.isabelle.System system]]. Nonetheless, users should go
+ * [[info.hupel.isabelle.System.build build]] a configuration or
+ * [[info.hupel.isabelle.System.create create]] a
+ * [[info.hupel.isabelle.System system]]. Nonetheless, users should go
  * through one of the constructors in the
  * [[Configuration$ companion object]].
  */

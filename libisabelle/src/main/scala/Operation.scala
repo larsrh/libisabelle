@@ -1,12 +1,12 @@
-package edu.tum.cs.isabelle
+package info.hupel.isabelle
 
 import java.util.{List => JList}
 
 import scala.collection.JavaConverters._
 import scala.util.control.NoStackTrace
 
-import edu.tum.cs.isabelle.api.XML
-import edu.tum.cs.isabelle.japi.MarkupProcessor
+import info.hupel.isabelle.api.XML
+import info.hupel.isabelle.japi.MarkupProcessor
 
 import acyclic.file
 
@@ -73,7 +73,7 @@ object Operation {
    * The format of the paths is rather peculiar: They are relative to the
    * working directory at the time the [[System.create system was created]],
    * but do not include the extension `.thy`. Theories which are already part
-   * of the [[edu.tum.cs.isabelle.api.Configuration configuration]] should not
+   * of the [[info.hupel.isabelle.api.Configuration configuration]] should not
    * be loaded again.
    */
   def UseThys[A, B](init: A)(markup: (A, XML.Tree) => A, finish: A => B): Operation[List[String], B] = new Operation[List[String], B]("use_thys") {
@@ -104,11 +104,11 @@ object Operation {
  * latter is irrelevant.)
  *
  * Data is transferred between JVM and the prover using
- * [[edu.tum.cs.isabelle.api.XML.Tree XML trees]]. To convert between typed
+ * [[info.hupel.isabelle.api.XML.Tree XML trees]]. To convert between typed
  * data and their XML representation, [[Codec codecs]] may be used.
  *
  * In the most general case, an operation listens for a stream of output from
- * the prover using an [[edu.tum.cs.isabelle.Observer observer]], comparable to
+ * the prover using an [[info.hupel.isabelle.Observer observer]], comparable to
  * iteratees.
  *
  * Operations can most easily be constructed with the
@@ -121,8 +121,8 @@ abstract class Operation[-I, +O](val name: String) { self =>
 
   /**
    * Prepare an input/output operation: Convert the input argument into an
-   * [[edu.tum.cs.isabelle.api.XML.Tree XML tree]] and create a fresh
-   * [[edu.tum.cs.isabelle.Observer observer]] to listen for results.
+   * [[info.hupel.isabelle.api.XML.Tree XML tree]] and create a fresh
+   * [[info.hupel.isabelle.Observer observer]] to listen for results.
    */
   def prepare(i: I): (XML.Tree, Observer[O])
 

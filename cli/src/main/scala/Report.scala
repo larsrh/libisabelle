@@ -1,11 +1,11 @@
-package edu.tum.cs.isabelle.cli
+package info.hupel.isabelle.cli
 
 import java.nio.file.{Path, Paths}
 
 import scala.concurrent._
 
-import edu.tum.cs.isabelle._
-import edu.tum.cs.isabelle.api._
+import info.hupel.isabelle._
+import info.hupel.isabelle.api._
 
 object Report extends Command {
 

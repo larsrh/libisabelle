@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle
+package info.hupel.isabelle
 
 /**
  * Collection of standard types for communication with Isabelle.

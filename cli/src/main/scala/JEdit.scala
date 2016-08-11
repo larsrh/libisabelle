@@ -1,9 +1,9 @@
-package edu.tum.cs.isabelle.cli
+package info.hupel.isabelle.cli
 
 import scala.concurrent._
 import scala.sys.process._
 
-import edu.tum.cs.isabelle.setup.Platform
+import info.hupel.isabelle.setup.Platform
 
 object JEdit extends Command {
 

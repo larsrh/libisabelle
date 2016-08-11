@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle.api
+package info.hupel.isabelle.api
 
 import java.util.concurrent.{AbstractExecutorService, TimeUnit}
 import java.util.{Collections, WeakHashMap}
@@ -65,7 +65,7 @@ object Environment {
  * Abstract interface for an Isabelle environment of a particular
  * [[Version version]] in a path with an underlying PIDE machinery.
  *
- * As opposed to a mere logic-less `[[edu.tum.cs.isabelle.setup.Setup Setup]]`,
+ * As opposed to a mere logic-less `[[info.hupel.isabelle.setup.Setup Setup]]`,
  * an environment knows how to manage Isabelle processes. It can also manage
  * multiple running processes at the same time.
  *
@@ -73,13 +73,13 @@ object Environment {
  * `libisabelle`.
  *
  * It is highly recommended to use
- * [[edu.tum.cs.isabelle.setup.Setup#makeEnvironment]] to instantiate
+ * [[info.hupel.isabelle.setup.Setup#makeEnvironment]] to instantiate
  * implementations.
  *
  * While implementations may be created freely by users, it is recommended to
  * only use the bundled implementations for the supported Isabelle versions.
- * By convention, they live in the package `edu.tum.cs.isabelle.impl`. See also
- * `[[edu.tum.cs.isabelle.setup.Setup.defaultPackageName Setup.defaultPackageName]]`.
+ * By convention, they live in the package `info.hupel.isabelle.impl`. See also
+ * `[[info.hupel.isabelle.setup.Setup.defaultPackageName Setup.defaultPackageName]]`.
  *
  * ''Contract''
  *
@@ -90,8 +90,8 @@ object Environment {
  *     argument (of type `[[Environment.Context]]`). There must be no other
  *     constructors. The constructor should be `private`.
  *   - Implementations must be annotated with
- *     `[[edu.tum.cs.isabelle.api.Implementation Implementation]]`, where the
- *     given [[edu.tum.cs.isabelle.api.Implementation.identifier identifier]]
+ *     `[[info.hupel.isabelle.api.Implementation Implementation]]`, where the
+ *     given [[info.hupel.isabelle.api.Implementation.identifier identifier]]
  *     corresponds to the [[Version version identifier]].
  *
  * ''Footnote''

@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle.setup
+package info.hupel.isabelle.setup
 
 import java.io.{File, FileNotFoundException}
 import java.nio.file._
@@ -12,7 +12,7 @@ import coursier._
 
 import org.log4s._
 
-import edu.tum.cs.isabelle.api.{BuildInfo, Version}
+import info.hupel.isabelle.api.{BuildInfo, Version}
 
 import acyclic.file
 

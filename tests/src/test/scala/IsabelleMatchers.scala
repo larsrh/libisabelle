@@ -1,9 +1,9 @@
-package edu.tum.cs.isabelle.tests
+package info.hupel.isabelle.tests
 
 import org.specs2.Specification
 import org.specs2.matcher._
 
-import edu.tum.cs.isabelle._
+import info.hupel.isabelle._
 
 trait IsabelleMatchers { self: Specification =>
 

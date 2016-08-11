@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle
+package info.hupel.isabelle
 
 import scala.concurrent.{Future, Promise}
 

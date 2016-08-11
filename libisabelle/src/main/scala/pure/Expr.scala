@@ -1,11 +1,11 @@
-package edu.tum.cs.isabelle.pure
+package info.hupel.isabelle.pure
 
 import scala.concurrent.{ExecutionContext, Future}
 
 import cats.std.future._
 import cats.data.OptionT
 
-import edu.tum.cs.isabelle._
+import info.hupel.isabelle._
 
 import acyclic.file
 

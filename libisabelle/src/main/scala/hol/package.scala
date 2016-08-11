@@ -1,9 +1,9 @@
-package edu.tum.cs.isabelle
+package info.hupel.isabelle
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.math.BigInt
 
-import edu.tum.cs.isabelle.pure._
+import info.hupel.isabelle.pure._
 
 import acyclic.file
 

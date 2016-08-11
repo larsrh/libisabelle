@@ -1,11 +1,11 @@
-package edu.tum.cs.isabelle.impl
+package info.hupel.isabelle.impl
 
 import java.nio.file.Path
 import java.util.concurrent.{Executors, ThreadFactory}
 
 import scala.concurrent.ExecutionContext
 
-import edu.tum.cs.isabelle.api
+import info.hupel.isabelle.api
 
 import shapeless._
 import shapeless.tag._

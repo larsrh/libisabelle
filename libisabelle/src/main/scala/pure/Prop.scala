@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle.pure
+package info.hupel.isabelle.pure
 
 class Prop private(term: Term)
 

@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle.api;
+package info.hupel.isabelle.api;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

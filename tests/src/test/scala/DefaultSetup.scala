@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle.tests
+package info.hupel.isabelle.tests
 
 import java.nio.file.Paths
 
@@ -7,8 +7,8 @@ import scala.concurrent.Future
 import org.specs2.Specification
 import org.specs2.specification.core.Env
 
-import edu.tum.cs.isabelle.api._
-import edu.tum.cs.isabelle.setup._
+import info.hupel.isabelle.api._
+import info.hupel.isabelle.setup._
 
 trait DefaultSetup { self: Specification =>
   val specs2Env: Env

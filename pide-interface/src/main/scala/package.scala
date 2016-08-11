@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle
+package info.hupel.isabelle
 
 import java.util.concurrent.{AbstractExecutorService, TimeUnit}
 import java.util.Collections
@@ -12,8 +12,8 @@ import acyclic.file
  * notion of an [[Environment environment]], which captures the base
  * functionality of an Isabelle process, e.g. starting and stopping an
  * instance. API clients should go through the higher-level
- * [[edu.tum.cs.isabelle.setup.Setup setup]] and
- * [[edu.tum.cs.isabelle.System system]] interfaces.
+ * [[info.hupel.isabelle.setup.Setup setup]] and
+ * [[info.hupel.isabelle.System system]] interfaces.
  */
 package object api {
 

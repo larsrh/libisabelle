@@ -1,4 +1,4 @@
-package edu.tum.cs.isabelle
+package info.hupel.isabelle
 
 import scala.concurrent._
 import scala.util.control.Exception._
@@ -6,7 +6,7 @@ import scala.util.control.NoStackTrace
 
 import monix.execution.{Cancelable, CancelableFuture}
 
-import edu.tum.cs.isabelle.api._
+import info.hupel.isabelle.api._
 
 import acyclic.file
 
@@ -17,16 +17,16 @@ object System {
 
   /**
    * Synchronously build a
-   * [[edu.tum.cs.isabelle.api.Configuration configuration]].
+   * [[info.hupel.isabelle.api.Configuration configuration]].
    *
    * This operation is idempotent, but not parallel-safe. It must not be running
-   * simultaneously for the same [[edu.tum.cs.isabelle.setup.Setup setup]], not
+   * simultaneously for the same [[info.hupel.isabelle.setup.Setup setup]], not
    * even on different JVMs or with differnet configurations. Parallel
    * invocations of `[[create]]` should be avoided, but are safe under the
    * condition that they are using independent configurations, or that the
    * common ancestors of the configurations have already been successfully
    * built. Refer to the
-   * [[edu.tum.cs.isabelle.api.Configuration documentation of configurations]]
+   * [[info.hupel.isabelle.api.Configuration documentation of configurations]]
    * for more details.
    *
    * A `true` return value indicates a successful build. Currently, there is no
@@ -85,7 +85,7 @@ object System {
 
   /**
    * Asynchronously create a new [[System system]] based on the specified
-   * [[edu.tum.cs.isabelle.api.Configuration configuration]].
+   * [[info.hupel.isabelle.api.Configuration configuration]].
    *
    * The behaviour of this function when the given configuration has not been
    * [[build built]] yet is unspecified. Since building is idempotent, it is
@@ -112,7 +112,7 @@ object System {
  * This class is thread-safe, that is, running multiple
  * [[Operation operations]] at the same time is expected and safe.
  *
- * @see [[edu.tum.cs.isabelle.setup.Setup]]
+ * @see [[info.hupel.isabelle.setup.Setup]]
  */
 final class System private(val env: Environment, config: Configuration) {
 
@@ -121,8 +121,8 @@ final class System private(val env: Environment, config: Configuration) {
    * internally for bi-directional communication with the prover.
    *
    * Guaranteed to be the same execution context as the
-   * [[edu.tum.cs.isabelle.api.Environment#executionContext execution context]]
-   * of the [[edu.tum.cs.isabelle.api.Environment environment]] used to
+   * [[info.hupel.isabelle.api.Environment#executionContext execution context]]
+   * of the [[info.hupel.isabelle.api.Environment environment]] used to
    * [[System.create create]] this system.
    *
    * It is fine to use this execution context for other purposes, for example
@@ -178,8 +178,8 @@ final class System private(val env: Environment, config: Configuration) {
    * afterwards.
    *
    * Depending on the
-   * [[edu.tum.cs.isabelle.api.Environment#executionContext implementation details]]
-   * of the [[edu.tum.cs.isabelle.api.Environment environment]] used to
+   * [[info.hupel.isabelle.api.Environment#executionContext implementation details]]
+   * of the [[info.hupel.isabelle.api.Environment environment]] used to
    * [[System.create create]] this system, it may be unneccessary to call this
    * method. In any case, it is good practice to call it.
    *
@@ -196,13 +196,13 @@ final class System private(val env: Environment, config: Configuration) {
    * stream the results to the [[Observer observer]] of the operation.
    *
    * The observer is automatically [[Operation#prepare instantiated]] with
-   * the underlying [[edu.tum.cs.isabelle.api.Environment environment]]
+   * the underlying [[info.hupel.isabelle.api.Environment environment]]
    * specified when [[System#create creating]] the system.
    *
    * The returned [[scala.concurrent.Future future]] gets fulfilled when the
    * observer transitions into either
-   * `[[edu.tum.cs.isabelle.Observer.Success Success]]` or
-   * `[[edu.tum.cs.isabelle.Observer.Failure Failure]]` state.
+   * `[[info.hupel.isabelle.Observer.Success Success]]` or
+   * `[[info.hupel.isabelle.Observer.Failure Failure]]` state.
    *
    * Any well-formed response, even if it is an "error", is treated as a
    * success. Only ill-formed responses, e.g. due to [[Codec#decode decoding]]

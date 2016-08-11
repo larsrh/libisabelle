@@ -1,6 +1,6 @@
-package edu.tum.cs.isabelle
+package info.hupel.isabelle
 
-import edu.tum.cs.isabelle.api.XML
+import info.hupel.isabelle.api.XML
 
 import acyclic.file
 
@@ -8,10 +8,10 @@ import acyclic.file
  * Result from the prover.
  *
  * In the error case, a special
- * `[[edu.tum.cs.isabelle.Operation.ProverException ProverException]]` will be
+ * `[[info.hupel.isabelle.Operation.ProverException ProverException]]` will be
  * provided.
  *
- * @see [[edu.tum.cs.isabelle.System#invoke]]
+ * @see [[info.hupel.isabelle.System#invoke]]
  */
 trait ProverResult[+T] {
   def unsafeGet: T = this match {
@@ -31,17 +31,17 @@ object ProverResult {
 
 /**
  * An iteratee-like structure consuming
- * [[edu.tum.cs.isabelle.api.XML.Tree XML trees]] and eventually producing an
+ * [[info.hupel.isabelle.api.XML.Tree XML trees]] and eventually producing an
  * output of type `T`, or an error.
  *
  * On a high level, this can be imagined like a function taking a list of
  * trees as an argument. In most cases, user code does not care about the
  * intermediate results. For that, combinators exist in the
  * [[Observer$ companion object]] and
- * `[[edu.tum.cs.isabelle.Operation$ Operation]]`.
+ * `[[info.hupel.isabelle.Operation$ Operation]]`.
  *
- * @see [[edu.tum.cs.isabelle.System#invoke]]
- * @see [[edu.tum.cs.isabelle.Operation]]
+ * @see [[info.hupel.isabelle.System#invoke]]
+ * @see [[info.hupel.isabelle.Operation]]
  */
 sealed abstract class Observer[+T] {
   def map[U](f: T => U): Observer[U] = this match {
@@ -60,7 +60,7 @@ object Observer {
    * It is recommended that this case is not used for unexpected failures.
    *
    * For the precise error semantics, see
-   * `[[edu.tum.cs.isabelle.System#invoke System#invoke]]`.
+   * `[[info.hupel.isabelle.System#invoke System#invoke]]`.
    */
   final case class Success[+T](t: ProverResult[T]) extends Observer[T]
 
@@ -71,7 +71,7 @@ object Observer {
    * conditions.
    *
    * For the precise error semantics, see
-   * `[[edu.tum.cs.isabelle.System#invoke System#invoke]]`.
+   * `[[info.hupel.isabelle.System#invoke System#invoke]]`.
    */
   final case class Failure(error: Exception) extends Observer[Nothing]
 
@@ -82,7 +82,7 @@ object Observer {
    * When receiving a final result, the returned new observer should be
    * either `[[Success]]` or `[[Failure]]`. This is not enforced, but not
    * doing so will most likely result in hanging
-   * [[edu.tum.cs.isabelle.Operation operations]].
+   * [[info.hupel.isabelle.Operation operations]].
    */
   final case class More[+T](step: XML.Tree => Observer[T], done: XML.Tree => Observer[T]) extends Observer[T]
 

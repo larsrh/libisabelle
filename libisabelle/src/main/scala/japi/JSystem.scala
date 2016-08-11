@@ -1,10 +1,10 @@
-package edu.tum.cs.isabelle.japi
+package info.hupel.isabelle.japi
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 
-import edu.tum.cs.isabelle._
-import edu.tum.cs.isabelle.api.{Configuration, Environment}
+import info.hupel.isabelle._
+import info.hupel.isabelle.api.{Configuration, Environment}
 
 object JSystem {
 
