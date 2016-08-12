@@ -6,8 +6,6 @@ import java.net.URL
 
 import scala.concurrent.{Future, ExecutionContext}
 
-import org.apache.commons.io.IOUtils
-
 import coursier._
 
 import org.log4s._
@@ -45,8 +43,10 @@ object Resolver {
       Option(classLoader.getResourceAsStream(fileName)) match {
         case Some(stream) =>
           val target = Files.createTempFile("pide", ".jar")
+          target.toFile.deleteOnExit()
           logger.debug(s"Dumping PIDE jar to $target ...")
-          IOUtils.copy(stream, Files.newOutputStream(target, StandardOpenOption.WRITE))
+          Files.copy(stream, target, StandardCopyOption.REPLACE_EXISTING)
+          stream.close()
           Future.successful { List(target) }
         case None =>
           Future.failed { new FileNotFoundException(s"PIDE ${version.identifier} not on classpath") }

@@ -97,7 +97,11 @@ object Main {
       }
 
       val dump = args.dump.getOrElse(Files.createTempDirectory("libisabelle_resources"))
-      val resources = Resources.dumpIsabelleResources(dump, getClass.getClassLoader)
+
+      val resources = Resources.dumpIsabelleResources(dump, getClass.getClassLoader) match {
+        case Xor.Right(resources) => resources
+        case Xor.Left(error) => sys.error(error.explain)
+      }
 
       val configuration = args.session match {
         case Some(session) => resources.makeConfiguration(args.include, session)

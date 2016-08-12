@@ -37,9 +37,6 @@ object Configuration {
   def fromBuiltin(session: String) =
     Configuration(Nil, session)
 
-  def isSessionRoot(path: Path): Boolean =
-    Files.exists(path.resolve("ROOT")) || Files.exists(path.resolve("ROOTS"))
-
 }
 
 /**

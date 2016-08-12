@@ -141,8 +141,7 @@ lazy val setup = project.in(file("setup"))
       "com.github.fge" % "java7-fs-more" % "0.2.0",
       "com.google.code.findbugs" % "jsr305" % "3.0.1" % "compile",
       "org.apache.commons" % "commons-compress" % "1.12",
-      "org.apache.commons" % "commons-lang3" % "3.4",
-      "commons-io" % "commons-io" % "2.5"
+      "org.apache.commons" % "commons-lang3" % "3.4"
     )
   )
 
@@ -250,7 +249,7 @@ lazy val workbench = project.in(file("workbench"))
 
       val setup = Await.result(Setup.defaultSetup(Version("2016")).toOption.get, Duration.Inf)
       val env = Await.result(setup.makeEnvironment, Duration.Inf)
-      val resources = Resources.dumpIsabelleResources()
+      val resources = Resources.dumpIsabelleResources().toOption.get
       val config = resources.makeConfiguration(Nil, "HOL-Protocol")
       System.build(env, config)
       val system = Await.result(System.create(env, config), Duration.Inf)
