@@ -170,9 +170,9 @@ final class System private(val env: Environment, config: Configuration) {
    * failed.
    *
    * It is recommended to wait for all pending futures to complete, or call
-   * `[[CancellableFuture#cancel cancel]]` on them before shutdown. It is
-   * guaranteed that when the returned [[scala.concurrent.Future future]]
-   * succeeds, the prover has been shut down.
+   * `cancel` on them before shutdown. It is guaranteed that when the returned
+   * [[scala.concurrent.Future future]] succeeds, the prover has been shut
+   * down.
    *
    * Calling anything after dispose is undefined. The object should not be used
    * afterwards.
@@ -203,6 +203,11 @@ final class System private(val env: Environment, config: Configuration) {
    * observer transitions into either
    * `[[info.hupel.isabelle.Observer.Success Success]]` or
    * `[[info.hupel.isabelle.Observer.Failure Failure]]` state.
+   *
+   * In addition to that, the transaction can be cancelled via the `cancel`
+   * method of the `CancelableFuture`. Cancellation entails marking the future
+   * as failed and signalling the prover that the operation should be
+   * interrupted.
    *
    * Any well-formed response, even if it is an "error", is treated as a
    * success. Only ill-formed responses, e.g. due to [[Codec#decode decoding]]

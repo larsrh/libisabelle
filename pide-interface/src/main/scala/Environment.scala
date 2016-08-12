@@ -51,9 +51,23 @@ object Environment {
     field.set(instance, Some(old ++ patch))
   }
 
+  /**
+   * Marker trait indicating raw (encoded) Isabelle symbol text.
+   *
+   * @see [[Environment#decode]]
+   * @see [[Environment#encode]]
+   */
   sealed trait Raw
+
+  /**
+   * Marker trait indicating Unicode (decoded) Isabelle symbol text.
+   *
+   * @see [[Environment#decode]]
+   * @see [[Environment#encode]]
+   */
   sealed trait Unicode
 
+  /** Bundles all requirements to instantiate an [[Environment environment]]. */
   case class Context(home: Path, ec: ExecutionContext) {
     def executorService = ec.toExecutorService
   }
@@ -73,8 +87,8 @@ object Environment {
  * `libisabelle`.
  *
  * It is highly recommended to use
- * [[info.hupel.isabelle.setup.Setup#makeEnvironment]] to instantiate
- * implementations.
+ * `[[info.hupel.isabelle.setup.Setup#makeEnvironment(resolver* Setup.makeEnvironment]]`
+ * to instantiate implementations.
  *
  * While implementations may be created freely by users, it is recommended to
  * only use the bundled implementations for the supported Isabelle versions.

@@ -17,8 +17,6 @@ import acyclic.file
 
 /**
  * Detection of the machine's [[Platform platform]].
- *
- * Currently, only Linux and Windows are supported.
  */
 object Platform {
 
@@ -51,6 +49,12 @@ object Platform {
     else
       None
 
+  /**
+   * Arbitrary platform based on a [[Platform#localStorage local storage]]
+   * path.
+   *
+   * The main purpose is when using a custom (unmanaged) Isabelle installation.
+   */
   def genericPlatform(localStorage0: Path): Platform =
     new Platform {
       val localStorage = localStorage0.toAbsolutePath
@@ -59,8 +63,8 @@ object Platform {
 }
 
 /**
- * The underlying operating system platform with knowlege of a local storage
- * path.
+ * The underlying operating system platform with knowlege of a
+ * [[localStorage local storage]] path.
  *
  * It is recommended to obtain instances via the
  * [[Platform$ companion object]].
@@ -69,6 +73,10 @@ sealed abstract class Platform {
 
   private val logger = getLogger
 
+  /**
+   * Path where `libisabelle` stores files downloaded from the Internet, e.g.
+   * by a [[Resolver resolver]] or by [[Setup.install installing]] Isabelle.
+   */
   def localStorage: Path
 
   final def setupStorage: Path =

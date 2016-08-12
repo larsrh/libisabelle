@@ -14,6 +14,12 @@ import info.hupel.isabelle.api.{BuildInfo, Version}
 
 import acyclic.file
 
+/**
+ * Function preparing a classpath containing an appropriate
+ * [[info.hupel.isabelle.api.Environment environment]].
+ *
+ * Instances are available in the [[Resolver$ companion object]].
+ */
 trait Resolver { self =>
 
   def resolve(platform: Platform, version: Version)(implicit ec: ExecutionContext): Future[List[Path]]
@@ -27,12 +33,25 @@ trait Resolver { self =>
 
 }
 
+/** [[Resolver resolver]] instances. */
 object Resolver {
 
+  /**
+   * Default resolver: look in the [[Classpath classpath]] first, then resolve
+   * via [[Maven]].
+   */
   def Default =
     Classpath orElse Maven
 
 
+  /**
+   * Classpath-based [[Resolver resolver]].
+   *
+   * When looking up a [[info.hupel.isabelle.api.Version version]], it expects
+   * a resource named `pide-\$version-assembly.jar` in the classpath. Because
+   * Java URLs cannot be nested, this resolver then writes this resource to a
+   * temporary file.
+   */
   object Classpath extends Resolver {
 
     private val logger = getLogger
@@ -55,6 +74,12 @@ object Resolver {
 
   }
 
+  /**
+   * Maven-/Ivy-based [[Resolver resolver]].
+   *
+   * Uses `coursier` under the hood to resolve artifacts from Maven and Ivy
+   * repositories.
+   */
   object Maven extends Resolver {
 
     private val logger = getLogger

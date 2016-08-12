@@ -61,6 +61,11 @@ object Setup {
   def successMarker(path: Path): Path =
     path.resolve(".success")
 
+  /**
+   * Download an official copy of Isabelle from the Internet and extract it
+   * in the [[Platform#setupStorage:* designated path]] according to the
+   * [[Platform platform]].
+   */
   def install(platform: OfficialPlatform, version: Version)(implicit ec: ExecutionContext): Future[Setup] = {
     Files.createDirectories(platform.setupStorage)
     val url = platform.url(version)
@@ -81,7 +86,11 @@ object Setup {
     }
   }
 
-  def detectSetup(platform: Platform, version: Version): Xor[NoSetupReason, Setup] = platform.withLock { () =>
+  /**
+   * Try to find an existing [[Setup setup]] in the
+   * [[Platform#setupStorage:* designated path]] of the [[Platform platform]].
+   */
+  def detectSetup(platform: Platform, version: Version): Xor[NoSetup, Setup] = platform.withLock { () =>
     val path = platform.setupStorage(version)
     if (Files.isDirectory(path)) {
       if (Files.isRegularFile(successMarker(path)))
@@ -93,7 +102,12 @@ object Setup {
       Xor.left(Absent)
   }.getOrElse(Xor.left(Busy(platform.lockFile)))
 
-  def defaultSetup(version: Version)(implicit ec: ExecutionContext): Xor[SetupImpossibleReason, Future[Setup]] =
+  /**
+   * The default setup: [[defaultPlatform default platform]],
+   * [[detectSetup detect existing setup]],
+   * [[install install if not existing]].
+   */
+  def defaultSetup(version: Version)(implicit ec: ExecutionContext): Xor[SetupImpossible, Future[Setup]] =
     defaultPlatform match {
       case None =>
         Xor.left(UnknownPlatform)
@@ -144,6 +158,10 @@ final case class Setup(home: Path, platform: Platform, version: Version, package
     constructor.newInstance(context)
   }
 
+  /**
+   * Prepares a fresh [[info.hupel.isabelle.api.Environment]] using the
+   * [[Resolver.Default default resolver]].
+   */
   def makeEnvironment(implicit ec: ExecutionContext): Future[Environment] =
     makeEnvironment(Resolver.Default)
 
