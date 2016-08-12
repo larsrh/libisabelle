@@ -25,16 +25,16 @@ import acyclic.file
  */
 object Setup {
 
-  sealed trait NoSetupReason
-  sealed trait SetupImpossibleReason { def explain: String }
-  case object Absent extends NoSetupReason
-  case class Corrupted(path: Path) extends NoSetupReason with SetupImpossibleReason {
+  sealed trait NoSetup
+  sealed trait SetupImpossible { def explain: String }
+  case object Absent extends NoSetup
+  case class Corrupted(path: Path) extends NoSetup with SetupImpossible {
     def explain = s"Possibly corrupted setup detected at $path; try deleting that folder and running again"
   }
-  case class Busy(path: Path) extends NoSetupReason with SetupImpossibleReason {
+  case class Busy(path: Path) extends NoSetup with SetupImpossible {
     def explain = s"File lock $path could not be acquired (busy)"
   }
-  case object UnknownPlatform extends SetupImpossibleReason {
+  case object UnknownPlatform extends SetupImpossible {
     def explain = "Impossible to download setup on unknown platform"
   }
 
@@ -105,7 +105,6 @@ object Setup {
           case Xor.Left(Corrupted(p)) => Xor.left(Corrupted(p))
         }
     }
-
 
 }
 

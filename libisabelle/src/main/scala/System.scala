@@ -212,7 +212,7 @@ final class System private(val env: Environment, config: Configuration) {
    * successful future may contain expected errors (e.g. due to a wrong input
    * argument or a failing proof).
    */
-  def cancelableInvoke[I, O](operation: Operation[I, O])(arg: I): CancelableFuture[ProverResult[O]] = {
+  def invoke[I, O](operation: Operation[I, O])(arg: I): CancelableFuture[ProverResult[O]] = {
     val (encoded, observer) = operation.prepare(arg)
     val state = new System.OperationState(env, observer)
     state.tryComplete()
@@ -232,8 +232,5 @@ final class System private(val env: Environment, config: Configuration) {
     }
     CancelableFuture(promise.future, cancel)
   }
-
-  final def invoke[I, O](operation: Operation[I, O])(arg: I): Future[ProverResult[O]] =
-    cancelableInvoke(operation)(arg)
 
 }
