@@ -124,7 +124,8 @@ lazy val libisabelle = project
   .settings(Seq(
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % "0.6.1",
-      "io.monix" %% "monix" % "2.0-RC9"
+      "io.monix" %% "monix" % "2.0-RC9",
+      "com.lihaoyi" %% "scalatags" % "0.5.4"
     )
   ))
 

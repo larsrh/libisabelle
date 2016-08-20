@@ -13,13 +13,16 @@ object Report extends Command {
   case object RawXML extends Format
   case object XRay extends Format
 
-  def print(reports: Reports, home: Path, format: Format): Unit = format match {
+  def print(reports: Reports, env: Environment, format: Format): Unit = format match {
     case RawXML =>
-      println(s"<?xml version='1.0' ?>\n<dump home='$home'>\n")
+      println(s"<?xml version='1.0' ?>\n<dump home='${env.home}'>\n")
       reports.items.foreach(tree => println(tree.pretty(2)))
       println("\n</dump>")
     case XRay =>
-      println(reports.interpret(home).pretty)
+      val model = reports.interpret(env)
+
+      println("<!DOCTYPE html>")
+      println(model.toHTML)
   }
 
   def run(bundle: Bundle, args: List[String])(implicit ec: ExecutionContext): Future[Unit] = {
@@ -32,10 +35,10 @@ object Report extends Command {
 
     for {
       s <- System.create(bundle.env, bundle.configuration)
-      reports <- s.invoke(Operation.UseThys(Reports.empty)(_ + _, identity))(files)
+      r <- s.invoke(Operation.UseThys(Reports.empty)(_ + _, identity))(files)
       _ <- s.dispose
     }
-    yield print(reports.unsafeGet, bundle.env.home, format)
+    yield print(r.unsafeGet, bundle.env, format)
   }
 
 }

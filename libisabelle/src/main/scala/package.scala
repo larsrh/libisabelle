@@ -5,6 +5,8 @@ import scala.util._
 
 import info.hupel.isabelle.api.XML
 
+import scalatags.Text
+
 import acyclic.file
 
 package object isabelle {
@@ -15,5 +17,7 @@ package object isabelle {
    * should contain an error message and a list of erroneous trees.
    */
   type XMLResult[+A] = Either[(String, XML.Body), A]
+
+  type HTML = Text.TypedTag[String]
 
 }
