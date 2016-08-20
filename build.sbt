@@ -216,7 +216,11 @@ lazy val cli = project.in(file("cli"))
   .settings(standardSettings)
   .settings(warningSettings)
   .settings(acyclicSettings)
-  .settings(libraryDependencies += logback)
+  .settings(
+    libraryDependencies += logback,
+    mainClass in Compile := Some("info.hupel.isabelle.cli.Main")
+  )
+  .enablePlugins(JavaAppPackaging, UniversalPlugin)
 
 
 // Examples
