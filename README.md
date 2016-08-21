@@ -82,10 +82,19 @@ Drop the following lines into your `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "info.hupel" %% "libisabelle" % "0.3.4",
-  "info.hupel" %% "libisabelle-setup" % "0.3.4"
+  "info.hupel" %% "libisabelle" % "0.4",
+  "info.hupel" %% "libisabelle-setup" % "0.4"
 )
 ```
+
+With this configuration, the automatic Isabelle setup will fetch additional JAR dependencies from Maven Central or Sonatype, depending on the selected Isabelle version.
+If you don't want this, additionally include the following dependency:
+
+```scala
+  "info.hupel" %% "pide-package" % "0.4"
+```
+
+This adds PIDE implementations for all supported Isabelle versions to your classpath.
 
 
 ## Participation
