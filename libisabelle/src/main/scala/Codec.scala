@@ -3,8 +3,8 @@ package info.hupel.isabelle
 import scala.math.BigInt
 import scala.util.control.Exception._
 
-import cats.std.either._
-import cats.std.list._
+import cats.instances.either._
+import cats.instances.list._
 import cats.syntax.traverse._
 
 import info.hupel.isabelle.api._

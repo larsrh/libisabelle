@@ -111,7 +111,7 @@ lazy val pideInterface = project.in(file("pide-interface"))
     buildInfoKeys := apiBuildInfoKeys,
     buildInfoPackage := "info.hupel.isabelle.api",
     libraryDependencies ++= Seq(
-      "com.chuusai" %% "shapeless" % "2.3.1",
+      "com.chuusai" %% "shapeless" % "2.3.2",
       "org.log4s" %% "log4s" % "1.3.0"
     )
   )
@@ -123,9 +123,9 @@ lazy val libisabelle = project
   .settings(acyclicSettings)
   .settings(Seq(
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "0.6.1",
-      "io.monix" %% "monix" % "2.0-RC9",
-      "com.lihaoyi" %% "scalatags" % "0.5.4"
+      "org.typelevel" %% "cats-core" % "0.7.0",
+      "io.monix" %% "monix-execution" % "2.0-RC13",
+      "com.lihaoyi" %% "scalatags" % "0.6.0"
     )
   ))
 
@@ -137,8 +137,8 @@ lazy val setup = project.in(file("setup"))
   .settings(acyclicSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "io.get-coursier" %% "coursier" % "1.0.0-M13",
-      "io.get-coursier" %% "coursier-cache" % "1.0.0-M13",
+      "io.get-coursier" %% "coursier" % "1.0.0-M14",
+      "io.get-coursier" %% "coursier-cache" % "1.0.0-M14",
       "com.github.fge" % "java7-fs-more" % "0.2.0",
       "com.google.code.findbugs" % "jsr305" % "3.0.1" % "compile",
       "org.apache.commons" % "commons-compress" % "1.12",
@@ -199,9 +199,9 @@ lazy val tests = project.in(file("tests"))
   .settings(acyclicSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "org.specs2" %% "specs2-core" % "3.6.5" % "test",
-      "org.specs2" %% "specs2-scalacheck" % "3.6.5" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.12.5" % "test",
+      "org.specs2" %% "specs2-core" % "3.8.4" % "test",
+      "org.specs2" %% "specs2-scalacheck" % "3.8.4" % "test",
+      "org.scalacheck" %% "scalacheck" % "1.13.2" % "test",
       logback % "test"
     ),
     parallelExecution in Test := false

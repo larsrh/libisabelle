@@ -2,7 +2,7 @@ package info.hupel.isabelle.pure
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import cats.std.future._
+import cats.instances.future._
 import cats.data.OptionT
 
 import info.hupel.isabelle._

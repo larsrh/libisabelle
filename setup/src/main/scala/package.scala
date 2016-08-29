@@ -14,7 +14,7 @@ package object setup {
   implicit class TaskOps[T](task: Task[T]) {
     def toScalaFuture: Future[T] = {
       val promise = Promise[T]
-      task.runAsync { res =>
+      task.unsafePerformAsync { res =>
         res.fold(promise.failure, promise.success)
         ()
       }
