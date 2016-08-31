@@ -18,3 +18,11 @@ matrix:
     - env: ISABELLE_VERSION=2016 SCALA_VERSION=2.11.8
       os: linux
       jdk: oraclejdk8
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt/boot
+    - $HOME/.isabelle
+before_cache:
+  - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
+  - find $HOME/.sbt -name "*.lock" -delete
