@@ -1,4 +1,4 @@
-signature PROTOCOL = sig
+signature LIBISABELLE_PROTOCOL = sig
   type name = string
   type ('i, 'o) operation =
     {from_lib : 'i codec,
@@ -15,7 +15,7 @@ signature PROTOCOL = sig
   val get_operation : name -> int -> XML.tree -> XML.tree
 end
 
-structure Protocol: PROTOCOL = struct
+structure Libisabelle_Protocol: LIBISABELLE_PROTOCOL = struct
 
 type name = string
 type ('i, 'o) operation =
