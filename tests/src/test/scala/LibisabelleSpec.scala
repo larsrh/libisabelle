@@ -21,6 +21,7 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
 
   An Isabelle session
     can be started          ${system must exist.awaitFor(timeout)}
+    supports term parsing   ${parseCheck must beSuccess(Option.empty[String]).awaitFor(timeout)}
     can parse terms         ${parsed must beSome.awaitFor(timeout)}
     can't parse wrong terms ${parseFailed must beNone.awaitFor(timeout)}
     can load theories       ${loaded must beSuccess(()).awaitFor(timeout)}
@@ -40,6 +41,8 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
   // Pure/HOL operations
 
   val thy = Theory.get("Pure")
+
+  val parseCheck = system.flatMap(sys => Term.parse(Context.initGlobal(thy), "TERM x").check(sys, "Protocol_Pure"))
 
   val parsed = system.flatMap(_.run(Expr.fromString[Prop](thy, "TERM x"), "Protocol_Pure"))
   val parseFailed = system.flatMap(_.run(Expr.fromString[Prop](thy, "TERM"), "Protocol_Pure"))
@@ -72,7 +75,7 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
   val teardown =
     for {
       s <- system
-      _ <- Future.sequence(List(parsed, parseFailed, error, cancelled.failed)) // barrier
+      _ <- Future.sequence(List(parsed, parseFailed, parseCheck, error, cancelled.failed)) // barrier
       _ <- s.dispose
     }
     yield ()

@@ -6,6 +6,7 @@ signature FFI = sig
 
   val print_ml_expr: Proof.context -> ml_expr -> string
   val eval: Proof.context -> ml_expr -> string -> XML.tree
+  val check: Proof.context -> ml_expr -> string -> string option
 
   val print_tree: XML.tree -> string
   val print_body: XML.body -> string
@@ -50,6 +51,41 @@ fun print_ml_expr _ (Lit text) =
       let
         val codec = Classy.resolve @{ML.class codec} (ML_Types.read_ml_type typ) (Context.Proof ctxt)
       in "(Codec.the_decode " ^ codec ^ " " ^ print_tree value ^ ")" end
+
+fun check ctxt prog raw_typ =
+  case try ML_Types.read_ml_type raw_typ of
+    NONE => SOME ("failed to parse result type " ^ raw_typ)
+  | SOME typ =>
+      let
+        val context = Context.Proof ctxt
+        val codec = can (Classy.resolve @{ML.class codec} typ) context
+
+        fun check_vals (Lit _) = NONE
+          | check_vals (App (f, x)) = merge_options (check_vals f, check_vals x)
+          | check_vals (Val (raw_typ, _)) =
+              case try ML_Types.read_ml_type raw_typ of
+                NONE => SOME ("failed to parse value type " ^ raw_typ)
+              | SOME _ =>
+                  if can (Classy.resolve @{ML.class codec} typ) context then
+                    NONE
+                  else
+                    SOME ("could not resolve codec for value type " ^ raw_typ)
+      in
+        if not codec then
+          SOME ("could not resolve codec for result type " ^ raw_typ)
+        else
+          case check_vals prog of
+            SOME err => SOME err
+          | NONE =>
+              case Exn.capture (ML_Types.ml_type_of ctxt) (print_ml_expr ctxt prog) of
+                Exn.Res typ' =>
+                  if typ = typ' then
+                    NONE
+                  else
+                    SOME ("expected result type " ^ raw_typ ^ " but got something else")
+              | Exn.Exn exn =>
+                  SOME ("compilation error: " ^ @{make_string} exn)
+      end
 
 fun eval ctxt prog typ =
   let

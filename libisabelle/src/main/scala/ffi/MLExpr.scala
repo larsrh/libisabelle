@@ -18,6 +18,9 @@ sealed abstract class MLExpr[A] {
       }
     })
 
+  def check(sys: System, thyName: String)(implicit A: Codec[A], ec: ExecutionContext): Future[ProverResult[Option[String]]] =
+    sys.invoke(MLExpr.CheckMLExpr)((Codec[A].mlType, this, thyName))
+
   def toProg(implicit A: Codec[A]): Program[A] = MLProg.expr(this)
 
 }
@@ -54,5 +57,6 @@ object MLExpr {
   }
 
   private val EvalMLExpr = Operation.implicitly[(String, MLExpr[_], String), XML.Tree]("eval_ml_expr")
+  private val CheckMLExpr = Operation.implicitly[(String, MLExpr[_], String), Option[String]]("check_ml_expr")
 
 }
