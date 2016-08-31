@@ -82,6 +82,7 @@ object Term {
 }
 
 sealed abstract class Term {
+
   def $(that: Term): Term = App(this, that)
 
   def constrain(typ: Typ): Term = typ match {
@@ -93,6 +94,10 @@ sealed abstract class Term {
 
   def check(ctxt: MLExpr[Context]): MLExpr[Option[Term]] =
     MLExpr.uncheckedLiteral[Context => Term => Term]("Syntax.check_term")(ctxt).liftTry(this)
+
+  def certify(ctxt: MLExpr[Context]): MLExpr[Option[CTerm]] =
+    MLExpr.uncheckedLiteral[Context => Term => CTerm]("Thm.cterm_of")(ctxt).liftTry(this)
+
 }
 
 final case class Const(name: String, typ: Typ) extends Term

@@ -31,22 +31,22 @@ package object hol extends LowPriorityImplicits {
   private val DestList = Operation.implicitly[Term, Option[List[Term]]]("dest_list")
 
   implicit def bigIntTypeable: Embeddable[BigInt] = new Embeddable[BigInt] {
-    def typ: Typ = Type("Int.int", Nil)
-    def embed(thy: MLExpr[Theory], t: BigInt) =
+    def typ = HOLogic.intT
+    def embed(t: BigInt) =
       MLProg.operation(MkInt, t)
-    def unembed(thy: MLExpr[Theory], t: Term) =
+    def unembed(t: Term) =
       MLProg.operation(DestInt, t)
   }
 
   implicit def boolTypeable: Embeddable[Boolean] = new Embeddable[Boolean] {
-    def typ: Typ = HOLogic.boolT
-    def embed(thy: MLExpr[Theory], t: Boolean) = MLProg.pure {
+    def typ = HOLogic.boolT
+    def embed(t: Boolean) = MLProg.pure {
       t match {
         case true => HOLogic.True
         case false => HOLogic.False
       }
     }
-    def unembed(thy: MLExpr[Theory], t: Term) = MLProg.pure {
+    def unembed(t: Term) = MLProg.pure {
       t match {
         case HOLogic.True => Some(true)
         case HOLogic.False => Some(false)
@@ -56,15 +56,15 @@ package object hol extends LowPriorityImplicits {
   }
 
   implicit def listEmbeddable[T : Embeddable]: Embeddable[List[T]] = new ListTypeable[T] with Embeddable[List[T]] {
-    def embed(thy: MLExpr[Theory], ts: List[T]) =
-      ts.traverse(Embeddable[T].embed(thy, _)) flatMap { ts =>
+    def embed(ts: List[T]) =
+      ts.traverse(Embeddable[T].embed) flatMap { ts =>
         MLProg.operation(MkList, ((Typeable.typ[T], ts)))
       }
 
-    def unembed(thy: MLExpr[Theory], t: Term) =
+    def unembed(t: Term) =
       MLProg.operation(DestList, t) flatMap {
         case None => MLProg.pure(None)
-        case Some(ts) => ts.traverse(Embeddable[T].unembed(thy, _)).map(_.sequence)
+        case Some(ts) => ts.traverse(Embeddable[T].unembed).map(_.sequence)
       }
   }
 

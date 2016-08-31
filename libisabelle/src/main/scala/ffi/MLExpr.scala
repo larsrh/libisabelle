@@ -21,6 +21,8 @@ sealed abstract class MLExpr[A] {
   def check(sys: System, thyName: String)(implicit A: Codec[A], ec: ExecutionContext): Future[ProverResult[Option[String]]] =
     sys.invoke(MLExpr.CheckMLExpr)((Codec[A].mlType, this, thyName))
 
+  def coerce[B]: MLExpr[B] = MLExpr.Coerce(this)
+
   def toProg(implicit A: Codec[A]): Program[A] = MLProg.expr(this)
 
 }
@@ -41,6 +43,7 @@ object MLExpr {
   private case class Val[T](t: T)(implicit T: Codec[T]) extends MLExpr[T] {
     def encode = Codec[(String, XML.Tree)].encode((T.mlType, T.encode(t)))
   }
+  private case class Coerce[T, U](t: MLExpr[T]) extends MLExpr[U]
 
   def value[T](t: T)(implicit T: Codec[T]): MLExpr[T] = Val[T](t)
   def uncheckedLiteral[A](text: String): MLExpr[A] = Lit[A](text)
@@ -53,6 +56,7 @@ object MLExpr {
       case Lit(text) => (0, Codec[String].encode(text))
       case App(f, x) => (1, (mlExprCodec tuple mlExprCodec).encode((f, x)))
       case v: Val[_] => (2, v.encode)
+      case Coerce(e) => enc(e)
     }
   }
 

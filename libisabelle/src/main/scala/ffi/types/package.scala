@@ -17,4 +17,10 @@ package object types {
   object CTerm
   type CTerm = CTerm.type
 
+  object Thm {
+    def term(ct: MLExpr[CTerm]): MLExpr[Thm] =
+      MLExpr.uncheckedLiteral[CTerm => Thm]("Drule.mk_term")(ct)
+  }
+  type Thm = Thm.type
+
 }

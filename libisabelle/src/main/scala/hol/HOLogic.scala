@@ -5,6 +5,7 @@ import info.hupel.isabelle.pure._
 object HOLogic {
 
   val boolT = Type("HOL.bool")
+  val intT = Type("Int.int")
 
   val True = Const("HOL.True", boolT)
   val False = Const("HOL.False", boolT)

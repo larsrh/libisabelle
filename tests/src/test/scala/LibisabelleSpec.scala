@@ -41,11 +41,12 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
   // Pure/HOL operations
 
   val thy = Theory.get("Pure")
+  val ctxt = Context.initGlobal(thy)
 
-  val parseCheck = system.flatMap(sys => Term.parse(Context.initGlobal(thy), "TERM x").check(sys, "Protocol_Pure"))
+  val parseCheck = system.flatMap(sys => Term.parse(ctxt, "TERM x").check(sys, "Protocol_Pure"))
 
-  val parsed = system.flatMap(_.run(Expr.fromString[Prop](thy, "TERM x"), "Protocol_Pure"))
-  val parseFailed = system.flatMap(_.run(Expr.fromString[Prop](thy, "TERM"), "Protocol_Pure"))
+  val parsed = system.flatMap(_.run(Expr.fromString[Prop](ctxt, "TERM x"), "Protocol_Pure"))
+  val parseFailed = system.flatMap(_.run(Expr.fromString[Prop](ctxt, "TERM"), "Protocol_Pure"))
 
 
   // Loading auxiliary files
