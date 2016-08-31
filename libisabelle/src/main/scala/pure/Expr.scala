@@ -41,7 +41,7 @@ final case class Expr[T] private[isabelle](term: Term) {
   private def copy = this
 
   def recheck(thy: MLExpr[Theory])(implicit T: Typeable[T]): Program[Expr[T]] =
-    MLProg.unsafeExpr(MLExpr.the(MLExpr.checkTerm(MLExpr.initGlobal(thy), term.constrain(Typeable[T].typ))), "term").map(Expr[T])
+    MLProg.unsafeExpr(MLExpr.the(MLExpr.checkTerm(MLExpr.initGlobal(thy), term.constrain(Typeable[T].typ)))).map(Expr[T])
 
   def unembed(thy: MLExpr[Theory])(implicit T: Embeddable[T]): Program[Option[T]] =
     T.unembed(thy, term)
@@ -52,14 +52,14 @@ object Expr {
   def ofString[T : Typeable](thy: MLExpr[Theory], term: String): Program[Option[Expr[T]]] = {
     val ctxt = MLExpr.initGlobal(thy)
 
-    MLProg.unsafeExpr(MLExpr.parseTerm(ctxt, term), "term option").flatMap {
+    MLProg.unsafeExpr(MLExpr.parseTerm(ctxt, term)).flatMap {
       case None => MLProg.pure(Option.empty[Term])
-      case Some(term) => MLProg.unsafeExpr(MLExpr.checkTerm(ctxt, term.constrain(Typeable[T].typ)), "term option")
+      case Some(term) => MLProg.unsafeExpr(MLExpr.checkTerm(ctxt, term.constrain(Typeable[T].typ)))
     }.map(_.map(Expr[T](_)))
   }
 
   def ofTerm[T : Typeable](thy: MLExpr[Theory], term: Term): Program[Option[Expr[T]]] =
-    MLProg.unsafeExpr(MLExpr.checkTerm(MLExpr.initGlobal(thy), term.constrain(Typeable[T].typ)), "term option").map(_.map(Expr[T]))
+    MLProg.unsafeExpr(MLExpr.checkTerm(MLExpr.initGlobal(thy), term.constrain(Typeable[T].typ))).map(_.map(Expr[T]))
 
   def embed[T : Embeddable](thy: MLExpr[Theory], t: T): Program[Expr[T]] =
     Embeddable[T].embed(thy, t).map(Expr[T](_)).flatMap(_.recheck(thy))

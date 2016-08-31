@@ -181,9 +181,7 @@ fun exn_result a =
   let
     fun enc (Exn.Res t) = (0, encode a t)
       | enc (Exn.Exn e) = (1, encode exn e)
-    fun dec 0 = SOME (decode a #> map_result Exn.Res)
-      | dec 1 = SOME (decode exn #> map_result Exn.Exn)
-      | dec _ = NONE
+    fun dec _ = NONE
   in variant enc dec "Exn.result" end
 
 fun triple a b c =
@@ -215,7 +213,7 @@ fun typ () =
       | dec 1 = SOME (decode typ_tfree #> map_result TFree)
       | dec 2 = SOME (decode typ_tvar #> map_result TVar)
       | dec _ = NONE
-  in variant enc dec "Pure.typ" end
+  in variant enc dec "typ" end
 
 val typ = typ ()
 
@@ -241,7 +239,7 @@ fun term () =
       | dec 4 = SOME (decode (term_abs ()) #> map_result Abs)
       | dec 5 = SOME (decode (term_app ()) #> map_result op $)
       | dec _ = NONE
-  in variant enc dec "Pure.term" end
+  in variant enc dec "term" end
 
 val term = term ()
 

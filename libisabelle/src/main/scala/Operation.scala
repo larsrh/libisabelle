@@ -35,10 +35,12 @@ object Operation {
   def simple[I, O](name: String, toProver: Codec[I], fromProver: Codec[O]): Operation[I, O] = {
     def exn(input: I) = Codec.text[Exception](
       _.getMessage,
-      str => Some(ProverException(name, str, input))
+      str => Some(ProverException(name, str, input)),
+      "exn"
     ).tagged("exn")
 
     def proverResult(input: I) = new Codec.Variant[ProverResult[O]]("Exn.result") {
+      val mlType = "Exn.result"
       def enc(a: ProverResult[O]) = sys.error("impossible")
       def dec(idx: Int) = idx match {
         case 0 => Some(fromProver.decode(_).right.map(ProverResult.Success.apply))

@@ -6,7 +6,9 @@ import info.hupel.isabelle.Codec
 import info.hupel.isabelle.api._
 
 object Typ {
-  implicit lazy val typCodec: Codec[Typ] = new Codec.Variant[Typ]("Pure.typ") {
+  implicit lazy val typCodec: Codec[Typ] = new Codec.Variant[Typ]("typ") {
+    val mlType = "typ"
+
     lazy val typType = Codec[(String, List[Typ])]
     val typTFree = Codec[(String, Sort)]
     val typTVar = Codec[(Indexname, Sort)]
@@ -39,7 +41,9 @@ final case class TFree(name: String, sort: Sort) extends Typ
 final case class TVar(name: Indexname, sort: Sort) extends Typ
 
 object Term {
-  implicit lazy val termCodec: Codec[Term] = new Codec.Variant[Term]("Pure.term") {
+  implicit lazy val termCodec: Codec[Term] = new Codec.Variant[Term]("term") {
+    val mlType = "term"
+
     val termConst = Codec[(String, Typ)]
     val termFree = Codec[(String, Typ)]
     val termVar = Codec[(Indexname, Typ)]

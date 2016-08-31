@@ -14,9 +14,9 @@ object MLProg {
     def run(sys: System, thyName: String)(implicit ec: ExecutionContext): Future[ProverResult[A]]
   }
 
-  private case class Ex[A](expr: MLExpr[A], typ: String)(implicit A: Codec[A]) extends Instruction[XMLResult[A]] {
+  private case class Ex[A](expr: MLExpr[A])(implicit A: Codec[A]) extends Instruction[XMLResult[A]] {
     def run(sys: System, thyName: String)(implicit ec: ExecutionContext) =
-      expr.eval(sys, typ, expr, thyName)
+      expr.eval(sys, expr, thyName)
   }
 
   private case class Op[I, O](operation: Operation[I, O], input: I) extends Instruction[O] {
@@ -36,11 +36,11 @@ object MLProg {
   def pure[A](a: A): Free[Instruction, A] =
     Free.pure(a)
 
-  def expr[A : Codec](mlExpr: MLExpr[A], typ: String): Free[Instruction, XMLResult[A]] =
-    Free.liftF[Instruction, XMLResult[A]](Ex(mlExpr, typ))
+  def expr[A : Codec](mlExpr: MLExpr[A]): Free[Instruction, XMLResult[A]] =
+    Free.liftF[Instruction, XMLResult[A]](Ex(mlExpr))
 
-  def unsafeExpr[A : Codec](mlExpr: MLExpr[A], typ: String): Free[Instruction, A] =
-    expr(mlExpr, typ) map {
+  def unsafeExpr[A : Codec](mlExpr: MLExpr[A]): Free[Instruction, A] =
+    expr(mlExpr) map {
       case Left((err, body)) => throw DecodingException(err, body)
       case Right(o) => o
     }

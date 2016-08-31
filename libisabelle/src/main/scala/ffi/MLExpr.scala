@@ -10,8 +10,8 @@ import info.hupel.isabelle.pure.Term
 
 sealed abstract class MLExpr[A] {
 
-  def eval(sys: System, typ: String, prog: MLExpr[A], thyName: String)(implicit A: Codec[A], ec: ExecutionContext): Future[ProverResult[XMLResult[A]]] =
-    sys.invoke(MLExpr.EvalMLExpr)((typ, this, thyName)).map(_.map(Codec[A].decode))
+  def eval(sys: System, prog: MLExpr[A], thyName: String)(implicit A: Codec[A], ec: ExecutionContext): Future[ProverResult[XMLResult[A]]] =
+    sys.invoke(MLExpr.EvalMLExpr)((Codec[A].mlType, this, thyName)).map(_.map(Codec[A].decode))
 
 }
 
@@ -19,19 +19,14 @@ object MLExpr {
 
   private case class Lit[A](name: String) extends MLExpr[A]
   private case class App[T, U](f: MLExpr[T => U], x: MLExpr[T]) extends MLExpr[U]
-  private case class Val[T](mlType: String, t: T)(implicit T: Codec[T]) extends MLExpr[T] {
-    def encode = Codec[(String, XML.Tree)].encode((mlType, T.encode(t)))
+  private case class Val[T](t: T)(implicit T: Codec[T]) extends MLExpr[T] {
+    def encode = Codec[(String, XML.Tree)].encode((T.mlType, T.encode(t)))
   }
 
 
-  def int(n: BigInt): MLExpr[BigInt] =
-    Val[BigInt]("int", n)
-
-  def string(s: String): MLExpr[String] =
-    Val[String]("string", s)
-
-  def term(t: Term): MLExpr[Term] =
-    Val[Term]("term", t)
+  def int(n: BigInt): MLExpr[BigInt] = Val(n)
+  def string(s: String): MLExpr[String] = Val(s)
+  def term(t: Term): MLExpr[Term] = Val(t)
 
   def getTheory(name: String): MLExpr[Theory] =
     App(Lit[String => Theory]("Thy_Info.get_theory"), string(name))
@@ -64,6 +59,7 @@ object MLExpr {
     )
 
   private implicit lazy val mlExprCodec: Codec[MLExpr[_]] = new Codec.Variant[MLExpr[_]]("FFI.ml_expr") {
+    val mlType = "FFI.ml_expr"
     protected def dec(idx: Int) = None
     protected def enc(prog: MLExpr[_]) = prog match {
       case Lit(name) => (0, Codec[String].encode(name))

@@ -41,7 +41,8 @@ object Codec {
       Left("indexed tag expected" -> List(tree))
   }
 
-  private[isabelle] def text[A](to: A => String, from: String => Option[A]): Codec[A] = new Codec[A] {
+  private[isabelle] def text[A](to: A => String, from: String => Option[A], mlType0: String): Codec[A] = new Codec[A] {
+    val mlType = mlType0
     // FIXME escape handling
     def encode(t: A) = XML.elem(("text", List("content" -> to(t))), Nil)
     def decode(tree: XML.Tree) = tree match {
@@ -55,11 +56,12 @@ object Codec {
     }
   }
 
-  implicit def string: Codec[String] = text[String](identity, Some.apply).tagged("string")
+  implicit def string: Codec[String] = text[String](identity, Some.apply, "string").tagged("string")
 
   implicit def integer: Codec[BigInt] = text[BigInt](
     _.toString,
-    str => catching(classOf[NumberFormatException]) opt BigInt(str)
+    str => catching(classOf[NumberFormatException]) opt BigInt(str),
+    "int"
   ).tagged("int")
 
   implicit def boolean: Codec[Boolean] = text[Boolean](
@@ -68,10 +70,12 @@ object Codec {
       case "true" => Some(true)
       case "false" => Some(false)
       case _ => None
-    }
+    },
+    "bool"
   ).tagged("bool")
 
   implicit def unit: Codec[Unit] = new Codec[Unit] {
+    val mlType = "unit"
     def encode(u: Unit) = addTag("unit", None, Nil)
     def decode(tree: XML.Tree) =
       expectTag("unit", tree).right.flatMap {
@@ -86,9 +90,10 @@ object Codec {
   implicit def tuple[A : Codec, B : Codec]: Codec[(A, B)] =
     Codec[A] tuple Codec[B]
 
-  implicit def triple[A : Codec, B : Codec, C : Codec]: Codec[(A, B, C)] = Codec[(A, (B, C))].transform(
+  implicit def triple[A : Codec, B : Codec, C : Codec]: Codec[(A, B, C)] = Codec[(A, (B, C))].transform[(A, B, C)](
     { case (a, (b, c)) => (a, b, c)  },
-    { case (a, b, c) => (a, (b, c)) }
+    { case (a, b, c) => (a, (b, c)) },
+    s"(${Codec[A].mlType}) * (${Codec[B].mlType}) * (${Codec[C].mlType})"
   )
 
   /**
@@ -152,6 +157,7 @@ object Codec {
   }
 
   implicit def option[A : Codec]: Codec[Option[A]] = new Variant[Option[A]]("option") {
+    val mlType = s"(${Codec[A].mlType}) option"
     def enc(a: Option[A]) = a match {
       case Some(a) => (0, Codec[A].encode(a))
       case None    => (1, Codec[Unit].encode(()))
@@ -164,6 +170,7 @@ object Codec {
   }
 
   implicit def either[A : Codec, B : Codec]: Codec[Either[A, B]] = new Variant[Either[A, B]]("either") {
+    val mlType = s"(${Codec[A].mlType}, ${Codec[B].mlType}) Codec.either"
     def enc(e: Either[A, B]) = e match {
       case Left(a)  => (0, Codec[A].encode(a))
       case Right(b) => (1, Codec[B].encode(b))
@@ -176,6 +183,7 @@ object Codec {
   }
 
   implicit def tree: Codec[XML.Tree] = new Codec[XML.Tree] {
+    val mlType = "XML.tree"
     def encode(t: XML.Tree) = t
     def decode(tree: XML.Tree) = Right(tree)
   }.tagged("XML.tree")
@@ -217,6 +225,8 @@ object Codec {
  */
 trait Codec[T] { self =>
 
+  val mlType: String
+
   /**
    * Encode a value into an
    * [[info.hupel.isabelle.api.XML.Tree XML tree]].
@@ -244,12 +254,14 @@ trait Codec[T] { self =>
    * After creating a new instance using `transform`, it is recommended to add
    * a new [[tagged tag]].
    */
-  def transform[U](f: T => U, g: U => T): Codec[U] = new Codec[U] {
+  def transform[U](f: T => U, g: U => T, mlType0: String): Codec[U] = new Codec[U] {
+    val mlType = mlType0
     def encode(u: U): XML.Tree = self.encode(g(u))
     def decode(tree: XML.Tree) = self.decode(tree).right.map(f)
   }
 
-  def ptransform[U](f: T => Option[U], g: U => T): Codec[U] = new Codec[U] {
+  def ptransform[U](f: T => Option[U], g: U => T, mlType0: String): Codec[U] = new Codec[U] {
+    val mlType = mlType0
     def encode(u: U): XML.Tree = self.encode(g(u))
     def decode(tree: XML.Tree) = self.decode(tree) match {
       case Left(err) => Left(err)
@@ -259,6 +271,7 @@ trait Codec[T] { self =>
 
   /** Codec for a list of `T`s, tagged with the string `list`. */
   def list: Codec[List[T]] = new Codec[List[T]] {
+    val mlType = s"(${self.mlType}) list"
     def encode(ts: List[T]): XML.Tree =
       Codec.addTag("list", None, ts.map(t => self.encode(t)))
     def decode(tree: XML.Tree) =
@@ -267,6 +280,7 @@ trait Codec[T] { self =>
 
   /** Codec for a pair of `T` and `U`, tagged with the string `tuple`. */
   def tuple[U](that: Codec[U]): Codec[(T, U)] = new Codec[(T, U)] {
+    val mlType = s"(${self.mlType}) * (${that.mlType})"
     def encode(tu: (T, U)): XML.Tree =
       Codec.addTag("tuple", None, List(self.encode(tu._1), that.encode(tu._2)))
     def decode(tree: XML.Tree) =
@@ -288,6 +302,7 @@ trait Codec[T] { self =>
    * tags are distinct, although that is not a requirement.
    */
   def tagged(tag: String): Codec[T] = new Codec[T] {
+    val mlType = self.mlType
     def encode(t: T): XML.Tree =
       Codec.addTag(tag, None, List(self.encode(t)))
     def decode(tree: XML.Tree) =
