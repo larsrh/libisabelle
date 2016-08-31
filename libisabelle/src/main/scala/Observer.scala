@@ -18,6 +18,10 @@ trait ProverResult[+T] {
     case ProverResult.Success(t) => t
     case ProverResult.Failure(exn) => throw exn
   }
+  def toOption: Option[T] = this match {
+    case ProverResult.Success(t) => Some(t)
+    case _ => None
+  }
   def map[U](f: T => U): ProverResult[U] = this match {
     case ProverResult.Success(t) => ProverResult.Success(f(t))
     case fail: ProverResult.Failure => fail

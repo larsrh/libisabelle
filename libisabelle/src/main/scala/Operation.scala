@@ -8,8 +8,6 @@ import scala.util.control.NoStackTrace
 import info.hupel.isabelle.api.XML
 import info.hupel.isabelle.japi.MarkupProcessor
 
-import acyclic.file
-
 /** Combinators for creating [[Operation operations]] and basic operations. */
 object Operation {
 

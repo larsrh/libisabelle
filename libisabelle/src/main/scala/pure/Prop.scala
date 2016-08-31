@@ -1,6 +1,8 @@
 package info.hupel.isabelle.pure
 
-class Prop private(term: Term)
+import acyclic.file
+
+sealed abstract class Prop
 
 object Prop {
   implicit def propTypeable: Typeable[Prop] =

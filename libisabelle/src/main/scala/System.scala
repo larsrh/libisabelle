@@ -8,8 +8,6 @@ import monix.execution.{Cancelable, CancelableFuture}
 
 import info.hupel.isabelle.api._
 
-import acyclic.file
-
 /** Functions to build and create [[System systems]]. */
 object System {
 

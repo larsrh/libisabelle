@@ -6,8 +6,8 @@ import cats.instances.future._
 import cats.data.OptionT
 
 import info.hupel.isabelle._
-
-import acyclic.file
+import info.hupel.isabelle.ffi.MLExpr
+import info.hupel.isabelle.ffi.types._
 
 trait Typeable[T] {
   def typ: Typ
@@ -22,43 +22,48 @@ object Typeable {
   }
 
   implicit def funTypeable[T : Typeable, U : Typeable]: Typeable[T => U] =
-    make(Type("fun", List(typ[T], typ[U])))
+    make(typ[T] -->: typ[U])
 }
 
 trait Embeddable[T] extends Typeable[T] {
-  def embed(thy: Theory, t: T)(implicit ec: ExecutionContext): Future[Term]
+  def embed(thy: MLExpr[Theory], t: T): Program[Term]
+  def unembed(thy: MLExpr[Theory], t: Term): Program[Option[T]]
 }
 
 object Embeddable {
   def apply[T](implicit T: Embeddable[T]) = T
 }
 
-case class Expr[T] private(term: Term) {
+final case class Expr[T] private[isabelle](term: Term) {
   def |>[U](that: Expr[T => U]): Expr[U] =
     Expr(App(that.term, this.term))
+
+  private def copy = this
+
+  def recheck(thy: MLExpr[Theory])(implicit T: Typeable[T]): Program[Expr[T]] =
+    MLProg.unsafeExpr(MLExpr.the(MLExpr.checkTerm(MLExpr.initGlobal(thy), term.constrain(Typeable[T].typ))), "term").map(Expr[T])
+
+  def unembed(thy: MLExpr[Theory])(implicit T: Embeddable[T]): Program[Option[T]] =
+    T.unembed(thy, term)
 }
 
 object Expr {
 
-  implicit def exprCodec[T : Typeable]: Codec[Expr[T]] =
-    Codec[(Term, Typ)].ptransform(
-      { case (term, typ) => if (typ == Typeable.typ[T]) Some(Expr[T](term)) else None },
-      { case Expr(term) => (term, Typeable.typ[T]) }
-    )
+  def ofString[T : Typeable](thy: MLExpr[Theory], term: String): Program[Option[Expr[T]]] = {
+    val ctxt = MLExpr.initGlobal(thy)
 
-  private val ReadTerm = Operation.implicitly[(String, Typ, String), Option[Term]]("read_term")
-  private val CheckTerm = Operation.implicitly[(Term, Typ, String), Option[Term]]("check_term")
+    MLProg.unsafeExpr(MLExpr.parseTerm(ctxt, term), "term option").flatMap {
+      case None => MLProg.pure(Option.empty[Term])
+      case Some(term) => MLProg.unsafeExpr(MLExpr.checkTerm(ctxt, term.constrain(Typeable[T].typ)), "term option")
+    }.map(_.map(Expr[T](_)))
+  }
 
-  private def fromProver[T](result: ProverResult[Option[Term]]): Option[Expr[T]] =
-    result.unsafeGet.map(Expr[T](_))
+  def ofTerm[T : Typeable](thy: MLExpr[Theory], term: Term): Program[Option[Expr[T]]] =
+    MLProg.unsafeExpr(MLExpr.checkTerm(MLExpr.initGlobal(thy), term.constrain(Typeable[T].typ)), "term option").map(_.map(Expr[T]))
 
-  def ofString[T : Typeable](thy: Theory, rawTerm: String)(implicit ec: ExecutionContext): Future[Option[Expr[T]]] =
-    thy.system.invoke(ReadTerm)((rawTerm, Typeable[T].typ, thy.name)).map(fromProver)
+  def embed[T : Embeddable](thy: MLExpr[Theory], t: T): Program[Expr[T]] =
+    Embeddable[T].embed(thy, t).map(Expr[T](_)).flatMap(_.recheck(thy))
 
-  def ofTerm[T : Typeable](thy: Theory, term: Term)(implicit ec: ExecutionContext): Future[Option[Expr[T]]] =
-    thy.system.invoke(CheckTerm)((term, Typeable[T].typ, thy.name)).map(fromProver)
-
-  def embed[T : Embeddable](thy: Theory, t: T)(implicit ec: ExecutionContext): Future[Expr[T]] =
-    Embeddable[T].embed(thy, t).map(Expr[T](_))
+  def unsafeOfTerm[T](term: Term): Expr[T] = Expr(term)
 
 }

@@ -38,6 +38,7 @@ in
 end
 \<close>
 
+ML_file "typed_eval.ML"
 ML_file "codec.ML"
 ML_file "protocol.ML"
 

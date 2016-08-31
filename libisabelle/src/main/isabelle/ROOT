@@ -2,11 +2,10 @@ session Protocol = Classy +
   theories
     "protocol/Protocol"
     "protocol/Codec_Test"
-    "operations/Basic"
+    "Protocol_Pure"
 
 session "HOL-Protocol" = "HOL-Classy" +
   theories
     "protocol/Protocol"
     "protocol/Codec_Test"
-    "operations/Basic"
-    "operations/HOL_Operations"
+    "Protocol_Main"

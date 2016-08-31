@@ -124,6 +124,7 @@ lazy val libisabelle = project
   .settings(Seq(
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % "0.7.0",
+      "org.typelevel" %% "cats-free" % "0.7.0",
       "io.monix" %% "monix-execution" % "2.0-RC13",
       "com.lihaoyi" %% "scalatags" % "0.6.0"
     )
@@ -244,8 +245,10 @@ lazy val workbench = project.in(file("workbench"))
     initialCommands in console := """
       import info.hupel.isabelle._
       import info.hupel.isabelle.api._
-      import info.hupel.isabelle.pure._
+      import info.hupel.isabelle.ffi._
+      import info.hupel.isabelle.ffi.types._
       import info.hupel.isabelle.hol._
+      import info.hupel.isabelle.pure._
       import info.hupel.isabelle.setup._
       import scala.concurrent.duration.Duration
       import scala.concurrent.Await
@@ -259,7 +262,7 @@ lazy val workbench = project.in(file("workbench"))
       System.build(env, config)
       val system = Await.result(System.create(env, config), Duration.Inf)
 
-      val main = Theory(system, "Main")"""
+      val main = MLExpr.getTheory("Main")"""
   )
 
 

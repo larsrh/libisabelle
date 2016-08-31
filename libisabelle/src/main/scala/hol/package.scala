@@ -3,9 +3,14 @@ package info.hupel.isabelle
 import scala.concurrent.{ExecutionContext, Future}
 import scala.math.BigInt
 
-import info.hupel.isabelle.pure._
+import cats.instances.option._
+import cats.instances.list._
+import cats.syntax.traverse._
 
-import acyclic.file
+import info.hupel.isabelle._
+import info.hupel.isabelle.ffi.MLExpr
+import info.hupel.isabelle.ffi.types._
+import info.hupel.isabelle.pure._
 
 package hol {
   private class ListTypeable[T : Typeable] extends Typeable[List[T]] {
@@ -22,33 +27,67 @@ package object hol extends LowPriorityImplicits {
   private val MkInt = Operation.implicitly[BigInt, Term]("mk_int")
   private val MkList = Operation.implicitly[(Typ, List[Term]), Term]("mk_list")
 
+  private val DestInt = Operation.implicitly[Term, Option[BigInt]]("dest_int")
+  private val DestList = Operation.implicitly[Term, Option[List[Term]]]("dest_list")
+
   implicit def bigIntTypeable: Embeddable[BigInt] = new Embeddable[BigInt] {
     def typ: Typ = Type("Int.int", Nil)
-    def embed(thy: Theory, t: BigInt)(implicit ec: ExecutionContext): Future[Term] =
-      thy.system.invoke(MkInt)(t) map {
-        case ProverResult.Failure(exn) => throw exn
-        case ProverResult.Success(t) => t
-      }
+    def embed(thy: MLExpr[Theory], t: BigInt) =
+      MLProg.operation(MkInt, t)
+    def unembed(thy: MLExpr[Theory], t: Term) =
+      MLProg.operation(DestInt, t)
   }
 
   implicit def boolTypeable: Embeddable[Boolean] = new Embeddable[Boolean] {
-    def typ: Typ = Type("HOL.bool", Nil)
-    def embed(thy: Theory, t: Boolean)(implicit ec: ExecutionContext): Future[Term] = Future.successful {
+    def typ: Typ = HOLogic.boolT
+    def embed(thy: MLExpr[Theory], t: Boolean) = MLProg.pure {
       t match {
-        case true => Const("HOL.True", typ)
-        case false => Const("HOL.False", typ)
+        case true => HOLogic.True
+        case false => HOLogic.False
+      }
+    }
+    def unembed(thy: MLExpr[Theory], t: Term) = MLProg.pure {
+      t match {
+        case HOLogic.True => Some(true)
+        case HOLogic.False => Some(false)
+        case _ => None
       }
     }
   }
 
   implicit def listEmbeddable[T : Embeddable]: Embeddable[List[T]] = new ListTypeable[T] with Embeddable[List[T]] {
-    def embed(thy: Theory, ts: List[T])(implicit ec: ExecutionContext): Future[Term] =
-      Future.traverse(ts)(Embeddable[T].embed(thy, _)) flatMap { ts =>
-        thy.system.invoke(MkList)((Typeable.typ[T], ts))
-      } map {
-        case ProverResult.Failure(exn) => throw exn
-        case ProverResult.Success(t) => t
+    def embed(thy: MLExpr[Theory], ts: List[T]) =
+      ts.traverse(Embeddable[T].embed(thy, _)) flatMap { ts =>
+        MLProg.operation(MkList, ((Typeable.typ[T], ts)))
       }
+
+    def unembed(thy: MLExpr[Theory], t: Term) =
+      MLProg.operation(DestList, t) flatMap {
+        case None => MLProg.pure(None)
+        case Some(ts) => ts.traverse(Embeddable[T].unembed(thy, _)).map(_.sequence)
+      }
+  }
+
+  implicit class BoolExprOps(t: Expr[Boolean]) {
+    def ∧(u: Expr[Boolean]): Expr[Boolean] =
+      Expr(HOLogic.conj $ t.term $ u.term)
+
+    def &(u: Expr[Boolean]): Expr[Boolean] = t ∧ u
+
+    def ∨(u: Expr[Boolean]): Expr[Boolean] =
+      Expr(HOLogic.disj $ t.term $ u.term)
+
+    def |(u: Expr[Boolean]): Expr[Boolean] = t ∨ u
+
+    def →(u: Expr[Boolean]): Expr[Boolean] =
+      Expr(HOLogic.imp $ t.term $ u.term)
+
+    def -->(u: Expr[Boolean]): Expr[Boolean] = t → u
+  }
+
+  implicit class HOLExprOps[A](t: Expr[A]) {
+    def ≡(u: Expr[A])(implicit A: Typeable[A]): Expr[Boolean] =
+      Expr(HOLogic.equ(A.typ) $ t.term $ u.term)
   }
 
 }

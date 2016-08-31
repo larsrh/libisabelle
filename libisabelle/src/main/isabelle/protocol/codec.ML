@@ -13,6 +13,7 @@ signature CODEC = sig
   val transform: ('a -> 'b) -> ('b -> 'a) -> 'a codec -> 'b codec
   val encode: 'a codec -> 'a -> XML.tree
   val decode: 'a codec -> XML.tree -> 'a result
+  val the_decode: 'a codec -> XML.tree -> 'a
 
   val basic: {encode: 'a -> XML.tree, decode: XML.tree -> 'a result} -> 'a codec
 
@@ -38,7 +39,8 @@ signature CODEC = sig
   val exn: exn codec
   val exn_result: 'a codec -> 'a Exn.result codec
 
-  val id: XML.tree codec (* internal *)
+ (* internal *)
+  val id: XML.tree codec
 end
 
 structure Codec: CODEC = struct
@@ -146,6 +148,8 @@ fun text to from = Codec
 val id = Codec {encode = I, decode = Success}
 
 end
+
+fun the_decode c = the_success o decode c
 
 val int = tagged "int" (text Markup.print_int (Exn.get_res o Exn.capture Markup.parse_int))
 val bool = tagged "bool" (text Markup.print_bool (Exn.get_res o Exn.capture Markup.parse_bool))

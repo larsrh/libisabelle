@@ -9,8 +9,6 @@ import cats.syntax.traverse._
 
 import info.hupel.isabelle.api._
 
-import acyclic.file
-
 /** Combinators for [[Codec codecs]]. */
 object Codec {
 

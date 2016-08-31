@@ -11,8 +11,9 @@ import org.specs2.specification.core.Env
 
 import info.hupel.isabelle._
 import info.hupel.isabelle.api._
-import info.hupel.isabelle.pure._
+import info.hupel.isabelle.ffi._
 import info.hupel.isabelle.hol._
+import info.hupel.isabelle.pure._
 
 class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetup with IsabelleMatchers { def is = s2"""
 
@@ -38,10 +39,10 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
 
   // Pure/HOL operations
 
-  val theory = system.map(Theory(_, "Pure"))
+  val thy = MLExpr.getTheory("Pure")
 
-  val parsed = theory.flatMap(Expr.ofString[Prop](_, "TERM x"))
-  val parseFailed = theory.flatMap(Expr.ofString[Prop](_, "+"))
+  val parsed = system.flatMap(sys => MLProg.run(Expr.ofString[Prop](thy, "TERM x"), sys, "Protocol_Pure"))
+  val parseFailed = system.flatMap(sys => MLProg.run(Expr.ofString[Prop](thy, "TERM"), sys, "Protocol_Pure"))
 
 
   // Loading auxiliary files

@@ -5,8 +5,6 @@ import scala.math.BigInt
 import info.hupel.isabelle.Codec
 import info.hupel.isabelle.api._
 
-import acyclic.file
-
 object Typ {
   implicit lazy val typCodec: Codec[Typ] = new Codec.Variant[Typ]("Pure.typ") {
     lazy val typType = Codec[(String, List[Typ])]
@@ -27,10 +25,15 @@ object Typ {
     }
   }
 
-  val dummyT = Type("dummy", Nil)
+  val dummyT: Typ = Type("dummy", Nil)
+  def funT(t: Typ, u: Typ): Typ = Type("fun", List(t, u))
 }
 
-sealed abstract class Typ
+sealed abstract class Typ {
+  def -->:(that: Typ) = Typ.funT(that, this)
+  def --->:(thats: List[Typ]) = thats.foldRight(this)(_ -->: _)
+}
+
 final case class Type(name: String, args: List[Typ] = Nil) extends Typ
 final case class TFree(name: String, sort: Sort) extends Typ
 final case class TVar(name: Indexname, sort: Sort) extends Typ
@@ -65,7 +68,15 @@ object Term {
   }
 }
 
-sealed abstract class Term
+sealed abstract class Term {
+  def $(that: Term): Term = App(this, that)
+
+  def constrain(typ: Typ): Term = typ match {
+    case Typ.dummyT => this
+    case _ => Const ("_type_constraint_", typ -->: typ) $ this
+  }
+}
+
 final case class Const(name: String, typ: Typ) extends Term
 final case class Free(name: String, typ: Typ) extends Term
 final case class Var(name: Indexname, typ: Typ) extends Term

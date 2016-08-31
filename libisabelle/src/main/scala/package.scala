@@ -3,11 +3,11 @@ package info.hupel
 import scala.concurrent._
 import scala.util._
 
-import info.hupel.isabelle.api.XML
+import cats.free.Free
 
 import scalatags.Text
 
-import acyclic.file
+import info.hupel.isabelle.api.XML
 
 package object isabelle {
 
@@ -19,5 +19,7 @@ package object isabelle {
   type XMLResult[+A] = Either[(String, XML.Body), A]
 
   type HTML = Text.TypedTag[String]
+
+  type Program[A] = Free[MLProg.Instruction, A]
 
 }
