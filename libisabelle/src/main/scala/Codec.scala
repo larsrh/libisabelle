@@ -45,9 +45,9 @@ object Codec {
 
   private[isabelle] def text[A](to: A => String, from: String => Option[A]): Codec[A] = new Codec[A] {
     // FIXME escape handling
-    def encode(t: A) = XML.text(to(t))
+    def encode(t: A) = XML.elem(("text", List("content" -> to(t))), Nil)
     def decode(tree: XML.Tree) = tree match {
-      case XML.Text(content) =>
+      case XML.Elem(("text", List(("content", content))), Nil) =>
         from(content) match {
           case Some(a) => Right(a)
           case None => Left("decoding failed" -> List(tree))
@@ -148,7 +148,7 @@ object Codec {
           case None => Left(s"invalid index $idx" -> List(tree))
         }
       case _ =>
-        Left("invalid structure" -> List(tree))
+        Left(s"invalid structure in variant $tag" -> List(tree))
     }
 
   }
@@ -276,7 +276,7 @@ trait Codec[T] { self =>
         case List(x, y) =>
           for { t <- self.decode(x).right; u <- that.decode(y).right } yield (t, u)
         case body =>
-          Left("invalid structure" -> body)
+          Left("invalid structure in tuple" -> body)
       }
   }
 
@@ -295,7 +295,7 @@ trait Codec[T] { self =>
     def decode(tree: XML.Tree) =
       Codec.expectTag(tag, tree).right.flatMap {
         case List(tree) => self.decode(tree)
-        case body => Left("invalid structure" -> body)
+        case body => Left(s"invalid structure in tagged $tag" -> body)
       }
   }
 

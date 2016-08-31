@@ -135,10 +135,10 @@ val unit = Codec
      | _ => Failure ("expected nothing", body))}
 
 fun text to from = Codec
-  {encode = XML.Text o to,
+  {encode = fn s => XML.Elem (("text", [("content", encode_string (to s))]), []),
    decode =
-    (fn tree as XML.Text content =>
-          (case from content of
+    (fn tree as XML.Elem (("text", [("content", s)]), []) =>
+          (case from (decode_string s) of
             NONE => Failure ("decoding failed", [tree]) |
             SOME a => Success a)
       | tree => Failure ("expected text tree", [tree]))}

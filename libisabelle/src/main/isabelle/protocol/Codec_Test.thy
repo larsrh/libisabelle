@@ -5,9 +5,14 @@ begin
 ML\<open>
 fun check_for str =
   let
-    val prop =
+    val prop1 =
       "ALL x. (let val c = (" ^ str ^ ") in Codec.decode c (Codec.encode c x) = Codec.Success x end)"
-  in check_property prop end
+    val prop2 =
+      "ALL x. (let val c = (" ^ str ^ ") in Codec.decode c (YXML.parse (YXML.string_of (Codec.encode c x))) = Codec.Success x end)"
+  in
+    check_property prop1;
+    check_property prop2
+  end
 
 fun gen_unit r =
   ((), r)
