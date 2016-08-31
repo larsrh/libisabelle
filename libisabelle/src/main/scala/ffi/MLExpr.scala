@@ -10,8 +10,15 @@ import info.hupel.isabelle.pure.Term
 
 sealed abstract class MLExpr[A] {
 
-  def eval(sys: System, prog: MLExpr[A], thyName: String)(implicit A: Codec[A], ec: ExecutionContext): Future[ProverResult[XMLResult[A]]] =
-    sys.invoke(MLExpr.EvalMLExpr)((Codec[A].mlType, this, thyName)).map(_.map(Codec[A].decode))
+  def eval(sys: System, prog: MLExpr[A], thyName: String)(implicit A: Codec[A], ec: ExecutionContext): Future[ProverResult[A]] =
+    sys.invoke(MLExpr.EvalMLExpr)((Codec[A].mlType, this, thyName)).map(_.map { tree =>
+      Codec[A].decode(tree) match {
+        case Left((err, body)) => throw DecodingException(err, body)
+        case Right(o) => o
+      }
+    })
+
+  def toProg(implicit A: Codec[A]): Program[A] = MLProg.expr(this)
 
 }
 

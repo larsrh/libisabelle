@@ -4,6 +4,10 @@ import scala.concurrent._
 import scala.util.control.Exception._
 import scala.util.control.NoStackTrace
 
+import cats.arrow.FunctionK
+import cats.data.EitherT
+import cats.instances.future._
+
 import monix.execution.{Cancelable, CancelableFuture}
 
 import info.hupel.isabelle.api._
@@ -234,6 +238,14 @@ final class System private(val env: Environment, config: Configuration) {
       env.sendCommand(session, "libisabelle_cancel", List(count0.toString))
     }
     CancelableFuture(promise.future, cancel)
+  }
+
+  def run[A](prog: Program[A], thyName: String): Future[A] = {
+    val interpreter = new FunctionK[MLProg.Instruction, Future] {
+      def apply[T](instruction: MLProg.Instruction[T]) =
+        instruction.run(System.this, thyName).map(_.unsafeGet)
+    }
+    prog.foldMap(interpreter)
   }
 
 }

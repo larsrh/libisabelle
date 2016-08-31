@@ -41,8 +41,8 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
 
   val thy = MLExpr.getTheory("Pure")
 
-  val parsed = system.flatMap(sys => MLProg.run(Expr.ofString[Prop](thy, "TERM x"), sys, "Protocol_Pure"))
-  val parseFailed = system.flatMap(sys => MLProg.run(Expr.ofString[Prop](thy, "TERM"), sys, "Protocol_Pure"))
+  val parsed = system.flatMap(_.run(Expr.fromString[Prop](thy, "TERM x"), "Protocol_Pure"))
+  val parseFailed = system.flatMap(_.run(Expr.fromString[Prop](thy, "TERM"), "Protocol_Pure"))
 
 
   // Loading auxiliary files
