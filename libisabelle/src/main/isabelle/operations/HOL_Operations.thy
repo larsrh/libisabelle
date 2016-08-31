@@ -7,10 +7,6 @@ operation_setup mk_int = \<open>
    to_lib = Codec.term,
    action = HOLogic.mk_number @{typ int}}\<close>
 
-operation_setup mk_list = \<open>
-  {from_lib = Codec.tuple Codec.typ (Codec.list Codec.term),
-   to_lib = Codec.term,
-   action = uncurry HOLogic.mk_list}
-\<close>
+operation_setup (auto) mk_list = \<open>uncurry HOLogic.mk_list\<close>
 
 end
