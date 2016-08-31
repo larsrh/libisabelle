@@ -41,8 +41,7 @@ final case class Expr[T] private[isabelle](term: Term) {
   private def copy = this
 
   def recheck(thy: MLExpr[Theory])(implicit T: Typeable[T]): Program[Expr[T]] =
-    MLExpr.the(MLExpr.checkTerm(MLExpr.initGlobal(thy), term.constrain(Typeable[T].typ)))
-      .toProg.map(Expr[T])
+    Expr.fromTerm(thy, term).map(_.get)
 
   def unembed(thy: MLExpr[Theory])(implicit T: Embeddable[T]): Program[Option[T]] =
     T.unembed(thy, term)
@@ -50,19 +49,16 @@ final case class Expr[T] private[isabelle](term: Term) {
 
 object Expr {
 
-  def fromString[T : Typeable](thy: MLExpr[Theory], term: String): Program[Option[Expr[T]]] = {
-    val ctxt = MLExpr.initGlobal(thy)
-
-    MLExpr.parseTerm(ctxt, term).toProg.flatMap {
-      case None => MLProg.pure(Option.empty[Term])
-      case Some(term) => MLExpr.checkTerm(ctxt, term.constrain(Typeable[T].typ)).toProg
-    }.map(_.map(Expr[T](_)))
-  }
-
   def fromTerm[T : Typeable](thy: MLExpr[Theory], term: Term): Program[Option[Expr[T]]] =
-    MLExpr.checkTerm(MLExpr.initGlobal(thy), term.constrain(Typeable[T].typ))
-      .toProg
-      .map(_.map(Expr[T]))
+    term.constrain[T].check(Context.initGlobal(thy)).toProg.map(_.map(Expr[T]))
+
+  def fromString[T : Typeable](thy: MLExpr[Theory], term: String): Program[Option[Expr[T]]] =
+    Term.parse(Context.initGlobal(thy), term).toProg.flatMap {
+      case None =>
+        MLProg.pure(Option.empty[Expr[T]])
+      case Some(term) =>
+        fromTerm(thy, term)
+    }
 
   def embed[T : Embeddable](thy: MLExpr[Theory], t: T): Program[Expr[T]] =
     Embeddable[T].embed(thy, t).map(Expr[T](_)).flatMap(_.recheck(thy))

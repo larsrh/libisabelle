@@ -11,7 +11,7 @@ import org.specs2.specification.core.Env
 
 import info.hupel.isabelle._
 import info.hupel.isabelle.api._
-import info.hupel.isabelle.ffi._
+import info.hupel.isabelle.ffi.types._
 import info.hupel.isabelle.hol._
 import info.hupel.isabelle.pure._
 
@@ -39,7 +39,7 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
 
   // Pure/HOL operations
 
-  val thy = MLExpr.getTheory("Pure")
+  val thy = Theory.get("Pure")
 
   val parsed = system.flatMap(_.run(Expr.fromString[Prop](thy, "TERM x"), "Protocol_Pure"))
   val parseFailed = system.flatMap(_.run(Expr.fromString[Prop](thy, "TERM"), "Protocol_Pure"))

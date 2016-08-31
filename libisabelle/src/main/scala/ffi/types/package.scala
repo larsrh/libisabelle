@@ -1,16 +1,20 @@
 package info.hupel.isabelle.ffi
 
-import shapeless.Witness
-
 package object types {
 
-  val Theory = Witness("theory")
-  type Theory = Theory.T
+  object Theory {
+    def get(name: String): MLExpr[Theory] =
+      MLExpr.uncheckedLiteral[String => Theory]("Thy_Info.get_theory")(name)
+  }
+  type Theory = Theory.type
 
-  val Context = Witness("context")
-  type Context = Context.T
+  object Context {
+    def initGlobal(thy: MLExpr[Theory]): MLExpr[Context] =
+      MLExpr.uncheckedLiteral[Theory => Context]("Proof_Context.init_global")(thy)
+  }
+  type Context = Context.type
 
-  val CTerm = Witness("cterm")
-  type CTerm = CTerm.T
+  object CTerm
+  type CTerm = CTerm.type
 
 }

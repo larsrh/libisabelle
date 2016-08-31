@@ -10,7 +10,7 @@ import info.hupel.isabelle.pure.Term
 
 sealed abstract class MLExpr[A] {
 
-  def eval(sys: System, prog: MLExpr[A], thyName: String)(implicit A: Codec[A], ec: ExecutionContext): Future[ProverResult[A]] =
+  def eval(sys: System, thyName: String)(implicit A: Codec[A], ec: ExecutionContext): Future[ProverResult[A]] =
     sys.invoke(MLExpr.EvalMLExpr)((Codec[A].mlType, this, thyName)).map(_.map { tree =>
       Codec[A].decode(tree) match {
         case Left((err, body)) => throw DecodingException(err, body)
@@ -24,52 +24,30 @@ sealed abstract class MLExpr[A] {
 
 object MLExpr {
 
-  private case class Lit[A](name: String) extends MLExpr[A]
+  implicit class MLExprFunOps[B, C](fun: MLExpr[B => C]) {
+    def apply(arg: MLExpr[B]): MLExpr[C] =
+      App(fun, arg)
+    def apply(b: B)(implicit B: Codec[B]): MLExpr[C] =
+      apply(value(b))
+    def liftTry: MLExpr[B => Option[C]] =
+      uncheckedLiteral[(B => C) => B => Option[C]]("try")(fun)
+  }
+
+  private case class Lit[A](text: String) extends MLExpr[A]
   private case class App[T, U](f: MLExpr[T => U], x: MLExpr[T]) extends MLExpr[U]
   private case class Val[T](t: T)(implicit T: Codec[T]) extends MLExpr[T] {
     def encode = Codec[(String, XML.Tree)].encode((T.mlType, T.encode(t)))
   }
 
+  def value[T](t: T)(implicit T: Codec[T]): MLExpr[T] = Val[T](t)
+  def uncheckedLiteral[A](text: String): MLExpr[A] = Lit[A](text)
 
-  def int(n: BigInt): MLExpr[BigInt] = Val(n)
-  def string(s: String): MLExpr[String] = Val(s)
-  def term(t: Term): MLExpr[Term] = Val(t)
-
-  def getTheory(name: String): MLExpr[Theory] =
-    App(Lit[String => Theory]("Thy_Info.get_theory"), string(name))
-
-  def initGlobal(thy: MLExpr[Theory]): MLExpr[Context] =
-    App(Lit[Theory => Context]("Proof_Context.init_global"), thy)
-
-  def tryApp[T, U](f: MLExpr[T => U], x: MLExpr[T]): MLExpr[Option[U]] =
-    App(App(Lit[(T => U) => T => Option[U]]("try"), f), x)
-
-  def the[T](expr: MLExpr[Option[T]]): MLExpr[T] =
-    App(Lit[Option[T] => T]("the"), expr)
-
-  def parseTerm(ctxt: MLExpr[Context], term: String): MLExpr[Option[Term]] =
-    tryApp(
-      App(Lit[Context => String => Term]("Syntax.parse_term"), ctxt),
-      string(term)
-    )
-
-  def checkTerm(ctxt: MLExpr[Context], t: Term): MLExpr[Option[Term]] =
-    tryApp(
-      App(Lit[Context => Term => Term]("Syntax.check_term"), ctxt),
-      term(t)
-    )
-
-  def readTerm(ctxt: MLExpr[Context], term: String): MLExpr[Option[Term]] =
-    tryApp(
-      App(Lit[Context => String => Term]("Syntax.read_term"), ctxt),
-      string(term)
-    )
 
   private implicit lazy val mlExprCodec: Codec[MLExpr[_]] = new Codec.Variant[MLExpr[_]]("FFI.ml_expr") {
     val mlType = "FFI.ml_expr"
     protected def dec(idx: Int) = None
     protected def enc(prog: MLExpr[_]) = prog match {
-      case Lit(name) => (0, Codec[String].encode(name))
+      case Lit(text) => (0, Codec[String].encode(text))
       case App(f, x) => (1, (mlExprCodec tuple mlExprCodec).encode((f, x)))
       case v: Val[_] => (2, v.encode)
     }

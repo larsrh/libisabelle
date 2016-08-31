@@ -4,6 +4,8 @@ import scala.math.BigInt
 
 import info.hupel.isabelle.Codec
 import info.hupel.isabelle.api._
+import info.hupel.isabelle.ffi.MLExpr
+import info.hupel.isabelle.ffi.types._
 
 object Typ {
   implicit lazy val typCodec: Codec[Typ] = new Codec.Variant[Typ]("typ") {
@@ -70,6 +72,13 @@ object Term {
       case _ => None
     }
   }
+
+
+  def parse(ctxt: MLExpr[Context], term: String): MLExpr[Option[Term]] =
+    MLExpr.uncheckedLiteral[Context => String => Term]("Syntax.parse_term")(ctxt).liftTry(term)
+
+  def read(ctxt: MLExpr[Context], term: String): MLExpr[Option[Term]] =
+    MLExpr.uncheckedLiteral[Context => String => Term]("Syntax.read_term")(ctxt).liftTry(term)
 }
 
 sealed abstract class Term {
@@ -79,6 +88,11 @@ sealed abstract class Term {
     case Typ.dummyT => this
     case _ => Const ("_type_constraint_", typ -->: typ) $ this
   }
+
+  def constrain[T : Typeable]: Term = constrain(Typeable[T].typ)
+
+  def check(ctxt: MLExpr[Context]): MLExpr[Option[Term]] =
+    MLExpr.uncheckedLiteral[Context => Term => Term]("Syntax.check_term")(ctxt).liftTry(this)
 }
 
 final case class Const(name: String, typ: Typ) extends Term

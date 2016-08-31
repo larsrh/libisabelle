@@ -262,7 +262,7 @@ lazy val workbench = project.in(file("workbench"))
       System.build(env, config)
       val system = Await.result(System.create(env, config), Duration.Inf)
 
-      val main = MLExpr.getTheory("Main")"""
+      val main = Theory.get("Main")"""
   )
 
 

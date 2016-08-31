@@ -14,7 +14,7 @@ object MLProg {
 
   private case class Ex[A](expr: MLExpr[A])(implicit A: Codec[A]) extends Instruction[A] {
     def run(sys: System, thyName: String)(implicit ec: ExecutionContext) =
-      expr.eval(sys, expr, thyName)
+      expr.eval(sys, thyName)
   }
 
   private case class Op[I, O](operation: Operation[I, O], input: I) extends Instruction[O] {
