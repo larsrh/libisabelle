@@ -10,8 +10,6 @@ import info.hupel.isabelle.api._
 import scalatags.Text.all._
 import shapeless.tag
 
-import acyclic.file
-
 private[isabelle] final case class CodepointIterator(string: String, offset: Int) {
   def get: Option[(Int, CodepointIterator)] =
     if (offset < string.length) {

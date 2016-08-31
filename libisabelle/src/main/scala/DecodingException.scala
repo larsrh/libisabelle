@@ -2,8 +2,6 @@ package info.hupel.isabelle
 
 import info.hupel.isabelle.api.XML
 
-import acyclic.file
-
 /**
  * Error case of [[XMLResult]] as an exception.
  *

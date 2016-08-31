@@ -1,7 +1,5 @@
 package info.hupel.isabelle.pure
 
-import acyclic.file
-
 sealed abstract class Prop
 
 object Prop {
