@@ -43,11 +43,41 @@ object Codec {
 
   private[isabelle] def text[A](to: A => String, from: String => Option[A], mlType0: String): Codec[A] = new Codec[A] {
     val mlType = mlType0
-    // FIXME escape handling
-    def encode(t: A) = XML.elem(("text", List("content" -> to(t))), Nil)
+
+    def escape(c: Char) = c match {
+      case '<' => "&lt;"
+      case '>' => "&gt;"
+      case '&' => "&amp;"
+      case '\'' => "&apos;"
+      case '"' => "&quot;"
+      case _ =>
+        val n = c.toInt
+        if (n < 32) s"&#$n;"
+        else if (n < 127) c.toString
+        else s"&#$n;"
+    }
+
+    val EntityPrefix = "&([^;]*);(.*)".r
+
+    def unescapeSingle(s: String) = s match {
+      case "lt" => '<'
+      case "gt" => '>'
+      case "amp" => '&'
+      case "apos" => '\''
+      case "quot" => '"'
+      case _ if s.startsWith("#") => s.tail.toInt.toChar
+    }
+
+    def unescape(s: String): String = s match {
+      case "" => ""
+      case EntityPrefix(entity, rest) => unescapeSingle(entity).toString + unescape(rest)
+      case _ => s.head.toString + unescape(s.tail)
+    }
+
+    def encode(t: A) = XML.elem(("text", List("content" -> to(t).flatMap(escape))), Nil)
     def decode(tree: XML.Tree) = tree match {
       case XML.Elem(("text", List(("content", content))), Nil) =>
-        from(content) match {
+        from(unescape(content)) match {
           case Some(a) => Right(a)
           case None => Left("decoding failed" -> List(tree))
         }
