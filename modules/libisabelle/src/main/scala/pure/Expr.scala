@@ -34,7 +34,8 @@ object Embeddable {
   def apply[T](implicit T: Embeddable[T]) = T
 }
 
-final case class Expr[T] private[isabelle](term: Term) {
+final case class Expr[T] private[isabelle](val term: Term) {
+
   def |>[U](that: Expr[T => U]): Expr[U] =
     Expr(App(that.term, this.term))
 
@@ -51,6 +52,10 @@ final case class Expr[T] private[isabelle](term: Term) {
 
   def typedCertify(ctxt: MLExpr[Context]): MLExpr[CExpr[T]] =
     untypedCertify(ctxt).coerce[CExpr[T]]
+
+  def evaluate(ctxt: MLExpr[Context]): Program[Expr[T]] =
+    term.evaluate(ctxt).toProg.map(Expr[T])
+
 }
 
 object Expr {

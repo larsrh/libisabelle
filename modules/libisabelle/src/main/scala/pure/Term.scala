@@ -98,6 +98,9 @@ sealed abstract class Term {
   def certify(ctxt: MLExpr[Context]): MLExpr[Option[CTerm]] =
     MLExpr.uncheckedLiteral[Context => Term => CTerm]("Thm.cterm_of")(ctxt).liftTry(this)
 
+  def evaluate(ctxt: MLExpr[Context]): MLExpr[Term] =
+    MLExpr.uncheckedLiteral[Context => Term => Term]("Value.value")(ctxt)(this)
+
 }
 
 final case class Const(name: String, typ: Typ) extends Term
