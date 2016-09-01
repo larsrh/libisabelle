@@ -256,7 +256,6 @@ lazy val workbench = project.in(file("modules/workbench"))
       import scala.concurrent.duration.Duration
       import scala.concurrent.Await
       import scala.concurrent.ExecutionContext.Implicits.global
-      import java.nio.file.Paths
 
       val setup = Await.result(Setup.defaultSetup(Version("2016")).toOption.get, Duration.Inf)
       val env = Await.result(setup.makeEnvironment, Duration.Inf)

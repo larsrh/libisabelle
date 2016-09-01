@@ -14,7 +14,12 @@ package object types {
   }
   type Context = Context.type
 
-  object CTerm
+  type Conv = CTerm => Thm
+
+  object CTerm {
+    def eval(ctxt: MLExpr[Context], cterm: MLExpr[CTerm]): MLExpr[Thm] =
+      MLExpr.uncheckedLiteral[Context => Conv]("Code_Simp.dynamic_conv")(ctxt)(cterm)
+  }
   type CTerm = CTerm.type
 
   object Thm {

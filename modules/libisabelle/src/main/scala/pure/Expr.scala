@@ -56,6 +56,9 @@ final case class Expr[T] private[isabelle](val term: Term) {
   def evaluate(ctxt: MLExpr[Context]): Program[Expr[T]] =
     term.evaluate(ctxt).toProg.map(Expr[T])
 
+  def print(ctxt: MLExpr[Context]): MLExpr[String] =
+    term.print(ctxt)
+
 }
 
 object Expr {

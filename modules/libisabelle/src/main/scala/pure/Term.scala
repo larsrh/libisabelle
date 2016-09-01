@@ -101,6 +101,9 @@ sealed abstract class Term {
   def evaluate(ctxt: MLExpr[Context]): MLExpr[Term] =
     MLExpr.uncheckedLiteral[Context => Term => Term]("Value.value")(ctxt)(this)
 
+  def print(ctxt: MLExpr[Context]): MLExpr[String] =
+    MLExpr.uncheckedLiteral[Context => Term => String]("(YXML.content_of oo Syntax.string_of_term)")(ctxt)(this)
+
 }
 
 final case class Const(name: String, typ: Typ) extends Term
