@@ -22,6 +22,7 @@ object XML {
     def toYXML: String = bodyToYXML(List(this))
     def pretty(indent: Int): String
     final def pretty: String = pretty(0)
+    def compact: String
   }
 
   final case class Elem(markup: Markup, body: Body) extends Tree {
@@ -37,11 +38,17 @@ object XML {
         head + rows + foot
       }
     }
+    def compact = {
+      val (name, attrs) = markup
+      val compactAttrs = attrs.map { case (k, v) => s"""$k="$v"""" }.mkString(" ")
+      s"<$name $compactAttrs>${body.map(_.compact).mkString("")}</$name>"
+    }
   }
 
   final case class Text(content: String) extends Tree {
     def pretty(indent: Int) =
       " " * indent + prettyEscape(content)
+    def compact = content
   }
 
   type Body = List[Tree]

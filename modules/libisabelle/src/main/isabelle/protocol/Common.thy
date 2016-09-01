@@ -42,4 +42,26 @@ ML_file "typed_eval.ML"
 ML_file "codec.ML"
 ML_file "protocol.ML"
 
+syntax "_cartouche_xml" :: "cartouche_position \<Rightarrow> 'a"  ("XML _")
+
+parse_translation\<open>
+let
+  fun translation args =
+    let
+      fun err () = raise TERM ("Splice.term_translation", args)
+      fun input s pos = Symbol_Pos.implode (Symbol_Pos.cartouche_content (Symbol_Pos.explode (s, pos)))
+      val eval = Codec.the_decode Codec.term o XML.parse
+    in
+      case args of
+        [(c as Const (@{syntax_const "_constrain"}, _)) $ Free (s, _) $ p] =>
+          (case Term_Position.decode_position p of
+            SOME (pos, _) => c $ eval (input s pos) $ p
+          | NONE => err ())
+      | _ => err ()
+  end
+in
+  [(@{syntax_const "_cartouche_xml"}, K translation)]
+end
+\<close>
+
 end

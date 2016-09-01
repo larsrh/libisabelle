@@ -126,7 +126,10 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
       "org.typelevel" %% "cats-core" % "0.7.0",
       "org.typelevel" %% "cats-free" % "0.7.0",
       "io.monix" %% "monix-execution" % "2.0-RC13",
-      "com.lihaoyi" %% "scalatags" % "0.6.0"
+      "com.lihaoyi" %% "scalatags" % "0.6.0",
+      "org.typelevel" %% "macro-compat" % "1.1.1",
+      "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
+      compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
     )
   ))
 
@@ -262,7 +265,8 @@ lazy val workbench = project.in(file("modules/workbench"))
       System.build(env, config)
       val system = Await.result(System.create(env, config), Duration.Inf)
 
-      val main = Theory.get("Main")"""
+      val main = Theory.get("Protocol_Main")
+      val ctxt = Context.initGlobal(main)"""
   )
 
 
