@@ -91,7 +91,7 @@ lazy val root = project.in(file("."))
     pidePackage
   )
 
-lazy val docs = project.in(file("docs"))
+lazy val docs = project.in(file("modules/docs"))
   .settings(moduleName := "libisabelle-docs")
   .settings(standardSettings)
   .settings(unidocSettings)
@@ -101,7 +101,7 @@ lazy val docs = project.in(file("docs"))
     target in unidoc in ScalaUnidoc := crossTarget.value / "api"
   )
 
-lazy val pideInterface = project.in(file("pide-interface"))
+lazy val pideInterface = project.in(file("modules/pide-interface"))
   .settings(moduleName := "pide-interface")
   .settings(standardSettings)
   .settings(warningSettings)
@@ -116,7 +116,7 @@ lazy val pideInterface = project.in(file("pide-interface"))
     )
   )
 
-lazy val libisabelle = project
+lazy val libisabelle = project.in(file("modules/libisabelle"))
   .dependsOn(pideInterface)
   .settings(standardSettings)
   .settings(warningSettings)
@@ -130,7 +130,7 @@ lazy val libisabelle = project
     )
   ))
 
-lazy val setup = project.in(file("setup"))
+lazy val setup = project.in(file("modules/setup"))
   .dependsOn(libisabelle, pideInterface)
   .settings(moduleName := "libisabelle-setup")
   .settings(standardSettings)
@@ -150,7 +150,7 @@ lazy val setup = project.in(file("setup"))
 
 // PIDE implementations
 
-def pide(version: String) = Project(s"pide$version", file(s"pide/$version"))
+def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$version"))
   .dependsOn(pideInterface % "provided")
   .settings(moduleName := s"pide-$version")
   .settings(standardSettings)
@@ -180,7 +180,7 @@ def assemblyGenerator(p: Project): Def.Initialize[Task[Seq[File]]] =
     Seq(target)
   }
 
-lazy val pidePackage = project.in(file("pide-package"))
+lazy val pidePackage = project.in(file("modules/pide-package"))
   .dependsOn(pideInterface)
   .settings(moduleName := "pide-package")
   .settings(standardSettings)
@@ -211,7 +211,7 @@ lazy val tests = project.in(file("tests"))
 
 // Standalone applications
 
-lazy val cli = project.in(file("cli"))
+lazy val cli = project.in(file("modules/cli"))
   .dependsOn(setup, pidePackage)
   .settings(moduleName := "libisabelle-cli")
   .settings(standardSettings)
@@ -226,7 +226,7 @@ lazy val cli = project.in(file("cli"))
 
 // Examples
 
-lazy val examples = project.in(file("examples"))
+lazy val examples = project.in(file("modules/examples"))
   .dependsOn(setup, pidePackage)
   .settings(noPublishSettings)
   .settings(standardSettings)
@@ -236,7 +236,7 @@ lazy val examples = project.in(file("examples"))
 
 // Workbench
 
-lazy val workbench = project.in(file("workbench"))
+lazy val workbench = project.in(file("modules/workbench"))
   .dependsOn(setup, pidePackage)
   .settings(noPublishSettings)
   .settings(standardSettings)
