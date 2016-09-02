@@ -2,12 +2,11 @@
 
 set -x
 
-SESSION="Protocol"
-
 ./sbt "++$SCALA_VERSION" compile
-./sbt "++$SCALA_VERSION" "cli/run --version $ISABELLE_VERSION --session $SESSION build"
+./sbt "++$SCALA_VERSION" "cli/run --version $ISABELLE_VERSION --session Protocol build"
 
 if [ "$TRAVIS_OS" = "linux" ]; then
+  ./sbt "++$SCALA_VERSION" "cli/run --version $ISABELLE_VERSION --session HOL-Protocol build"
   ./sbt "++$SCALA_VERSION" validate
 else
   ./sbt "++$SCALA_VERSION" validateQuick
