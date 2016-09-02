@@ -193,29 +193,26 @@ lazy val pidePackage = project.in(file("modules/pide-package"))
   )
 
 
-// Tests
+// Tests & CI
 
 lazy val tests = project.in(file("tests"))
   .settings(standardSettings)
   .settings(noPublishSettings)
-  .aggregate(offlineTest, pureTest)
+  .aggregate(offlineTest, pureTest, holTest)
 
-lazy val testSettings = Seq(
-  parallelExecution in Test := false
-)
+val specs2Version = "3.8.4"
 
 lazy val offlineTest = project.in(file("tests/offline"))
   .dependsOn(setup, pidePackage)
   .settings(noPublishSettings)
   .settings(standardSettings)
   .settings(warningSettings)
-  .settings(testSettings)
   .settings(
     isabellePackage := "tests",
+    parallelExecution in Test := false,
     libraryDependencies ++= Seq(
-      "org.specs2" %% "specs2-core" % "3.8.4",
-      "org.specs2" %% "specs2-scalacheck" % "3.8.4" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.13.2" % "test",
+      "org.specs2" %% "specs2-core" % specs2Version,
+      "org.specs2" %% "specs2-scalacheck" % specs2Version % "test",
       logback
     )
   )
@@ -225,7 +222,22 @@ lazy val pureTest = project.in(file("tests/pure"))
   .settings(noPublishSettings)
   .settings(standardSettings)
   .settings(warningSettings)
-  .settings(testSettings)
+  .settings(
+    parallelExecution in Test := false
+  )
+
+lazy val holTest = project.in(file("tests/hol"))
+  .dependsOn(offlineTest)
+  .settings(noPublishSettings)
+  .settings(standardSettings)
+  .settings(warningSettings)
+  .settings(
+    logBuffered in Test := false,
+    libraryDependencies += "org.specs2" %% "specs2-scalacheck" % specs2Version % "test"
+  )
+
+addCommandAlias("validateSlow", "; holTest/test")
+addCommandAlias("validateQuick", "; offlineTest/test ; pureTest/test")
 
 
 // Standalone applications
@@ -306,9 +318,3 @@ releaseProcess := Seq[ReleaseStep](
 // Miscellaneous
 
 cancelable in Global := true
-
-
-// CI
-
-addCommandAlias("validate", "test")
-addCommandAlias("validateQuick", "; offlineTest/test ; pureTest/test")

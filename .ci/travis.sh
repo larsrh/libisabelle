@@ -7,7 +7,8 @@ set -x
 
 if [ "$TRAVIS_OS" = "linux" ]; then
   ./sbt "++$SCALA_VERSION" "cli/run --version $ISABELLE_VERSION --session HOL-Protocol build"
-  ./sbt "++$SCALA_VERSION" validate
+  ./sbt "++$SCALA_VERSION" validateQuick
+  ./sbt "++$SCALA_VERSION" validateSlow
 else
   ./sbt "++$SCALA_VERSION" validateQuick
 fi
