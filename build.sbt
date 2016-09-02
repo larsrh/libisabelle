@@ -196,20 +196,36 @@ lazy val pidePackage = project.in(file("modules/pide-package"))
 // Tests
 
 lazy val tests = project.in(file("tests"))
+  .settings(standardSettings)
+  .settings(noPublishSettings)
+  .aggregate(offlineTest, pureTest)
+
+lazy val testSettings = Seq(
+  parallelExecution in Test := false
+)
+
+lazy val offlineTest = project.in(file("tests/offline"))
   .dependsOn(setup, pidePackage)
   .settings(noPublishSettings)
   .settings(standardSettings)
   .settings(warningSettings)
-  .settings(acyclicSettings)
+  .settings(testSettings)
   .settings(
+    isabellePackage := "tests",
     libraryDependencies ++= Seq(
-      "org.specs2" %% "specs2-core" % "3.8.4" % "test",
+      "org.specs2" %% "specs2-core" % "3.8.4",
       "org.specs2" %% "specs2-scalacheck" % "3.8.4" % "test",
       "org.scalacheck" %% "scalacheck" % "1.13.2" % "test",
-      logback % "test"
-    ),
-    parallelExecution in Test := false
+      logback
+    )
   )
+
+lazy val pureTest = project.in(file("tests/pure"))
+  .dependsOn(offlineTest)
+  .settings(noPublishSettings)
+  .settings(standardSettings)
+  .settings(warningSettings)
+  .settings(testSettings)
 
 
 // Standalone applications

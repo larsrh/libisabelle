@@ -32,8 +32,9 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
 
   def timeout = 30.seconds
 
-
   // Starting the system
+
+  val config: Configuration = resources.makeConfiguration(Nil, "Protocol")
 
   val system = env.flatMap(System.create(_, config))
 
