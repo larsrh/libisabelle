@@ -43,6 +43,8 @@ class Macros(val c: whitebox.Context { type PrefixType <: ExprStringContext.term
       q"""_root_.info.hupel.isabelle.MLProg.pure($arg.term)"""
     else {
       val embeddable = c.inferImplicitValue(appliedType(typeOf[Embeddable[_]], arg.tpe))
+      if (embeddable == EmptyTree)
+        c.error(c.enclosingPosition, s"Could not find implicit `Embeddable` for type ${arg.tpe}")
       q"""$embeddable.embed($arg)"""
     }
   }
