@@ -3,7 +3,6 @@ package info.hupel.isabelle.tests
 import java.nio.file.Paths
 
 import scala.concurrent._
-import scala.concurrent.duration._
 import scala.math.BigInt
 
 import org.specs2.Specification
@@ -20,23 +19,20 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
   Basic protocol interaction
 
   An Isabelle session
-    can be started          ${system must exist.awaitFor(timeout)}
-    supports term parsing   ${parseCheck must beSuccess(Option.empty[String]).awaitFor(timeout)}
-    can parse terms         ${parsed must beSome.awaitFor(timeout)}
-    can't parse wrong terms ${parseFailed must beNone.awaitFor(timeout)}
-    can load theories       ${loaded must beSuccess(()).awaitFor(timeout)}
-    handles errors          ${error must beFailure.awaitFor(timeout)}
-    can cancel requests     ${cancelled.failed must beAnInstanceOf[CancellationException].awaitFor(timeout)}
-    can be torn down        ${teardown must exist.awaitFor(timeout)}"""
-
-
-  def timeout = 30.seconds
+    can be started          ${system must exist.awaitFor(duration)}
+    supports term parsing   ${parseCheck must beSuccess(Option.empty[String]).awaitFor(duration)}
+    can parse terms         ${parsed must beSome.awaitFor(duration)}
+    can't parse wrong terms ${parseFailed must beNone.awaitFor(duration)}
+    can load theories       ${loaded must beSuccess(()).awaitFor(duration)}
+    handles errors          ${error must beFailure.awaitFor(duration)}
+    can cancel requests     ${cancelled.failed must beAnInstanceOf[CancellationException].awaitFor(duration)}
+    can be torn down        ${teardown must exist.awaitFor(duration)}"""
 
   // Starting the system
 
-  val config: Configuration = resources.makeConfiguration(Nil, "Protocol")
+  val config = resources.makeConfiguration(Nil, "Protocol")
 
-  val system = env.flatMap(System.create(_, config))
+  val system = isabelleEnv.flatMap(System.create(_, config))
 
 
   // Pure/HOL operations
@@ -73,6 +69,7 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
     yield ()
 
 
+  // Teardown
 
   val teardown =
     for {
