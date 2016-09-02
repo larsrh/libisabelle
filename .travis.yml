@@ -1,23 +1,29 @@
 language: java
 env:
-  - ISABELLE_VERSION=2015 SCALA_VERSION=2.11.8
-  - ISABELLE_VERSION=2016 SCALA_VERSION=2.11.8
+  - ISABELLE_VERSION=2015 SCALA_VERSION=2.11.8 TRAVIS_OS=osx
+  - ISABELLE_VERSION=2016 SCALA_VERSION=2.11.8 TRAVIS_OS=osx
 install:
   - git submodule update --init --recursive
 os:
   - osx
 script:
-  - ./sbt "++$SCALA_VERSION" compile
-  - ./sbt "++$SCALA_VERSION" "cli/run --version $ISABELLE_VERSION build"
-  - ./sbt "++$SCALA_VERSION" test
+  - ./.ci/travis.sh
 matrix:
   include:
-    - env: ISABELLE_VERSION=2015 SCALA_VERSION=2.10.6
+    - env: ISABELLE_VERSION=2015 SCALA_VERSION=2.10.6 TRAVIS_OS=linux
       os: linux
       jdk: oraclejdk7
-    - env: ISABELLE_VERSION=2016 SCALA_VERSION=2.11.8
+      addons:
+        apt:
+          packages:
+            - lib32stdc++6
+    - env: ISABELLE_VERSION=2016 SCALA_VERSION=2.11.8 TRAVIS_OS=linux
       os: linux
       jdk: oraclejdk8
+      addons:
+        apt:
+          packages:
+            - lib32stdc++6
 cache:
   directories:
     - $HOME/.ivy2/cache

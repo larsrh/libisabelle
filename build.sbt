@@ -306,3 +306,9 @@ releaseProcess := Seq[ReleaseStep](
 // Miscellaneous
 
 cancelable in Global := true
+
+
+// CI
+
+addCommandAlias("validate", "test")
+addCommandAlias("validateQuick", "; offlineTest/test ; pureTest/test")
