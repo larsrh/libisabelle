@@ -19,11 +19,9 @@ class SystemSpec(val specs2Env: Env) extends Specification with DefaultSetup wit
   Isabelle system
 
   An Isabelle system
-    detects startup failures   ${failingSystem.failed must beAnInstanceOf[System.StartupException].awaitFor(timeout)}"""
+    detects startup failures   ${failingSystem.failed must beAnInstanceOf[System.StartupException].awaitFor(duration)}"""
 
-
-  def timeout = 10.seconds
-
-  val failingSystem = env.flatMap(System.create(_, resources.makeConfiguration(Nil, "Unbuilt_Session")))
+  val failingSystem =
+    isabelleEnv.flatMap(System.create(_, resources.makeConfiguration(Nil, "Unbuilt_Session")))
 
 }

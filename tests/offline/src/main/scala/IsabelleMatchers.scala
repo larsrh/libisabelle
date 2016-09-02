@@ -1,11 +1,10 @@
 package info.hupel.isabelle.tests
 
-import org.specs2.Specification
 import org.specs2.matcher._
 
 import info.hupel.isabelle._
 
-trait IsabelleMatchers { self: Specification =>
+trait IsabelleMatchers { self: Matchers =>
 
   def beSuccess[A](check: ValueCheck[A]): Matcher[ProverResult[A]] =
     new OptionLikeCheckedMatcher[ProverResult, A, A]("ProverResult.Success", {
@@ -22,4 +21,3 @@ trait IsabelleMatchers { self: Specification =>
   def exist[A]: Matcher[A] = ((a: A) => a != null, "doesn't exist")
 
 }
-
