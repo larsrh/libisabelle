@@ -10,7 +10,6 @@ import org.specs2.specification.core.Env
 
 import info.hupel.isabelle._
 import info.hupel.isabelle.api._
-import info.hupel.isabelle.ffi.types._
 import info.hupel.isabelle.hol._
 import info.hupel.isabelle.pure._
 

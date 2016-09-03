@@ -1,4 +1,4 @@
-signature FFI = sig
+signature ML_EXPR = sig
   datatype ml_expr =
       Lit of string
     | App of ml_expr * ml_expr
@@ -12,17 +12,17 @@ signature FFI = sig
   val print_body: XML.body -> string
 
   (* internal *)
-  val ml_expr_codec: ml_expr codec
+  val codec: ml_expr codec
   structure Eval : TYPED_EVAL
 end
 
-structure FFI : FFI = struct
+structure ML_Expr : ML_EXPR = struct
 
 structure Eval = Typed_Eval
 (
   type T = XML.tree
   val typ = "XML.tree"
-  val name = "FFI.Eval"
+  val name = "ML_Expr.Eval"
 )
 
 fun print_tree (XML.Elem elem) =
@@ -95,10 +95,10 @@ fun eval ctxt prog typ =
     Eval.eval (Input.string prog) ctxt
   end
 
-fun ml_expr_codec () =
+fun codec () =
   let
     val ml_expr_lit = Codec.string
-    fun ml_expr_app () = Codec.tuple (ml_expr_codec ()) (ml_expr_codec ())
+    fun ml_expr_app () = Codec.tuple (codec ()) (codec ())
     val ml_expr_val = Codec.tuple Codec.string Codec.tree
 
     fun enc _ = error "impossible"
@@ -106,8 +106,8 @@ fun ml_expr_codec () =
       | dec 1 = SOME (Codec.decode (ml_expr_app ()) #> Codec.map_result App)
       | dec 2 = SOME (Codec.decode ml_expr_val #> Codec.map_result Val)
       | dec _ = NONE
-  in Codec.variant enc dec "FFI.ml_expr" end
+  in Codec.variant enc dec "ML_Expr.ml_expr" end
 
-val ml_expr_codec = ml_expr_codec ()
+val codec = codec ()
 
 end

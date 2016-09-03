@@ -2,7 +2,7 @@ theory Protocol_Pure
 imports
   Pure
   "operations/Basic"
-  "operations/FFI"
+  "operations/ML_Expr"
 begin
 
 end

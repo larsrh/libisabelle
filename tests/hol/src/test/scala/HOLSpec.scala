@@ -17,7 +17,6 @@ import org.log4s._
 
 import info.hupel.isabelle._
 import info.hupel.isabelle.api._
-import info.hupel.isabelle.ffi.types._
 import info.hupel.isabelle.hol._
 import info.hupel.isabelle.pure._
 

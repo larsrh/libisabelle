@@ -8,8 +8,6 @@ import cats.instances.list._
 import cats.syntax.traverse._
 
 import info.hupel.isabelle._
-import info.hupel.isabelle.ffi.MLExpr
-import info.hupel.isabelle.ffi.types._
 import info.hupel.isabelle.pure._
 
 package hol {
@@ -33,20 +31,20 @@ package object hol extends LowPriorityImplicits {
   implicit def bigIntTypeable: Embeddable[BigInt] = new Embeddable[BigInt] {
     def typ = HOLogic.intT
     def embed(t: BigInt) =
-      MLProg.operation(MkInt, t)
+      Program.operation(MkInt, t)
     def unembed(t: Term) =
-      MLProg.operation(DestInt, t)
+      Program.operation(DestInt, t)
   }
 
   implicit def boolTypeable: Embeddable[Boolean] = new Embeddable[Boolean] {
     def typ = HOLogic.boolT
-    def embed(t: Boolean) = MLProg.pure {
+    def embed(t: Boolean) = Program.pure {
       t match {
         case true => HOLogic.True
         case false => HOLogic.False
       }
     }
-    def unembed(t: Term) = MLProg.pure {
+    def unembed(t: Term) = Program.pure {
       t match {
         case HOLogic.True => Some(true)
         case HOLogic.False => Some(false)
@@ -58,12 +56,12 @@ package object hol extends LowPriorityImplicits {
   implicit def listEmbeddable[T : Embeddable]: Embeddable[List[T]] = new ListTypeable[T] with Embeddable[List[T]] {
     def embed(ts: List[T]) =
       ts.traverse(Embeddable[T].embed) flatMap { ts =>
-        MLProg.operation(MkList, ((Typeable.typ[T], ts)))
+        Program.operation(MkList, ((Typeable.typ[T], ts)))
       }
 
     def unembed(t: Term) =
-      MLProg.operation(DestList, t) flatMap {
-        case None => MLProg.pure(None)
+      Program.operation(DestList, t) flatMap {
+        case None => Program.pure(None)
         case Some(ts) => ts.traverse(Embeddable[T].unembed).map(_.sequence)
       }
   }

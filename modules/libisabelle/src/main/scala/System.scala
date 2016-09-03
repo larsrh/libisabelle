@@ -241,8 +241,8 @@ final class System private(val env: Environment, config: Configuration) {
   }
 
   def run[A](prog: Program[A], thyName: String): Future[A] = {
-    val interpreter = new FunctionK[MLProg.Instruction, Future] {
-      def apply[T](instruction: MLProg.Instruction[T]) =
+    val interpreter = new FunctionK[Instruction, Future] {
+      def apply[T](instruction: Instruction[T]) =
         instruction.run(System.this, thyName).map(_.unsafeGet)
     }
     prog.foldMap(interpreter)

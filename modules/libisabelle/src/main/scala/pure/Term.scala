@@ -2,10 +2,8 @@ package info.hupel.isabelle.pure
 
 import scala.math.BigInt
 
-import info.hupel.isabelle.Codec
+import info.hupel.isabelle._
 import info.hupel.isabelle.api._
-import info.hupel.isabelle.ffi.MLExpr
-import info.hupel.isabelle.ffi.types._
 
 object Typ {
   implicit lazy val typCodec: Codec[Typ] = new Codec.Variant[Typ]("typ") {
@@ -74,11 +72,11 @@ object Term {
   }
 
 
-  def parse(ctxt: MLExpr[Context], term: String): MLExpr[Option[Term]] =
-    MLExpr.uncheckedLiteral[Context => String => Term]("Syntax.parse_term")(ctxt).liftTry(term)
+  def parse(ctxt: ml.Expr[Context], term: String): ml.Expr[Option[Term]] =
+    ml.Expr.uncheckedLiteral[Context => String => Term]("Syntax.parse_term")(ctxt).liftTry(term)
 
-  def read(ctxt: MLExpr[Context], term: String): MLExpr[Option[Term]] =
-    MLExpr.uncheckedLiteral[Context => String => Term]("Syntax.read_term")(ctxt).liftTry(term)
+  def read(ctxt: ml.Expr[Context], term: String): ml.Expr[Option[Term]] =
+    ml.Expr.uncheckedLiteral[Context => String => Term]("Syntax.read_term")(ctxt).liftTry(term)
 }
 
 sealed abstract class Term {
@@ -92,17 +90,17 @@ sealed abstract class Term {
 
   def constrain[T : Typeable]: Term = constrain(Typeable[T].typ)
 
-  def check(ctxt: MLExpr[Context]): MLExpr[Option[Term]] =
-    MLExpr.uncheckedLiteral[Context => Term => Term]("Syntax.check_term")(ctxt).liftTry(this)
+  def check(ctxt: ml.Expr[Context]): ml.Expr[Option[Term]] =
+    ml.Expr.uncheckedLiteral[Context => Term => Term]("Syntax.check_term")(ctxt).liftTry(this)
 
-  def certify(ctxt: MLExpr[Context]): MLExpr[Option[CTerm]] =
-    MLExpr.uncheckedLiteral[Context => Term => CTerm]("Thm.cterm_of")(ctxt).liftTry(this)
+  def certify(ctxt: ml.Expr[Context]): ml.Expr[Option[CTerm]] =
+    ml.Expr.uncheckedLiteral[Context => Term => CTerm]("Thm.cterm_of")(ctxt).liftTry(this)
 
-  def evaluate(ctxt: MLExpr[Context]): MLExpr[Term] =
-    MLExpr.uncheckedLiteral[Context => Term => Term]("Value.value")(ctxt)(this)
+  def evaluate(ctxt: ml.Expr[Context]): ml.Expr[Term] =
+    ml.Expr.uncheckedLiteral[Context => Term => Term]("Value.value")(ctxt)(this)
 
-  def print(ctxt: MLExpr[Context]): MLExpr[String] =
-    MLExpr.uncheckedLiteral[Context => Term => String]("(YXML.content_of oo Syntax.string_of_term)")(ctxt)(this)
+  def print(ctxt: ml.Expr[Context]): ml.Expr[String] =
+    ml.Expr.uncheckedLiteral[Context => Term => String]("(YXML.content_of oo Syntax.string_of_term)")(ctxt)(this)
 
 }
 

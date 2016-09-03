@@ -20,6 +20,19 @@ package object isabelle {
 
   type HTML = Text.TypedTag[String]
 
-  type Program[A] = Free[MLProg.Instruction, A]
+  type Program[A] = Free[Instruction, A]
+
+  object Program {
+
+    def pure[A](a: A): Program[A] =
+      Free.pure(a)
+
+    def expr[A : Codec](mlExpr: ml.Expr[A]): Program[A] =
+      Free.liftF[Instruction, A](Instruction.Ex(mlExpr))
+
+    def operation[I, O](operation: Operation[I, O], input: I): Program[O] =
+      Free.liftF[Instruction, O](Instruction.Op(operation, input))
+
+  }
 
 }
