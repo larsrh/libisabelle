@@ -38,9 +38,9 @@ class Macros(val c: whitebox.Context { type PrefixType <: ExprStringContext.term
 
   private def embed(arg: Tree): Tree = {
     if (arg.tpe <:< typeOf[Term])
-      q"""_root_.info.hupel.isabelle.MLProg.pure($arg)"""
+      q"""_root_.info.hupel.isabelle.Program.pure($arg)"""
     else if (arg.tpe <:< typeOf[Expr[_]])
-      q"""_root_.info.hupel.isabelle.MLProg.pure($arg.term)"""
+      q"""_root_.info.hupel.isabelle.Program.pure($arg.term)"""
     else {
       val embeddable = c.inferImplicitValue(appliedType(typeOf[Embeddable[_]], arg.tpe))
       if (embeddable == EmptyTree)

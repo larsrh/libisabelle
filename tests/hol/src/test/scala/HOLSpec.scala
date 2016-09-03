@@ -74,7 +74,7 @@ class HOLSpec(val specs2Env: Env) extends Specification
       system must exist.awaitFor(duration)
     }
     "quasiquote" >> prop { (n: BigInt, b: Boolean) =>
-      val prog = term"$n > $n --> $b".flatMap(Expr.fromString[Boolean](ctxt, _))
+      val prog = term"$n > $n --> ($b & ${HOLogic.True})".flatMap(Expr.fromString[Boolean](ctxt, _))
       run(prog) must beSome.awaitFor(duration)
     }
     "eval" >> prop { (b1: Boolean, b2: Boolean, b3: Boolean) =>
