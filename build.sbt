@@ -52,9 +52,7 @@ lazy val warningSettings = Seq(
     "-Ywarn-value-discard",
     "-Xfatal-warnings"
   ),
-  scalacOptions in (Compile, doc) := Seq(
-    "-encoding", "UTF-8"
-  )
+  scalacOptions in (Compile, doc) ~= (_.filterNot(_ == "-Xfatal-warnings"))
 )
 
 lazy val noPublishSettings = Seq(
@@ -67,6 +65,15 @@ lazy val acyclicSettings = Seq(
   libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.4" % "provided",
   autoCompilerPlugins := true,
   addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.4")
+)
+
+lazy val macroSettings = Seq(
+  libraryDependencies ++= Seq(
+    "org.typelevel" %% "macro-compat" % "1.1.1",
+    "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
+    "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
+    compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
+  )
 )
 
 lazy val apiBuildInfoKeys = Seq[BuildInfoKey](
@@ -95,6 +102,7 @@ lazy val docs = project.in(file("modules/docs"))
   .settings(moduleName := "libisabelle-docs")
   .settings(standardSettings)
   .settings(unidocSettings)
+  .settings(macroSettings)
   .settings(
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(pideInterface, libisabelle, setup),
     doc in Compile := (doc in ScalaUnidoc).value,
@@ -120,18 +128,15 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
   .dependsOn(pideInterface)
   .settings(standardSettings)
   .settings(warningSettings)
-  .settings(acyclicSettings)
-  .settings(Seq(
+  .settings(macroSettings)
+  .settings(
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % "0.7.2",
       "org.typelevel" %% "cats-free" % "0.7.2",
       "io.monix" %% "monix-execution" % "2.0.0",
-      "com.lihaoyi" %% "scalatags" % "0.6.0",
-      "org.typelevel" %% "macro-compat" % "1.1.1",
-      "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
-      compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
+      "com.lihaoyi" %% "scalatags" % "0.6.0"
     )
-  ))
+  )
 
 lazy val setup = project.in(file("modules/setup"))
   .dependsOn(libisabelle, pideInterface)
