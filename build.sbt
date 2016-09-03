@@ -123,9 +123,9 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
   .settings(acyclicSettings)
   .settings(Seq(
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "0.7.0",
-      "org.typelevel" %% "cats-free" % "0.7.0",
-      "io.monix" %% "monix-execution" % "2.0-RC13",
+      "org.typelevel" %% "cats-core" % "0.7.2",
+      "org.typelevel" %% "cats-free" % "0.7.2",
+      "io.monix" %% "monix-execution" % "2.0.0",
       "com.lihaoyi" %% "scalatags" % "0.6.0",
       "org.typelevel" %% "macro-compat" % "1.1.1",
       "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
