@@ -8,7 +8,7 @@
 | AppVeyor (Windows CI)     | [![Build status](https://ci.appveyor.com/api/projects/status/uuafgv21ragvoqei/branch/master?svg=true)](https://ci.appveyor.com/project/larsrh/libisabelle/branch/master) |
 | Scaladex                  | [![Latest release](https://index.scala-lang.org/larsrh/libisabelle/libisabelle/latest.svg?color=orange)](https://index.scala-lang.org/larsrh/libisabelle) |
 | Scaladoc                  | [![Scaladoc](http://javadoc-badge.appspot.com/info.hupel/libisabelle-docs_2.11.svg?label=scaladoc)](http://javadoc-badge.appspot.com/info.hupel/libisabelle-docs_2.11) |
-| Zenodo (DOI)              | [![DOI](https://zenodo.org/badge/19880/larsrh/libisabelle.svg)](https://zenodo.org/badge/latestdoi/19880/larsrh/libisabelle) |
+| Zenodo (DOI)              | [![DOI](https://zenodo.org/badge/3836/larsrh/libisabelle.svg)](https://zenodo.org/badge/latestdoi/3836/larsrh/libisabelle) |
 | Gitter (Chat)             | [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/larsrh/libisabelle) |
 
 
@@ -82,8 +82,8 @@ Drop the following lines into your `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "info.hupel" %% "libisabelle" % "0.4",
-  "info.hupel" %% "libisabelle-setup" % "0.4"
+  "info.hupel" %% "libisabelle" % "0.5",
+  "info.hupel" %% "libisabelle-setup" % "0.5"
 )
 ```
 
@@ -91,7 +91,7 @@ With this configuration, the automatic Isabelle setup will fetch additional JAR 
 If you don't want this, additionally include the following dependency:
 
 ```scala
-  "info.hupel" %% "pide-package" % "0.4"
+  "info.hupel" %% "pide-package" % "0.5"
 ```
 
 This adds PIDE implementations for all supported Isabelle versions to your classpath.
