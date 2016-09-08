@@ -281,8 +281,6 @@ lazy val workbench = project.in(file("modules/workbench"))
     initialCommands in console := """
       import info.hupel.isabelle._
       import info.hupel.isabelle.api._
-      import info.hupel.isabelle.ffi._
-      import info.hupel.isabelle.ffi.types._
       import info.hupel.isabelle.hol._
       import info.hupel.isabelle.pure._
       import info.hupel.isabelle.setup._
