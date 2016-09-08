@@ -4,8 +4,7 @@ import scala.concurrent._
 import scala.concurrent.duration._
 import scala.math.BigInt
 
-import org.specs2.ScalaCheck
-import org.specs2.mutable.Specification
+import org.specs2.{ScalaCheck, Specification}
 import org.specs2.scalacheck.Parameters
 import org.specs2.specification.AfterAll
 import org.specs2.specification.core.Env
@@ -24,7 +23,27 @@ class HOLSpec(val specs2Env: Env) extends Specification
   with DefaultSetup
   with IsabelleMatchers
   with AfterAll
-  with ScalaCheck {
+  with ScalaCheck { def is = s2"""
+
+  Isabelle/HOL operations
+
+  An Isabelle/HOL session
+    can be started               ${system must exist.awaitFor(duration)}
+
+  Quasiquotes                    ${quasiquotes}
+  Term evaluation                ${eval}
+
+  Embedding and rechecking terms
+    of type BigInt               ${propEmbedRecheck[BigInt]}
+    of type Boolean              ${propEmbedRecheck[Boolean]}
+    of type List[BigInt]         ${propEmbedRecheck[List[BigInt]]}
+    of type List[List[Boolean]]  ${propEmbedRecheck[List[List[Boolean]]]}
+
+  Embedding and unembedding terms
+    of type BigInt               ${propEmbedUnembed[BigInt]}
+    of type Boolean              ${propEmbedUnembed[Boolean]}
+    of type List[BigInt]         ${propEmbedUnembed[List[BigInt]]}
+    of type List[List[Boolean]]  ${propEmbedUnembed[List[List[Boolean]]]}"""
 
   implicit val params = Parameters(minTestsOk = 20, maxSize = 10).verbose
 
@@ -57,6 +76,25 @@ class HOLSpec(val specs2Env: Env) extends Specification
     run(prog) must beSome(a1).awaitFor(duration)
   }
 
+  val quasiquotes = prop { (n: BigInt, b: Boolean) =>
+    val prog = term"$n > $n --> ($b & ${HOLogic.True})".flatMap(Expr.fromString[Boolean](ctxt, _))
+    run(prog) must beSome.awaitFor(duration)
+  }
+
+  val eval = prop { (b1: Boolean, b2: Boolean, b3: Boolean) =>
+    val rScala = (b1 && b2) || b3
+    val prog =
+      for {
+        e1 <- Expr.embed(ctxt, b1)
+        e2 <- Expr.embed(ctxt, b2)
+        e3 <- Expr.embed(ctxt, b3)
+        e = (e1 ∧ e2) ∨ e3
+        evaluated <- e.evaluate(ctxt)
+        rIsabelle <- evaluated.unembed
+      } yield rIsabelle
+    run(prog) must beSome(rScala).awaitFor(duration)
+  }
+
 
   // Teardown
 
@@ -65,43 +103,6 @@ class HOLSpec(val specs2Env: Env) extends Specification
   def afterAll() = {
     logger.info("Shutting down system ...")
     Await.result(system.flatMap(_.dispose), duration)
-  }
-
-  // Specification
-
-  "An Isabelle/HOL session" >> {
-    "can be started" >> {
-      system must exist.awaitFor(duration)
-    }
-    "quasiquote" >> prop { (n: BigInt, b: Boolean) =>
-      val prog = term"$n > $n --> ($b & ${HOLogic.True})".flatMap(Expr.fromString[Boolean](ctxt, _))
-      run(prog) must beSome.awaitFor(duration)
-    }
-    "eval" >> prop { (b1: Boolean, b2: Boolean, b3: Boolean) =>
-      val rScala = (b1 && b2) || b3
-      val prog =
-        for {
-          e1 <- Expr.embed(ctxt, b1)
-          e2 <- Expr.embed(ctxt, b2)
-          e3 <- Expr.embed(ctxt, b3)
-          e = (e1 ∧ e2) ∨ e3
-          evaluated <- e.evaluate(ctxt)
-          rIsabelle <- evaluated.unembed
-        } yield rIsabelle
-      run(prog) must beSome(rScala).awaitFor(duration)
-    }
-    "embed/recheck" >> {
-      "BigInt" >> propEmbedRecheck[BigInt]
-      "Boolean" >> propEmbedRecheck[Boolean]
-      "List[BigInt]" >> propEmbedRecheck[List[BigInt]]
-      "List[List[Boolean]]" >> propEmbedRecheck[List[List[Boolean]]]
-    }
-    "embed/unembed" >> {
-      "BigInt" >> propEmbedUnembed[BigInt]
-      "Boolean" >> propEmbedUnembed[Boolean]
-      "List[BigInt]" >> propEmbedUnembed[List[BigInt]]
-      "List[List[Boolean]]" >> propEmbedUnembed[List[List[Boolean]]]
-    }
   }
 
 }
