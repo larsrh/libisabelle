@@ -72,14 +72,14 @@ object Term {
   }
 
 
-  def parse(ctxt: ml.Expr[Context], term: String): ml.Expr[Option[Term]] =
-    ml.Expr.uncheckedLiteral[Context => String => Term]("Syntax.parse_term")(ctxt).liftTry(term)
+  val parse: ml.Expr[Context => String => Option[Term]] =
+    ml.Expr.uncheckedLiteral("(fn ctxt => try (Syntax.parse_term ctxt))")
 
-  def read(ctxt: ml.Expr[Context], term: String): ml.Expr[Option[Term]] =
-    ml.Expr.uncheckedLiteral[Context => String => Term]("Syntax.read_term")(ctxt).liftTry(term)
+  val read: ml.Expr[Context => String => Option[Term]] =
+    ml.Expr.uncheckedLiteral("(fn ctxt => try (Syntax.read_term ctxt))")
 
   val fromThm: ml.Expr[Thm => Term] =
-    ml.Expr.uncheckedLiteral[Thm => Term]("Thm.prop_of")
+    ml.Expr.uncheckedLiteral("Thm.prop_of")
 }
 
 sealed abstract class Term {
@@ -93,17 +93,17 @@ sealed abstract class Term {
 
   def constrain[T : Typeable]: Term = constrain(Typeable[T].typ)
 
-  def check(ctxt: ml.Expr[Context]): ml.Expr[Option[Term]] =
-    ml.Expr.uncheckedLiteral[Context => Term => Term]("Syntax.check_term")(ctxt).liftTry(this)
+  val check: ml.Expr[Context => Option[Term]] =
+    ml.Expr.uncheckedLiteral[Term => Context => Term]("(fn t => fn ctxt => Syntax.check_term ctxt t)")(this).liftTry
 
-  def certify(ctxt: ml.Expr[Context]): ml.Expr[Option[Cterm]] =
-    ml.Expr.uncheckedLiteral[Context => Term => Cterm]("Thm.cterm_of")(ctxt).liftTry(this)
+  def certify: ml.Expr[Context => Option[Cterm]] =
+    ml.Expr.uncheckedLiteral[Term => Context => Cterm]("(fn t => fn ctxt => Thm.cterm_of ctxt t)")(this).liftTry
 
-  def evaluate(ctxt: ml.Expr[Context]): ml.Expr[Term] =
-    ml.Expr.uncheckedLiteral[Context => Term => Term]("Value.value")(ctxt)(this)
+  def evaluate: ml.Expr[Context => Term] =
+    ml.Expr.uncheckedLiteral[Term => Context => Term]("(fn t => fn ctxt => Value.value ctxt t)")(this)
 
-  def print(ctxt: ml.Expr[Context]): ml.Expr[String] =
-    ml.Expr.uncheckedLiteral[Context => Term => String]("(YXML.content_of oo Syntax.string_of_term)")(ctxt)(this)
+  def print: ml.Expr[Context => String] =
+    ml.Expr.uncheckedLiteral[Term => Context => String]("(fn t => fn ctxt => YXML.content_of (Syntax.string_of_term ctxt t))")(this)
 
 }
 

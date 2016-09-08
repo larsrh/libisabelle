@@ -57,6 +57,8 @@ trait Scope {
         apply(value(b))
       def liftTry: Expr[B => Option[C]] =
         uncheckedLiteral[(B => C) => B => Option[C]]("try")(fun)
+      def andThen[D](fun2: Expr[C => D]): Expr[B => D] =
+        uncheckedLiteral[(B => C) => (C => D) => B => D]("(fn f => fn g => g o f)")(fun)(fun2)
     }
 
     private case class Lit[A](text: String) extends Expr[A] {
