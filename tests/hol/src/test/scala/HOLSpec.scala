@@ -30,9 +30,6 @@ class HOLSpec(val specs2Env: Env) extends Specification
   An Isabelle/HOL session
     can be started               ${system must exist.awaitFor(duration)}
 
-  Quasiquotes                    ${quasiquotes}
-  Term evaluation                ${eval}
-
   Embedding and rechecking terms
     of type BigInt               ${propEmbedRecheck[BigInt]}
     of type Boolean              ${propEmbedRecheck[Boolean]}
@@ -43,7 +40,11 @@ class HOLSpec(val specs2Env: Env) extends Specification
     of type BigInt               ${propEmbedUnembed[BigInt]}
     of type Boolean              ${propEmbedUnembed[Boolean]}
     of type List[BigInt]         ${propEmbedUnembed[List[BigInt]]}
-    of type List[List[Boolean]]  ${propEmbedUnembed[List[List[Boolean]]]}"""
+    of type List[List[Boolean]]  ${propEmbedUnembed[List[List[Boolean]]]}
+
+  Quasiquotes                    ${quasiquotes}
+  Term evaluation                ${eval}
+  Peeking                        ${peeking}"""
 
   implicit val params = Parameters(minTestsOk = 20, maxSize = 10).verbose
   override def session = "HOL-Protocol"
@@ -88,6 +89,27 @@ class HOLSpec(val specs2Env: Env) extends Specification
         rIsabelle <- evaluated.unembed
       } yield rIsabelle
     run(prog) must beSome(rScala).awaitFor(duration)
+  }
+
+  val peeking = prop { (n: BigInt, m: BigInt) =>
+    val rScala = n + m
+
+    val prog =
+      for {
+        str <- term"$n + $m"
+        expr <- Expr.fromString[BigInt](ctxt, str).map(_.get)
+        terms <-
+          Cterm.eval(ctxt)(expr.untypedCertify(ctxt)).peek(Term.fromThm)(new ml.Scoped[Thm, Term, (Term, Term)] {
+            def apply(scope: ml.LocalScope)(term: Term, ref: scope.Expr[Thm]) = {
+              import scope._
+              localize(Term.fromThm)(ref).toProg.map((term, _))
+            }
+          })
+      } yield terms
+
+    run(prog) must beLike[(Term, Term)] { case (t1, t2) =>
+      t1 must be_===(t2)
+    }.awaitFor(duration)
   }
 
 
