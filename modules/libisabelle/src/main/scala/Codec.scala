@@ -277,6 +277,11 @@ trait Codec[T] { self =>
    */
   def decode(tree: XML.Tree): XMLResult[T]
 
+  final def decodeOrThrow(tree: XML.Tree): T = decode(tree) match {
+    case Left((err, body)) => throw DecodingException(err, body)
+    case Right(o) => o
+  }
+
   /**
    * Transform a codec for a type `T` into a codec for a type `U` by applying
    * one of the two specified conversions.

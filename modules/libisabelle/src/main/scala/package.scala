@@ -8,6 +8,7 @@ import cats.free.Free
 import scalatags.Text
 
 import info.hupel.isabelle.api.XML
+import info.hupel.isabelle.ml.Ref
 
 package object isabelle {
 
@@ -29,6 +30,12 @@ package object isabelle {
 
     def expr[A : Codec](mlExpr: ml.Expr[A]): Program[A] =
       Free.liftF[Instruction, A](Instruction.Ex(mlExpr))
+
+    def rawPeek[A : ml.Opaque, Repr : Codec](mlExpr: ml.Expr[A], conv: ml.Expr[A => Repr]): Program[(Ref[A], Repr)] =
+      mlExpr.rawPeek0(conv)
+
+    def peek[A : ml.Opaque, Repr : Codec, C](mlExpr: ml.Expr[A], conv: ml.Expr[A => Repr])(scoped: ml.Scoped[A, Repr, C]): Program[C] =
+      mlExpr.peek0(conv, scoped)
 
     def operation[I, O](operation: Operation[I, O], input: I): Program[O] =
       Free.liftF[Instruction, O](Instruction.Op(operation, input))

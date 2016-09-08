@@ -77,6 +77,9 @@ object Term {
 
   def read(ctxt: ml.Expr[Context], term: String): ml.Expr[Option[Term]] =
     ml.Expr.uncheckedLiteral[Context => String => Term]("Syntax.read_term")(ctxt).liftTry(term)
+
+  val fromThm: ml.Expr[Thm => Term] =
+    ml.Expr.uncheckedLiteral[Thm => Term]("Thm.prop_of")
 }
 
 sealed abstract class Term {
@@ -93,8 +96,8 @@ sealed abstract class Term {
   def check(ctxt: ml.Expr[Context]): ml.Expr[Option[Term]] =
     ml.Expr.uncheckedLiteral[Context => Term => Term]("Syntax.check_term")(ctxt).liftTry(this)
 
-  def certify(ctxt: ml.Expr[Context]): ml.Expr[Option[CTerm]] =
-    ml.Expr.uncheckedLiteral[Context => Term => CTerm]("Thm.cterm_of")(ctxt).liftTry(this)
+  def certify(ctxt: ml.Expr[Context]): ml.Expr[Option[Cterm]] =
+    ml.Expr.uncheckedLiteral[Context => Term => Cterm]("Thm.cterm_of")(ctxt).liftTry(this)
 
   def evaluate(ctxt: ml.Expr[Context]): ml.Expr[Term] =
     ml.Expr.uncheckedLiteral[Context => Term => Term]("Value.value")(ctxt)(this)

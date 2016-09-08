@@ -45,11 +45,11 @@ final case class Expr[T] private[isabelle](val term: Term) {
   def unembed(implicit T: Embeddable[T]): Program[Option[T]] =
     T.unembed(term)
 
-  def untypedCertify(ctxt: ml.Expr[Context]): ml.Expr[CTerm] =
-    ml.Expr.uncheckedLiteral[Option[CTerm] => CTerm]("the")(term.certify(ctxt))
+  def untypedCertify(ctxt: ml.Expr[Context]): ml.Expr[Cterm] =
+    ml.Expr.uncheckedLiteral[Option[Cterm] => Cterm]("the")(term.certify(ctxt))
 
-  def typedCertify(ctxt: ml.Expr[Context]): ml.Expr[CExpr[T]] =
-    untypedCertify(ctxt).coerce[CExpr[T]]
+  def typedCertify(ctxt: ml.Expr[Context]): ml.Expr[Cexpr[T]] =
+    untypedCertify(ctxt).coerce[Cexpr[T]]
 
   def evaluate(ctxt: ml.Expr[Context]): Program[Expr[T]] =
     term.evaluate(ctxt).toProg.map(Expr[T])
@@ -80,25 +80,25 @@ object Expr {
   def untyped[T](expr: ml.Expr[Expr[T]]): ml.Expr[Term] =
     expr.coerce
 
-  def fromThm(thm: ml.Expr[Thm]): ml.Expr[Expr[Prop]] =
-    ml.Expr.uncheckedLiteral[Thm => Term]("Thm.prop_of")(thm).coerce
+  val fromThm: ml.Expr[Thm => Expr[Prop]] =
+    ml.Expr.uncheckedLiteral[Thm => Term]("Thm.prop_of").coerce
 
 }
 
-sealed abstract class CExpr[T]
+sealed abstract class Cexpr[T]
 
-object CExpr {
+object Cexpr {
 
-  def trivial(ce: ml.Expr[CExpr[Prop]]): ml.Expr[Thm] =
-    ml.Expr.uncheckedLiteral[CTerm => Thm]("Thm.trivial")(untyped(ce))
+  def trivial(ce: ml.Expr[Cexpr[Prop]]): ml.Expr[Thm] =
+    ml.Expr.uncheckedLiteral[Cterm => Thm]("Thm.trivial")(untyped(ce))
 
-  def untyped[T](ce: ml.Expr[CExpr[T]]): ml.Expr[CTerm] =
+  def untyped[T](ce: ml.Expr[Cexpr[T]]): ml.Expr[Cterm] =
     ce.coerce
 
-  def uncertify[T](ce: ml.Expr[CExpr[T]]): ml.Expr[Expr[T]] =
-    ml.Expr.uncheckedLiteral[CTerm => Term]("Thm.term_of")(ce.coerce[CTerm]).coerce[Expr[T]]
+  def uncertify[T](ce: ml.Expr[Cexpr[T]]): ml.Expr[Expr[T]] =
+    ml.Expr.uncheckedLiteral[Cterm => Term]("Thm.term_of")(ce.coerce[Cterm]).coerce[Expr[T]]
 
-  def fromThm(thm: ml.Expr[Thm]): ml.Expr[CExpr[Prop]] =
-    ml.Expr.uncheckedLiteral[Thm => CTerm]("Thm.cprop_of")(thm).coerce
+  val fromThm: ml.Expr[Thm => Cexpr[Prop]] =
+    ml.Expr.uncheckedLiteral[Thm => Cterm]("Thm.cprop_of").coerce
 
 }

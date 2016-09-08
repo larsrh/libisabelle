@@ -6,6 +6,7 @@ signature ML_EXPR = sig
 
   val print_ml_expr: Proof.context -> ml_expr -> string
   val eval: Proof.context -> ml_expr -> string -> XML.tree
+  val eval_opaque: Proof.context -> ml_expr -> {table: string, repr_typ: string, conv: ml_expr} -> serial * XML.tree
   val check: Proof.context -> ml_expr -> string -> string option
 
   val print_tree: XML.tree -> string
@@ -93,6 +94,24 @@ fun eval ctxt prog typ =
     val prog = "(Codec.encode " ^ codec ^ " (" ^ print_ml_expr ctxt prog ^ "))"
   in
     Eval.eval (Input.string prog) ctxt
+  end
+
+fun eval_opaque ctxt prog {table, repr_typ, conv} =
+  let
+    val codec = Classy.resolve @{ML.class codec} (ML_Types.read_ml_type repr_typ) (Context.Proof ctxt)
+    val id = serial ()
+    val var = "eval_opaque_result"
+    val inner_prog = "(" ^ print_ml_expr ctxt prog ^ ")"
+    val store_prog = table ^ ".write " ^ ML_Syntax.print_int id ^ " " ^ var
+    val res_prog = "Codec.encode " ^ codec ^ " ((" ^ print_ml_expr ctxt conv ^ ") " ^ var ^ ")"
+    val prog =
+      "(let " ^
+         "val " ^ var ^ " = " ^ inner_prog ^
+      " in " ^
+          "(" ^ store_prog ^ " ; " ^ res_prog ^ ") " ^
+      "end)"
+  in
+    (id, Eval.eval (Input.string prog) ctxt)
   end
 
 fun codec () =
