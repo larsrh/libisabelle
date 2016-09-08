@@ -13,7 +13,9 @@ import info.hupel.isabelle.api._
 import info.hupel.isabelle.hol._
 import info.hupel.isabelle.pure._
 
-class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetup with IsabelleMatchers { def is = s2"""
+class LibisabelleSpec(val specs2Env: Env) extends Specification
+  with DefaultSetup
+  with IsabelleMatchers { def is = s2"""
 
   Basic protocol interaction
 
@@ -26,12 +28,6 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
     handles errors          ${error must beFailure.awaitFor(duration)}
     can cancel requests     ${cancelled.failed must beAnInstanceOf[CancellationException].awaitFor(duration)}
     can be torn down        ${teardown must exist.awaitFor(duration)}"""
-
-  // Starting the system
-
-  val config = resources.makeConfiguration(Nil, "Protocol")
-
-  val system = isabelleEnv.flatMap(System.create(_, config))
 
 
   // Pure/HOL operations

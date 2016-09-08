@@ -46,12 +46,7 @@ class HOLSpec(val specs2Env: Env) extends Specification
     of type List[List[Boolean]]  ${propEmbedUnembed[List[List[Boolean]]]}"""
 
   implicit val params = Parameters(minTestsOk = 20, maxSize = 10).verbose
-
-  // Starting the system
-
-  val config = resources.makeConfiguration(Nil, "HOL-Protocol")
-
-  val system = isabelleEnv.flatMap(System.create(_, config))
+  override def session = "HOL-Protocol"
 
 
   // HOL operations
