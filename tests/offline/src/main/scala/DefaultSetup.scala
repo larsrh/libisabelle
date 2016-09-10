@@ -8,6 +8,7 @@ import scala.concurrent.duration._
 import org.specs2.Specification
 import org.specs2.specification.core.Env
 
+import info.hupel.isabelle.System
 import info.hupel.isabelle.api._
 import info.hupel.isabelle.setup._
 
@@ -25,6 +26,11 @@ trait DefaultSetup {
   lazy val setup: Setup = Setup.detectSetup(platform, version).getOrElse(sys.error("no setup"))
   lazy val isabelleEnv: Future[Environment] = setup.makeEnvironment
   lazy val resources: Resources = Resources.dumpIsabelleResources().getOrElse(sys.error("no resources"))
+
+  def session: String = "Protocol"
+
+  lazy val config: Configuration = resources.makeConfiguration(Nil, session)
+  lazy val system: Future[System] = isabelleEnv.flatMap(System.create(_, config))
 
   lazy val duration = 30.seconds
 }

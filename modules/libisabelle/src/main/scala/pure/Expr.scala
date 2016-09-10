@@ -45,17 +45,17 @@ final case class Expr[T] private[isabelle](val term: Term) {
   def unembed(implicit T: Embeddable[T]): Program[Option[T]] =
     T.unembed(term)
 
-  def untypedCertify(ctxt: ml.Expr[Context]): ml.Expr[CTerm] =
-    ml.Expr.uncheckedLiteral[Option[CTerm] => CTerm]("the")(term.certify(ctxt))
+  def untypedCertify: ml.Expr[Context => Cterm] =
+    term.certify andThen ml.Expr.uncheckedLiteral[Option[Cterm] => Cterm]("the")
 
-  def typedCertify(ctxt: ml.Expr[Context]): ml.Expr[CExpr[T]] =
-    untypedCertify(ctxt).coerce[CExpr[T]]
+  def typedCertify: ml.Expr[Context => Cexpr[T]] =
+    untypedCertify.coerce
 
   def evaluate(ctxt: ml.Expr[Context]): Program[Expr[T]] =
     term.evaluate(ctxt).toProg.map(Expr[T])
 
-  def print(ctxt: ml.Expr[Context]): ml.Expr[String] =
-    term.print(ctxt)
+  def print: ml.Expr[Context => String] =
+    term.print
 
 }
 
@@ -65,7 +65,7 @@ object Expr {
     term.constrain[T].check(ctxt).toProg.map(_.map(Expr[T]))
 
   def fromString[T : Typeable](ctxt: ml.Expr[Context], term: String): Program[Option[Expr[T]]] =
-    Term.parse(ctxt, term).toProg.flatMap {
+    Term.parse(ctxt)(term).toProg.flatMap {
       case None =>
         Program.pure(Option.empty[Expr[T]])
       case Some(term) =>
@@ -77,28 +77,28 @@ object Expr {
 
   def unsafeOfTerm[T](term: Term): Expr[T] = Expr(term)
 
-  def untyped[T](expr: ml.Expr[Expr[T]]): ml.Expr[Term] =
-    expr.coerce
+  def untyped[T]: ml.Expr[Expr[T] => Term] =
+    ml.Expr.uncheckedLiteral[Term => Term]("I").coerce
 
-  def fromThm(thm: ml.Expr[Thm]): ml.Expr[Expr[Prop]] =
-    ml.Expr.uncheckedLiteral[Thm => Term]("Thm.prop_of")(thm).coerce
+  val fromThm: ml.Expr[Thm => Expr[Prop]] =
+    ml.Expr.uncheckedLiteral[Thm => Term]("Thm.prop_of").coerce
 
 }
 
-sealed abstract class CExpr[T]
+sealed abstract class Cexpr[T]
 
-object CExpr {
+object Cexpr {
 
-  def trivial(ce: ml.Expr[CExpr[Prop]]): ml.Expr[Thm] =
-    ml.Expr.uncheckedLiteral[CTerm => Thm]("Thm.trivial")(untyped(ce))
+  def trivial: ml.Expr[Cexpr[Prop] => Thm] =
+    untyped[Prop] andThen ml.Expr.uncheckedLiteral[Cterm => Thm]("Thm.trivial")
 
-  def untyped[T](ce: ml.Expr[CExpr[T]]): ml.Expr[CTerm] =
-    ce.coerce
+  def untyped[T]: ml.Expr[Cexpr[T] => Cterm] =
+    ml.Expr.uncheckedLiteral[Cterm => Cterm]("I").coerce
 
-  def uncertify[T](ce: ml.Expr[CExpr[T]]): ml.Expr[Expr[T]] =
-    ml.Expr.uncheckedLiteral[CTerm => Term]("Thm.term_of")(ce.coerce[CTerm]).coerce[Expr[T]]
+  def uncertify[T]: ml.Expr[Cexpr[T] => Expr[T]] =
+    ml.Expr.uncheckedLiteral[Cterm => Term]("Thm.term_of").coerce
 
-  def fromThm(thm: ml.Expr[Thm]): ml.Expr[CExpr[Prop]] =
-    ml.Expr.uncheckedLiteral[Thm => CTerm]("Thm.cprop_of")(thm).coerce
+  val fromThm: ml.Expr[Thm => Cexpr[Prop]] =
+    ml.Expr.uncheckedLiteral[Thm => Cterm]("Thm.cprop_of").coerce
 
 }

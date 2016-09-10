@@ -13,7 +13,9 @@ import info.hupel.isabelle.api._
 import info.hupel.isabelle.hol._
 import info.hupel.isabelle.pure._
 
-class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetup with IsabelleMatchers { def is = s2"""
+class LibisabelleSpec(val specs2Env: Env) extends Specification
+  with DefaultSetup
+  with IsabelleMatchers { def is = s2"""
 
   Basic protocol interaction
 
@@ -27,19 +29,13 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification with DefaultSetu
     can cancel requests     ${cancelled.failed must beAnInstanceOf[CancellationException].awaitFor(duration)}
     can be torn down        ${teardown must exist.awaitFor(duration)}"""
 
-  // Starting the system
-
-  val config = resources.makeConfiguration(Nil, "Protocol")
-
-  val system = isabelleEnv.flatMap(System.create(_, config))
-
 
   // Pure/HOL operations
 
   val thy = Theory.get("Pure")
   val ctxt = Context.initGlobal(thy)
 
-  val parseCheck = system.flatMap(sys => Term.parse(ctxt, "TERM x").check(sys, "Protocol_Pure"))
+  val parseCheck = system.flatMap(sys => Term.parse(ctxt)("TERM x").check(sys, "Protocol_Pure"))
 
   val parsed = system.flatMap(_.run(Expr.fromString[Prop](ctxt, "TERM x"), "Protocol_Pure"))
   val parseFailed = system.flatMap(_.run(Expr.fromString[Prop](ctxt, "TERM"), "Protocol_Pure"))

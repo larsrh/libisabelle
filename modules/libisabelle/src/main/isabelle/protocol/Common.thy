@@ -40,6 +40,7 @@ end
 
 ML_file "typed_eval.ML"
 ML_file "codec.ML"
+ML_file "ref_table.ML"
 ML_file "protocol.ML"
 
 syntax "_cartouche_xml" :: "cartouche_position \<Rightarrow> 'a"  ("XML _")

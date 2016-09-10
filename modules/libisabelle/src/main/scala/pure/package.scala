@@ -17,28 +17,36 @@ package object pure {
   }
 
   object Theory {
-    def get(name: String): ml.Expr[Theory] =
-      ml.Expr.uncheckedLiteral[String => Theory]("Thy_Info.get_theory")(name)
+    val get: ml.Expr[String => Theory] =
+      ml.Expr.uncheckedLiteral("Thy_Info.get_theory")
+
+    implicit val thyOpaque: ml.Opaque[Theory] = ml.Opaque.make("Refs.Thy")
   }
   type Theory = Theory.type
 
   object Context {
-    def initGlobal(thy: ml.Expr[Theory]): ml.Expr[Context] =
-      ml.Expr.uncheckedLiteral[Theory => Context]("Proof_Context.init_global")(thy)
+    val initGlobal: ml.Expr[Theory => Context] =
+      ml.Expr.uncheckedLiteral("Proof_Context.init_global")
+
+    implicit val ctxtOpaque: ml.Opaque[Context] = ml.Opaque.make("Refs.Ctxt")
   }
   type Context = Context.type
 
-  type Conv = CTerm => Thm
+  type Conv = Cterm => Thm
 
-  object CTerm {
-    def eval(ctxt: ml.Expr[Context], cterm: ml.Expr[CTerm]): ml.Expr[Thm] =
-      ml.Expr.uncheckedLiteral[Context => Conv]("Code_Simp.dynamic_conv")(ctxt)(cterm)
+  object Cterm {
+    val eval: ml.Expr[Context => Conv] =
+      ml.Expr.uncheckedLiteral("Code_Simp.dynamic_conv")
+
+    implicit val ctermOpaque: ml.Opaque[Cterm] = ml.Opaque.make("Refs.Cterm")
   }
-  type CTerm = CTerm.type
+  type Cterm = Cterm.type
 
   object Thm {
-    def term(ct: ml.Expr[CTerm]): ml.Expr[Thm] =
-      ml.Expr.uncheckedLiteral[CTerm => Thm]("Drule.mk_term")(ct)
+    val mkTerm: ml.Expr[Cterm => Thm] =
+      ml.Expr.uncheckedLiteral("Drule.mk_term")
+
+    implicit val thmOpaque: ml.Opaque[Thm] = ml.Opaque.make("Refs.Thm")
   }
   type Thm = Thm.type
 

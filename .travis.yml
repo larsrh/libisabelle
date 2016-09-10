@@ -1,7 +1,7 @@
 language: java
 env:
-  - ISABELLE_VERSION=2015 SCALA_VERSION=2.11.8 TRAVIS_OS=osx
-  - ISABELLE_VERSION=2016 SCALA_VERSION=2.11.8 TRAVIS_OS=osx
+  - ISABELLE_VERSION=2015 SCALA_VERSION=2.11.8 PROFILE=quick
+  - ISABELLE_VERSION=2016 SCALA_VERSION=2.11.8 PROFILE=quick
 install:
   - git submodule update --init --recursive
 os:
@@ -10,14 +10,14 @@ script:
   - ./.ci/travis.sh
 matrix:
   include:
-    - env: ISABELLE_VERSION=2015 SCALA_VERSION=2.10.6 TRAVIS_OS=linux
+    - env: ISABELLE_VERSION=2015 SCALA_VERSION=2.10.6 PROFILE=quick
       os: linux
       jdk: oraclejdk7
       addons:
         apt:
           packages:
             - lib32stdc++6
-    - env: ISABELLE_VERSION=2016 SCALA_VERSION=2.11.8 TRAVIS_OS=linux
+    - env: ISABELLE_VERSION=2016 SCALA_VERSION=2.11.8 PROFILE=slow
       os: linux
       jdk: oraclejdk8
       addons:
