@@ -110,21 +110,17 @@ object Main {
 
       logger.info(s"Using $configuration")
 
-      def mkSetup = args.home match {
+      val setup = args.home match {
         case None =>
           Setup.defaultSetup(version) match {
             case Xor.Right(setup) => setup
             case Xor.Left(reason) => sys.error(reason.explain)
           }
-        case Some(home) => Future.successful(Setup(home, guessPlatform, version, Setup.defaultPackageName))
+        case Some(home) =>
+          Setup(home, guessPlatform, version, Setup.defaultPackageName)
       }
 
-      lazy val bundle =
-        for {
-          setup <- mkSetup
-          env <- setup.makeEnvironment
-        }
-        yield Bundle(env, setup, configuration)
+      lazy val bundle = setup.makeEnvironment.map(Bundle(_, setup, configuration))
 
       val app = args.command match {
         case None => bundle.map(_ => ())

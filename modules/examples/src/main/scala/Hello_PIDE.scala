@@ -10,9 +10,10 @@ import info.hupel.isabelle.setup._
 
 object Hello_PIDE extends App {
 
+  val setup = Setup.defaultSetup(Version("2015")).toOption.get // yolo
+
   val transaction =
     for {
-      setup <- Setup.defaultSetup(Version("2015")).toOption.get // yolo
       env <- setup.makeEnvironment
       resources = Resources.dumpIsabelleResources().toOption.get // yolo
       config = resources.makeConfiguration(Nil, "Protocol")

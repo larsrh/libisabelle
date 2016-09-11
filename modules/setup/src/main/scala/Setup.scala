@@ -37,6 +37,9 @@ object Setup {
   case object UnknownPlatform extends SetupImpossible {
     def explain = "Impossible to download setup on unknown platform"
   }
+  case class InstallationError(t: Throwable) extends SetupImpossible {
+    def explain = s"Download and installation failed: ${t.getMessage}"
+  }
 
   private val logger = getLogger
 
@@ -66,23 +69,25 @@ object Setup {
    * in the [[Platform#setupStorage:* designated path]] according to the
    * [[Platform platform]].
    */
-  def install(platform: OfficialPlatform, version: Version)(implicit ec: ExecutionContext): Future[Setup] = {
+  def install(platform: OfficialPlatform, version: Version): Xor[SetupImpossible, Setup] = {
     Files.createDirectories(platform.setupStorage)
     val url = platform.url(version)
     logger.debug(s"Downloading setup $version from $url to ${platform.setupStorage}")
     Tar.download(url) match {
       case Success(stream) =>
-        val future = platform.withAsyncLock { () =>
-          Tar.extractTo(platform.setupStorage, stream).map { path =>
-            Files.createFile(successMarker(path))
-            Setup(path, platform, version, defaultPackageName)
+        platform.withLock { () =>
+          Tar.extractTo(platform.setupStorage, stream) match {
+            case Success(path) =>
+              Files.createFile(successMarker(path))
+              stream.close()
+              Xor.right(Setup(path, platform, version, defaultPackageName))
+            case Failure(ex) =>
+              Xor.left(InstallationError(ex))
           }
-        }
-        future.onComplete { _ => stream.close() }
-        future
+        }.getOrElse(Xor.left(Busy(platform.lockFile)))
       case Failure(ex) =>
         logger.error(ex)(s"Failed to download $url")
-        Future.failed(ex)
+        Xor.left(InstallationError(ex))
     }
   }
 
@@ -107,14 +112,14 @@ object Setup {
    * [[detectSetup detect existing setup]],
    * [[install install if not existing]].
    */
-  def defaultSetup(version: Version)(implicit ec: ExecutionContext): Xor[SetupImpossible, Future[Setup]] =
+  def defaultSetup(version: Version): Xor[SetupImpossible, Setup] =
     defaultPlatform match {
       case None =>
         Xor.left(UnknownPlatform)
       case Some(platform) =>
         detectSetup(platform, version) match {
-          case Xor.Right(install) =>     Xor.right(Future.successful(install))
-          case Xor.Left(Absent) =>       Xor.right(install(platform, version))
+          case Xor.Right(install) =>     Xor.right(install)
+          case Xor.Left(Absent) =>       install(platform, version)
           case Xor.Left(Busy(p)) =>      Xor.left(Busy(p))
           case Xor.Left(Corrupted(p)) => Xor.left(Corrupted(p))
         }
