@@ -12,7 +12,7 @@ import org.apache.commons.lang3.SystemUtils
 
 import com.github.fge.filesystem.MoreFiles
 
-/** Downloading and unpacking `tar` archives. */
+/** Downloading and unpacking `tar` archives. All operations are blocking. */
 object Tar {
 
   def download(url: URL): Try[TarArchiveInputStream] =

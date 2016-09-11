@@ -11,9 +11,10 @@ object Configuration {
    * (or indirectly via a `ROOTS` file).
    *
    * In almost all cases, it should refer to a session which has one of the
-   * `Protocol` session of the
-   * [[https://github.com/larsrh/libisabelle-protocol accompanying theory sources]]
-   * as an ancestor, or includes these theories in some other way.
+   * `Protocol` session of the accompanying Isabelle sources
+   * as an ancestor, or includes these theories in some other way. To manage
+   * these sources automatically, you may use the
+   * `[[info.hupel.isabelle.setup.Resources Resources]]` class.
    *
    * The given path must not be identical to or be a subdirectory of the
    * Isabelle home path. It must also, either directly or indirectly via a

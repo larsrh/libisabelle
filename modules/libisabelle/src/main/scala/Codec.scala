@@ -240,8 +240,8 @@ object Codec {
  *
  * Instances of this class must satisfy the following contract:
  * [[decode Decoding]] any value produced via `[[encode]]` must succeed,
- * yielding the original value. This only has to hold for one environment,
- * but not necessarily across environments.
+ * yielding the original value. The `[[mlType]]` field must contain a string
+ * representation of the corresponding type in Isabelle/ML.
  *
  * For the opposite direction, it is generally expected that a value which
  * cannot be produced via `[[encode]]` should not [[decode]] cleanly. This is
@@ -255,6 +255,7 @@ object Codec {
  */
 trait Codec[T] { self =>
 
+  /** String representation of the type corresponding to `T` in Isabelle/ML. */
   val mlType: String
 
   /**

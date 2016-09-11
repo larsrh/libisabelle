@@ -23,8 +23,18 @@ import info.hupel.isabelle.api.{BuildInfo, Environment, Version}
  */
 object Setup {
 
+  /**
+   * Common trait for a reason why a [[Setup setup]] could not be
+   * [[detect detected]].
+   */
   sealed trait NoSetup
+
+  /**
+   * Common trait for a reason why a [[Setup setup]] could not be
+   * [[install installed]].
+   */
   sealed trait SetupImpossible { def explain: String }
+
   case object Absent extends NoSetup
   case class Corrupted(path: Path) extends NoSetup with SetupImpossible {
     def explain = s"Possibly corrupted setup detected at $path; try deleting that folder and running again"
