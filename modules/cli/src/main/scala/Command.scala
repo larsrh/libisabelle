@@ -7,8 +7,6 @@ import org.log4s._
 import info.hupel.isabelle.api._
 import info.hupel.isabelle.setup.Setup
 
-import acyclic.file
-
 /**
  * Simple bundle of an Isabelle [[info.hupel.isabelle.setup.Setup setup]], a
  * matching [[info.hupel.isabelle.api.Environment environment]] and a requested

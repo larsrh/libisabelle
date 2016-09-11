@@ -13,8 +13,6 @@ import org.log4s._
 
 import info.hupel.isabelle.api.{BuildInfo, Environment, Version}
 
-import acyclic.file
-
 /**
  * Detecting and creating [[Setup setups]].
  *

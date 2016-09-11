@@ -2,8 +2,6 @@ package info.hupel.isabelle.api
 
 import scala.collection.mutable.ListBuffer
 
-import acyclic.file
-
 // FIXME code mostly copied from xml.scala and yxml.scala
 
 object XML {

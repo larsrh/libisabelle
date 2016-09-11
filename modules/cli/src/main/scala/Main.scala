@@ -13,8 +13,6 @@ import cats.data.Xor
 import info.hupel.isabelle.api._
 import info.hupel.isabelle.setup._
 
-import acyclic.file
-
 // FIXME rewrite using alexarchambault/case-app
 object Args {
 

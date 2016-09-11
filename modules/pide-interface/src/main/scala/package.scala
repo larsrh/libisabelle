@@ -5,8 +5,6 @@ import java.util.Collections
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService}
 
-import acyclic.file
-
 /**
  * Minimal API for managing some Isabelle version. It is centered around the
  * notion of an [[Environment environment]], which captures the base

@@ -12,8 +12,6 @@ import org.log4s._
 
 import info.hupel.isabelle.api.{BuildInfo, Version}
 
-import acyclic.file
-
 /**
  * Function preparing a classpath containing an appropriate
  * [[info.hupel.isabelle.api.Environment environment]].

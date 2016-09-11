@@ -13,8 +13,6 @@ import org.log4s._
 
 import info.hupel.isabelle.api.{Configuration, Version}
 
-import acyclic.file
-
 object Resources {
 
   sealed abstract class Error(val explain: String)

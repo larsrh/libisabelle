@@ -2,8 +2,6 @@ package info.hupel.isabelle.api
 
 import java.nio.file.{Files, Path}
 
-import acyclic.file
-
 /** Convenience constructors for [[Configuration configurations]]. */
 object Configuration {
 

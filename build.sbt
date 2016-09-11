@@ -61,12 +61,6 @@ lazy val noPublishSettings = Seq(
   publishArtifact := false
 )
 
-lazy val acyclicSettings = Seq(
-  libraryDependencies += "com.lihaoyi" %% "acyclic" % "0.1.4" % "provided",
-  autoCompilerPlugins := true,
-  addCompilerPlugin("com.lihaoyi" %% "acyclic" % "0.1.4")
-)
-
 lazy val macroSettings = Seq(
   libraryDependencies ++= Seq(
     "org.typelevel" %% "macro-compat" % "1.1.1",
@@ -113,7 +107,6 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
   .settings(moduleName := "pide-interface")
   .settings(standardSettings)
   .settings(warningSettings)
-  .settings(acyclicSettings)
   .enablePlugins(GitVersioning, BuildInfoPlugin)
   .settings(
     buildInfoKeys := apiBuildInfoKeys,
@@ -133,7 +126,7 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % "0.7.2",
       "org.typelevel" %% "cats-free" % "0.7.2",
-      "io.monix" %% "monix-execution" % "2.0.0",
+      "io.monix" %% "monix-execution" % "2.0.1",
       "com.lihaoyi" %% "scalatags" % "0.6.0"
     )
   )
@@ -143,7 +136,6 @@ lazy val setup = project.in(file("modules/setup"))
   .settings(moduleName := "libisabelle-setup")
   .settings(standardSettings)
   .settings(warningSettings)
-  .settings(acyclicSettings)
   .settings(
     libraryDependencies ++= Seq(
       "io.get-coursier" %% "coursier" % "1.0.0-M14",
@@ -205,7 +197,7 @@ lazy val tests = project.in(file("tests"))
   .settings(noPublishSettings)
   .aggregate(offlineTest, pureTest, holTest)
 
-val specs2Version = "3.8.4"
+val specs2Version = "3.8.5"
 
 lazy val offlineTest = project.in(file("tests/offline"))
   .dependsOn(setup, pidePackage)
@@ -252,7 +244,6 @@ lazy val cli = project.in(file("modules/cli"))
   .settings(moduleName := "libisabelle-cli")
   .settings(standardSettings)
   .settings(warningSettings)
-  .settings(acyclicSettings)
   .settings(
     libraryDependencies += logback,
     mainClass in Compile := Some("info.hupel.isabelle.cli.Main")

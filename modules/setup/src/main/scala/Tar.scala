@@ -13,8 +13,6 @@ import org.apache.commons.lang3.SystemUtils
 
 import com.github.fge.filesystem.MoreFiles
 
-import acyclic.file
-
 /** Downloading and unpacking `tar` archives. */
 object Tar {
 

@@ -7,9 +7,8 @@ import java.nio.file.Path
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService}
 
 import org.log4s._
-import shapeless.tag._
 
-import acyclic.file
+import shapeless.tag._
 
 object Environment {
 
