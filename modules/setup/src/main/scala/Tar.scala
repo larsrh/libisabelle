@@ -4,7 +4,6 @@ import java.io.InputStream
 import java.net.URL
 import java.nio.file._
 
-import scala.concurrent._
 import scala.util.Try
 
 import org.apache.commons.compress.archivers.tar.{TarArchiveEntry, TarArchiveInputStream}
@@ -19,7 +18,7 @@ object Tar {
   def download(url: URL): Try[TarArchiveInputStream] =
     Try(new TarArchiveInputStream(new GzipCompressorInputStream(url.openStream())))
 
-  def extractTo(path: Path, tar: TarArchiveInputStream)(implicit ec: ExecutionContext): Future[Path] = Future {
+  def extractTo(path: Path, tar: TarArchiveInputStream): Try[Path] = Try {
     def next() = Option(tar.getNextTarEntry())
 
     @annotation.tailrec
@@ -54,7 +53,7 @@ object Tar {
         go(next(), p ::: paths)
     }
 
-    blocking { go(next(), Nil) }.foldLeft(List.empty[Path]) { (roots, path) =>
+    go(next(), Nil).foldLeft(List.empty[Path]) { (roots, path) =>
       if (roots.exists(path.startsWith))
         roots
       else
