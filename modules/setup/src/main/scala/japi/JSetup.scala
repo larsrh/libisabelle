@@ -12,7 +12,7 @@ import info.hupel.isabelle.setup._
 object JSetup {
 
   def defaultSetup(version: Version, timeout: Duration): Setup =
-    Setup.defaultSetup(version).valueOr(reason => sys.error(reason.explain))
+    Setup.default(version).valueOr(reason => sys.error(reason.explain))
 
   def defaultSetup(version: Version): Setup =
     defaultSetup(version, Duration.Inf)

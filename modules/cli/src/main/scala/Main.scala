@@ -88,7 +88,7 @@ object Main {
       Option(System.getProperty("info.hupel.isabelle.version"))
     ).map(Version)
 
-  def guessPlatform: Platform = Setup.defaultPlatform match {
+  def guessPlatform: Platform = Platform.guess match {
     case Some(platform) => platform
     case None =>
       logger.debug("Falling back to generic platform, will write temporary data into `./libisabelle`")
@@ -118,7 +118,7 @@ object Main {
 
       val setup = args.home match {
         case None =>
-          Setup.defaultSetup(version) match {
+          Setup.default(version) match {
             case Xor.Right(setup) => setup
             case Xor.Left(reason) => sys.error(reason.explain)
           }

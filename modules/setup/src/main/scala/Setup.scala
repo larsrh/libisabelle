@@ -41,9 +41,6 @@ object Setup {
 
   private val logger = getLogger
 
-  /** Default platform: [[Platform.guess guessing]]. */
-  def defaultPlatform: Option[OfficialPlatform] = Platform.guess
-
   /**
    * Default package name of PIDE jars.
    *
@@ -93,7 +90,7 @@ object Setup {
    * Try to find an existing [[Setup setup]] in the
    * [[Platform#setupStorage:* designated path]] of the [[Platform platform]].
    */
-  def detectSetup(platform: Platform, version: Version): Xor[NoSetup, Setup] = platform.withLock { () =>
+  def detect(platform: Platform, version: Version): Xor[NoSetup, Setup] = platform.withLock { () =>
     val path = platform.setupStorage(version)
     if (Files.isDirectory(path)) {
       if (Files.isRegularFile(successMarker(path)))
@@ -106,16 +103,16 @@ object Setup {
   }.getOrElse(Xor.left(Busy(platform.lockFile)))
 
   /**
-   * The default setup: [[defaultPlatform default platform]],
-   * [[detectSetup detect existing setup]],
+   * The default setup: [[Platform.guess default platform]],
+   * [[detect detect existing setup]],
    * [[install install if not existing]].
    */
-  def defaultSetup(version: Version): Xor[SetupImpossible, Setup] =
-    defaultPlatform match {
+  def default(version: Version): Xor[SetupImpossible, Setup] =
+    Platform.guess match {
       case None =>
         Xor.left(UnknownPlatform)
       case Some(platform) =>
-        detectSetup(platform, version) match {
+        detect(platform, version) match {
           case Xor.Right(install) =>     Xor.right(install)
           case Xor.Left(Absent) =>       install(platform, version)
           case Xor.Left(Busy(p)) =>      Xor.left(Busy(p))
