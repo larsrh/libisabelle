@@ -10,7 +10,7 @@ import info.hupel.isabelle.setup.*;
 public class Hello_PIDE {
 
   public static void main(String args[]) {
-    Environment env = JSetup.makeEnvironment(JSetup.defaultSetup(new Version("2015")));
+    Environment env = JSetup.makeEnvironment(JSetup.defaultSetup(new Version("2016")));
     JResources res = JResources.dumpIsabelleResources();
     Configuration config = res.makeConfiguration(Arrays.<Path> asList(), "Protocol");
     JSystem sys = JSystem.create(env, config);

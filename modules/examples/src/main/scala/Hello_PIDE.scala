@@ -10,7 +10,7 @@ import info.hupel.isabelle.setup._
 
 object Hello_PIDE extends App {
 
-  val setup = Setup.defaultSetup(Version("2015")).toOption.get // yolo
+  val setup = Setup.defaultSetup(Version("2016")).toOption.get // yolo
 
   val transaction =
     for {
