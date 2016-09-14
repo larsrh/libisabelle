@@ -115,6 +115,8 @@ lazy val docs = project.in(file("modules/docs"))
     )
   )
 
+addCommandAlias("pushSite", "; docs/makeSite ; docs/ghpagesPushSite")
+
 lazy val pideInterface = project.in(file("modules/pide-interface"))
   .settings(moduleName := "pide-interface")
   .settings(standardSettings)

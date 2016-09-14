@@ -1,6 +1,8 @@
 # libisabelle
 
-A Scala library which talks to Isabelle
+A Scala library which talks to Isabelle.
+It currently works with Isabelle2015 and Isabelle2016.
+For more information about the project, visit [its website](http://lars.hupel.info/libisabelle/).
 
 | Service                   | Status |
 | ------------------------- | ------ |
@@ -10,69 +12,6 @@ A Scala library which talks to Isabelle
 | Scaladoc                  | [![Scaladoc](http://javadoc-badge.appspot.com/info.hupel/libisabelle-docs_2.11.svg?label=scaladoc)](http://javadoc-badge.appspot.com/info.hupel/libisabelle-docs_2.11) |
 | Zenodo (DOI)              | [![DOI](https://zenodo.org/badge/3836/larsrh/libisabelle.svg)](https://zenodo.org/badge/latestdoi/3836/larsrh/libisabelle) |
 | Gitter (Chat)             | [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/larsrh/libisabelle) |
-
-
-## Setup
-
-`libisabelle` is a Scala library which talks to Isabelle.
-It currently works with Isabelle2015 and Isabelle2016.
-
-To get started, follow these steps:
-
-1. Make sure you have checked out and/or updated all submodules.
-   This can be done easily by running `git submodule update --init --recursive`.
-2. Run the `sbt` script to fetch all required Scala dependencies.
-   After this is done, you are in the SBT shell.
-3. Compile the sources with `compile`.
-4. Bootstrap an Isabelle installation using `cli/run --version 2016 build`, which will download and extract the latest supported Isabelle version for you.
-
-On some systems, you might need to install Perl, Python, and/or some additional libraries.
-
-Note to proficient Isabelle users:
-`libisabelle` does not respect `ISABELLE_HOME`.
-Bootstrapping will create a new installation in your home folder (Linux: `~/.local/share`, Windows: `%LOCALAPPDATA%`, OS X: `~/Library/Preferences`).
-
-
-## Operating system support
-
-`libisabelle` works on all platforms supported by Isabelle (Mac OS X, Linux, Windows).
-It can either use an existing installation or bootstrap one (by downloading the appropriate archive from the Isabelle website).
-Bootstrapping is automatically tested on all three platforms.
-
-### Note on Windows support
-
-AppVeyor builds `libisabelle` on Windows, but only bootstraps an Isabelle installation.
-It does not run the integration tests (for now).
-
-
-## Running the tests
-
-Run the `sbt` script again, then, in the SBT shell, type `test`.
-This requires the environment variable `ISABELLE_VERSION` to be set.
-Another option is to pass the version to the test framework directly.
-
-Example:
-
-```
-$ cd libisabelle
-$ ./sbt
-...
-> testOnly * -- isabelle.version 2016
-```
-
-Make sure to have bootstrapped the installation as described above for the appropriate Isabelle version, otherwise the tests will fail.
-
-
-## Command line interface
-
-The `cli` application is able to launch an Isabelle/jEdit instance with a specified logic.
-
-```
-$ cd libisabelle
-$ ./sbt
-...
-> cli/run --version 2016 --session HOL-Probability jedit
-```
 
 
 ## Including libisabelle into your project
@@ -95,6 +34,26 @@ If you don't want this, additionally include the following dependency:
 ```
 
 This adds PIDE implementations for all supported Isabelle versions to your classpath.
+
+
+## Command line interface
+
+You can download a recent tarball release from [GitHub](https://github.com/larsrh/libisabelle/releases).
+This tarball is packaged with [sbt-native-packager](https://github.com/sbt/sbt-native-packager) and provides convenient launcher scripts to use `libisabelle`'s command line interface.
+
+
+### Downloading & checking your installation
+
+```
+./bin/cli --version 2016 check
+```
+
+
+### Launching Isabelle/jEdit
+
+```
+./bin/cli --version 2016 --session HOL-Probability jedit
+```
 
 
 ## Participation
