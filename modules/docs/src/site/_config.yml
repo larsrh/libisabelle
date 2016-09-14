@@ -7,3 +7,7 @@ kramdown:
 highlighter: rouge
 exclude:
   ["vendor"]
+
+collections:
+  tut:
+    output: true

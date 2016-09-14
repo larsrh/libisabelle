@@ -95,13 +95,16 @@ lazy val root = project.in(file("."))
   )
 
 lazy val docs = project.in(file("modules/docs"))
+  .dependsOn(setup, pidePackage)
   .settings(moduleName := "libisabelle-docs")
   .settings(standardSettings)
   .settings(unidocSettings)
   .settings(macroSettings)
+  .settings(tutSettings)
   .settings(site.settings)
   .settings(ghpages.settings)
   .settings(
+    libraryDependencies += logback,
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(pideInterface, libisabelle, setup),
     doc in Compile := (doc in ScalaUnidoc).value,
     target in unidoc in ScalaUnidoc := crossTarget.value / "api",
@@ -110,9 +113,8 @@ lazy val docs = project.in(file("modules/docs"))
     includeFilter in makeSite := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.yml" | "*.md" | "Gemfile" | "config",
     watchSources ++= (siteSourceDirectory.value ** "*").get,
     watchSources += ((baseDirectory in ThisBuild).value / "README.md"),
-    siteMappings ++= Seq(
-      ((baseDirectory in ThisBuild).value / "README.md", "_includes/README.md")
-    )
+    siteMappings += ((baseDirectory in ThisBuild).value / "README.md", "_includes/README.md"),
+    site.addMappingsToSiteDir(tut, "_tut")
   )
 
 addCommandAlias("pushSite", "; docs/makeSite ; docs/ghpagesPushSite")
