@@ -1,3 +1,5 @@
+import GhPagesKeys._
+import SiteKeys._
 import UnidocKeys._
 
 lazy val standardSettings = Seq(
@@ -97,10 +99,20 @@ lazy val docs = project.in(file("modules/docs"))
   .settings(standardSettings)
   .settings(unidocSettings)
   .settings(macroSettings)
+  .settings(site.settings)
+  .settings(ghpages.settings)
   .settings(
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(pideInterface, libisabelle, setup),
     doc in Compile := (doc in ScalaUnidoc).value,
-    target in unidoc in ScalaUnidoc := crossTarget.value / "api"
+    target in unidoc in ScalaUnidoc := crossTarget.value / "api",
+    ghpagesNoJekyll := false,
+    git.remoteRepo := "github.com:larsrh/libisabelle.git",
+    includeFilter in makeSite := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.yml" | "*.md" | "Gemfile" | "config",
+    watchSources ++= (siteSourceDirectory.value ** "*").get,
+    watchSources += ((baseDirectory in ThisBuild).value / "README.md"),
+    siteMappings ++= Seq(
+      ((baseDirectory in ThisBuild).value / "README.md", "_includes/README.md")
+    )
   )
 
 lazy val pideInterface = project.in(file("modules/pide-interface"))

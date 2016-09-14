@@ -1,6 +1,6 @@
 # libisabelle
 
- A Scala library which talks to Isabelle
+A Scala library which talks to Isabelle
 
 | Service                   | Status |
 | ------------------------- | ------ |
