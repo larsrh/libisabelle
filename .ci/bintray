@@ -1,0 +1,23 @@
+{
+    "package": {
+        "name": "isabellectl",
+        "repo": "libisabelle",
+        "subject": "larsrh"
+    },
+
+    "version": {
+        "name": "nightly"
+    },
+
+    "files": [
+        {
+          "includePattern": "modules/cli/target/scala-2.11/isabellectl-assembly-.*\.jar",
+          "uploadPattern": "isabellectl.jar",
+          "matrixParams": {
+              "override": 1
+          }
+        }
+    ],
+
+    "publish": true
+}
