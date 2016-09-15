@@ -262,12 +262,13 @@ addCommandAlias("validateQuick", "; offlineTest/test ; pureTest/test")
 
 lazy val cli = project.in(file("modules/cli"))
   .dependsOn(setup, pidePackage)
-  .settings(moduleName := "libisabelle-cli")
+  .settings(moduleName := "isabellectl")
   .settings(standardSettings)
   .settings(warningSettings)
   .settings(
     libraryDependencies += logback,
-    mainClass in Compile := Some("info.hupel.isabelle.cli.Main")
+    mainClass in Compile := Some("info.hupel.isabelle.cli.Main"),
+    assemblyJarName in assembly := s"isabellectl-assembly-${version.value}.jar"
   )
   .enablePlugins(JavaAppPackaging, UniversalPlugin)
 
