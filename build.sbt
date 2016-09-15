@@ -101,7 +101,7 @@ lazy val docs = project.in(file("modules/docs"))
   .settings(unidocSettings)
   .settings(macroSettings)
   .settings(tutSettings)
-  .settings(site.settings)
+  .settings(site.settings ++ site.includeScaladoc("api/nightly"))
   .settings(ghpages.settings)
   .settings(
     libraryDependencies += logback,
