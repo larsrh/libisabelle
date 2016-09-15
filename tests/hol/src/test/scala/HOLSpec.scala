@@ -46,6 +46,7 @@ class HOLSpec(val specs2Env: Env) extends Specification
   Term evaluation                ${eval}
   Peeking                        ${peeking}"""
 
+  implicit val bigIntArbitrary: Arbitrary[BigInt] = Arbitrary(Gen.choose(-100, 100).map(BigInt(_)))
   implicit val params = Parameters(minTestsOk = 20, maxSize = 10).verbose
   override def session = "HOL-Protocol"
 
