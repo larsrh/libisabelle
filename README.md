@@ -38,21 +38,22 @@ This adds PIDE implementations for all supported Isabelle versions to your class
 
 ## Command line interface
 
-You can download a recent tarball release from [GitHub](https://github.com/larsrh/libisabelle/releases).
-This tarball is packaged with [sbt-native-packager](https://github.com/sbt/sbt-native-packager) and provides convenient launcher scripts to use `libisabelle`'s command line interface.
+`libisabelle` features a CLI called `isabellectl`.
+Currently, it only allows some basic features like downloading, building and launching Isabelle.
+You can download the latest nightly CLI JAR from [Bintray](https://bintray.com/larsrh/libisabelle/isabellectl/nightly).
 
 
 ### Downloading & checking your installation
 
 ```
-./bin/cli --version 2016 check
+java -jar isabellectl.jar --version 2016 check
 ```
 
 
 ### Launching Isabelle/jEdit
 
 ```
-./bin/cli --version 2016 --session HOL-Probability jedit
+java -jar isabellectl.jar --version 2016 --session HOL-Probability jedit
 ```
 
 
