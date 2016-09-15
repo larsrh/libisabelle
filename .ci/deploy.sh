@@ -11,8 +11,8 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
 fi
 
 if [ "$PROFILE" = "slow" ]; then
-  git config user.name "Lars Hupel"
-  git config user.email "lars.hupel@mytum.de"
+  git config --global user.name "Lars Hupel"
+  git config --global user.email "lars.hupel@mytum.de"
   ./sbt "++$SCALA_VERSION" pushSite
 else
   echo "This build job executes the '$PROFILE' profile and not 'slow', no deploy."

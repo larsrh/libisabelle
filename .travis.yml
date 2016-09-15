@@ -11,8 +11,11 @@ os:
   - osx
 script:
   - ./.ci/travis.sh
-after_success:
-  - ./.ci/deploy.sh
+deploy:
+  provider: script
+  script: ./.ci/deploy.sh
+  on:
+    branch: master
 matrix:
   include:
     - env: ISABELLE_VERSION=2015 SCALA_VERSION=2.10.6 PROFILE=quick
