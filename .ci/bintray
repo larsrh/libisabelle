@@ -11,7 +11,7 @@
 
     "files": [
         {
-          "includePattern": "modules/cli/target/scala-2.11/isabellectl-assembly-.*\.jar",
+          "includePattern": "modules/cli/target/scala-2.11/(isabellectl-assembly-.*)",
           "uploadPattern": "isabellectl.jar",
           "matrixParams": {
               "override": 1
