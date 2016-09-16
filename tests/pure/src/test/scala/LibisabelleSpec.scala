@@ -26,8 +26,7 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification
     can't parse wrong terms ${parseFailed must beNone.awaitFor(duration)}
     can load theories       ${loaded must beSuccess(()).awaitFor(duration)}
     handles errors          ${error must beFailure.awaitFor(duration)}
-    can cancel requests     ${cancelled.failed must beAnInstanceOf[CancellationException].awaitFor(duration)}
-    can be torn down        ${teardown must exist.awaitFor(duration)}"""
+    can cancel requests     ${cancelled.failed must beAnInstanceOf[CancellationException].awaitFor(duration)}"""
 
 
   // Pure/HOL operations
@@ -60,17 +59,6 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification
       s <- system
       _ <- loaded
       res <- { val future = s.invoke(Sleepy)(1); future.cancel(); future }
-    }
-    yield ()
-
-
-  // Teardown
-
-  val teardown =
-    for {
-      s <- system
-      _ <- Future.sequence(List(parsed, parseFailed, parseCheck, error, cancelled.failed)) // barrier
-      _ <- s.dispose
     }
     yield ()
 

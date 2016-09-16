@@ -6,13 +6,10 @@ import scala.math.BigInt
 
 import org.specs2.{ScalaCheck, Specification}
 import org.specs2.scalacheck.Parameters
-import org.specs2.specification.AfterAll
 import org.specs2.specification.core.Env
 
 import org.scalacheck._
 import org.scalacheck.Prop.forAll
-
-import org.log4s._
 
 import info.hupel.isabelle._
 import info.hupel.isabelle.api._
@@ -22,7 +19,6 @@ import info.hupel.isabelle.pure._
 class HOLSpec(val specs2Env: Env) extends Specification
   with DefaultSetup
   with IsabelleMatchers
-  with AfterAll
   with ScalaCheck { def is = s2"""
 
   Isabelle/HOL operations
@@ -110,16 +106,6 @@ class HOLSpec(val specs2Env: Env) extends Specification
     run(prog) must beLike[(Term, Term)] { case (t1, t2) =>
       t1 must be_===(t2)
     }.awaitFor(duration)
-  }
-
-
-  // Teardown
-
-  val logger = getLogger
-
-  def afterAll() = {
-    logger.info("Shutting down system ...")
-    Await.result(system.flatMap(_.dispose), duration)
   }
 
 }

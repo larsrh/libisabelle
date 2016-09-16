@@ -2,17 +2,20 @@ package info.hupel.isabelle.tests
 
 import java.nio.file.Paths
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 
+import org.log4s._
+
 import org.specs2.Specification
+import org.specs2.specification.AfterAll
 import org.specs2.specification.core.Env
 
 import info.hupel.isabelle.System
 import info.hupel.isabelle.api._
 import info.hupel.isabelle.setup._
 
-trait DefaultSetup {
+trait DefaultSetup extends AfterAll {
   val specs2Env: Env
   implicit val ee = specs2Env.executionEnv
 
@@ -33,4 +36,13 @@ trait DefaultSetup {
   lazy val system: Future[System] = isabelleEnv.flatMap(System.create(_, config))
 
   lazy val duration = 30.seconds
+
+
+  val logger = getLogger
+
+  def afterAll() = {
+    logger.info("Shutting down system ...")
+    Await.result(system.flatMap(_.dispose), duration)
+  }
+
 }
