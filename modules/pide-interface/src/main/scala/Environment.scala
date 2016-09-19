@@ -125,11 +125,11 @@ abstract class Environment protected(val context: Environment.Context) { self =>
 
   final val version: Version = Environment.getVersion(getClass())
 
-  final val variables: Map[String, String] = Map(
+  final lazy val variables: Map[String, String] = Map(
     "ISABELLE_VERSION" -> version.identifier,
     "LIBISABELLE_GIT" -> BuildInfo.gitHeadCommit.getOrElse(""),
     "LIBISABELLE_VERSION" -> BuildInfo.version,
-    "USER_HOME" -> user.toString
+    "USER_HOME" -> isabellePath(user.toString)
   )
 
   override def toString: String =
@@ -137,6 +137,8 @@ abstract class Environment protected(val context: Environment.Context) { self =>
 
 
   protected final val logger = getLogger
+
+  protected[isabelle] def isabellePath(path: String): String
 
   protected[isabelle] def build(config: Configuration): Int
 

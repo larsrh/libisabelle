@@ -15,7 +15,7 @@ final class Environment private(context: api.Environment.Context) extends api.En
 
   isabelle.Future.execution_context = context.executorService
   isabelle.Isabelle_System.init(
-    isabelle_home = home.toAbsolutePath.toString,
+    isabelle_home = home.toString,
     cygwin_root = home.resolve("contrib/cygwin").toAbsolutePath.toString
   )
 
@@ -33,8 +33,11 @@ final class Environment private(context: api.Environment.Context) extends api.En
 
   private lazy val options = isabelle.Options.init()
 
+  protected[isabelle] def isabellePath(path: String): String =
+    isabelle.Isabelle_System.posix_path(path)
+
   private def mkPaths(paths: List[Path]) =
-    paths.map(p => isabelle.Path.explode(isabelle.Isabelle_System.posix_path(p.toAbsolutePath.toString)))
+    paths.map(p => isabelle.Path.explode(isabellePath(p.toAbsolutePath.toString)))
 
   private def progress(config: api.Configuration) = new isabelle.Build.Progress {
     logger.debug(s"Building $config ...")

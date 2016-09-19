@@ -33,8 +33,11 @@ final class Environment private(context: api.Environment.Context) extends api.En
 
   private lazy val options = isabelle.Options.init()
 
+  protected[isabelle] def isabellePath(path: String): String =
+    isabelle.File.standard_path(path)
+
   private def mkPaths(paths: List[Path]) =
-    paths.map(p => isabelle.Path.explode(isabelle.File.standard_path(p.toAbsolutePath.toString)))
+    paths.map(p => isabelle.Path.explode(isabellePath(p.toAbsolutePath.toString)))
 
   private def progress(config: api.Configuration) = new isabelle.Progress {
     logger.debug(s"Building $config ...")
