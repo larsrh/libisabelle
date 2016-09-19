@@ -57,6 +57,13 @@ isabellectl --version 2016 --session HOL-Probability jedit
 ```
 
 
+### Using Isabelle tools
+
+```
+isabellectl --version 2016 exec getenv ISABELLE_HOME
+```
+
+
 ## Participation
 
 This project supports the [Typelevel][typelevel] [code of conduct][codeofconduct] and wants all of its channels (at the moment: GitHub and Gitter) to be welcoming environments for everyone.
