@@ -1,6 +1,7 @@
 import GhPagesKeys._
 import SiteKeys._
 import UnidocKeys._
+import sbtassembly.AssemblyPlugin.defaultShellScript
 
 lazy val standardSettings = Seq(
   organization := "info.hupel",
@@ -273,7 +274,8 @@ lazy val cli = project.in(file("modules/cli"))
   .settings(
     libraryDependencies += logback,
     mainClass in Compile := Some("info.hupel.isabelle.cli.Main"),
-    assemblyJarName in assembly := s"isabellectl-assembly-${version.value}.jar"
+    assemblyJarName in assembly := s"isabellectl-assembly-${version.value}",
+    assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript))
   )
   .enablePlugins(JavaAppPackaging, UniversalPlugin)
 

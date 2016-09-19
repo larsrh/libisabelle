@@ -40,20 +40,20 @@ This adds PIDE implementations for all supported Isabelle versions to your class
 
 `libisabelle` features a CLI called `isabellectl`.
 Currently, it only allows some basic features like downloading, building and launching Isabelle.
-You can download the latest nightly CLI JAR from [Bintray](https://bintray.com/larsrh/libisabelle/isabellectl/nightly).
+You can download the latest nightly CLI executable from [Bintray](https://bintray.com/larsrh/libisabelle/isabellectl/nightly).
 
 
 ### Downloading & checking your installation
 
 ```
-java -jar isabellectl.jar --version 2016 check
+isabellectl --version 2016 check
 ```
 
 
 ### Launching Isabelle/jEdit
 
 ```
-java -jar isabellectl.jar --version 2016 --session HOL-Probability jedit
+isabellectl --version 2016 --session HOL-Probability jedit
 ```
 
 
