@@ -179,11 +179,16 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
   .settings(Seq(
     buildInfoKeys := apiBuildInfoKeys,
     buildInfoPackage := "info.hupel.isabelle.impl",
+    autoScalaLibrary := false,
+    libraryDependencies += "org.scala-lang" % "scala-library" % scalaVersion.value % "provided",
     libraryDependencies ++= {
+      val dep =
+        ("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4").exclude("org.scala-lang", "scala-library")
+
       if (scalaVersion.value startsWith "2.10")
         Seq()
       else
-        Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4")
+        Seq(dep)
     },
     assemblyJarName := s"${moduleName.value}-assembly.jar"
   ))
