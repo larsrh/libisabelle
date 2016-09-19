@@ -22,16 +22,21 @@ object Args {
     case "--session" :: session :: rest if args.session.isEmpty => parse(args.copy(session = Some(session)), rest)
     case "--home" :: home :: rest if args.home.isEmpty => parse(args.copy(home = Some(Paths.get(home))), rest)
     case "--dump" :: dump :: rest if args.dump.isEmpty => parse(args.copy(dump = Some(Paths.get(dump))), rest)
+    case "--fresh-user" :: rest if args.user.isEmpty => parse(args.copy(user = Some(Files.createTempDirectory("libisabelle_user"))), rest)
+    case "--user" :: user :: rest if args.user.isEmpty => parse(args.copy(user = Some(Paths.get(user))), rest)
     case cmd :: rest if !cmd.startsWith("-") => Some(args.copy(command = Some(cmd), rest = rest))
     case Nil => Some(args)
     case _ => None
   }
 
   def parse(args: List[String]): Option[Args] =
-    parse(Args(None, Nil, None, None, None, None, Nil), args)
+    parse(Args(None, Nil, None, None, None, None, None, Nil), args)
 
   val usage = """
-    | Usage: [--version VERSION] [--include PATH]* [--session SESSION] [--home PATH] [--dump PATH] [CMD [extra options ...]]
+    | Usage:
+    |   isabellectl [--version VERSION] [--include PATH]* [--session SESSION]
+    |               [--home PATH] [--dump PATH] [--user PATH | --fresh-user]
+    |               [CMD [extra options ...]]
     |
     | Available commands:
     |   build
@@ -52,6 +57,7 @@ case class Args(
   session: Option[String],
   home: Option[Path],
   dump: Option[Path],
+  user: Option[Path],
   command: Option[String],
   rest: List[String]
 )
@@ -118,7 +124,7 @@ object Main {
           Setup(home, guessPlatform, version, Setup.defaultPackageName)
       }
 
-      lazy val bundle = setup.makeEnvironment.map(Bundle(_, setup, configuration))
+      lazy val bundle = setup.makeEnvironment(Resolver.Default, args.user).map(Bundle(_, setup, configuration))
 
       val app = args.command match {
         case None => bundle.map(_ => ())

@@ -25,7 +25,7 @@ object Environment {
   private val instances: java.util.Map[Class[_ <: Environment], Path] =
     Collections.synchronizedMap(new WeakHashMap())
 
-  private def checkInstance(clazz: Class[_ <: Environment], home: Path): Unit = instances.synchronized {
+  private def checkInstance(clazz: Class[_ <: Environment], home: Path, user: Path): Unit = instances.synchronized {
     val version = getVersion(clazz)
     if (instances.containsKey(clazz)) {
       val oldHome = instances.get(clazz)
@@ -37,7 +37,7 @@ object Environment {
       }
     }
     else {
-      logger.debug(s"Instantiating environment for $version at $home")
+      logger.debug(s"Instantiating environment for $version at $home (with user storage $user)")
       instances.put(clazz, home)
       ()
     }
@@ -67,7 +67,7 @@ object Environment {
   sealed trait Unicode
 
   /** Bundles all requirements to instantiate an [[Environment environment]]. */
-  case class Context(home: Path, ec: ExecutionContext) {
+  case class Context(home: Path, ec: ExecutionContext, user: Path) {
     def executorService = ec.toExecutorService
   }
 
@@ -117,17 +117,19 @@ object Environment {
  */
 abstract class Environment protected(val context: Environment.Context) { self =>
 
-  final val home = context.home
+  final val home = context.home.toAbsolutePath
+  final val user = context.user.toAbsolutePath
   final implicit val executionContext: ExecutionContext = context.ec
 
-  Environment.checkInstance(getClass(), home)
+  Environment.checkInstance(getClass(), home, user)
 
   final val version: Version = Environment.getVersion(getClass())
 
   final val variables: Map[String, String] = Map(
     "ISABELLE_VERSION" -> version.identifier,
     "LIBISABELLE_GIT" -> BuildInfo.gitHeadCommit.getOrElse(""),
-    "LIBISABELLE_VERSION" -> BuildInfo.version
+    "LIBISABELLE_VERSION" -> BuildInfo.version,
+    "USER_HOME" -> user.toString
   )
 
   override def toString: String =

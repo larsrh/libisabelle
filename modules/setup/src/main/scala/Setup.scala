@@ -141,7 +141,7 @@ final case class Setup(home: Path, platform: Platform, version: Version, package
 
   private val logger = getLogger
 
-  private def instantiate(urls: List[URL])(implicit ec: ExecutionContext): Environment = {
+  private def instantiate(urls: List[URL], user: Path)(implicit ec: ExecutionContext): Environment = {
     logger.debug(s"Instantiating setup with classpath ${urls.mkString(":")} ...")
 
     val classLoader = new URLClassLoader(urls.toArray, getClass.getClassLoader)
@@ -156,7 +156,7 @@ final case class Setup(home: Path, platform: Platform, version: Version, package
       sys.error(s"build info does not match")
 
     val constructor = env.getDeclaredConstructor(classOf[Environment.Context])
-    val context = Environment.Context(home, ec)
+    val context = Environment.Context(home, ec, user)
     constructor.setAccessible(true)
     constructor.newInstance(context)
   }
@@ -166,7 +166,7 @@ final case class Setup(home: Path, platform: Platform, version: Version, package
    * [[Resolver.Default default resolver]].
    */
   def makeEnvironment(implicit ec: ExecutionContext): Future[Environment] =
-    makeEnvironment(Resolver.Default)
+    makeEnvironment(Resolver.Default, None)
 
   /**
    * Prepares a fresh [[info.hupel.isabelle.api.Environment]].
@@ -174,7 +174,9 @@ final case class Setup(home: Path, platform: Platform, version: Version, package
    * If the [[Resolver resolver]] found an appropriate classpath, this method
    * also checks for matching [[info.hupel.isabelle.api.BuildInfo build info]].
    */
-  def makeEnvironment(resolver: Resolver)(implicit ec: ExecutionContext): Future[Environment] =
-    resolver.resolve(platform, version).map(paths => instantiate(paths.map(_.toUri.toURL)))
+  def makeEnvironment(resolver: Resolver, user: Option[Path])(implicit ec: ExecutionContext): Future[Environment] = {
+    val user0 = user.getOrElse(platform.userStorage(version))
+    resolver.resolve(platform, version).map(paths => instantiate(paths.map(_.toUri.toURL), user0))
+  }
 
 }

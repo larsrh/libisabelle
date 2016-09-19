@@ -89,6 +89,9 @@ sealed abstract class Platform {
   final def lockFile: Path =
     localStorage.resolve(".lock")
 
+  final def userStorage(version: Version): Path =
+    localStorage.resolve("user").resolve(version.identifier)
+
   private def acquireLock(): Option[FileLock] = {
     Files.createDirectories(localStorage)
     FileChannel.open(lockFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE).tryLock() match {
