@@ -20,7 +20,7 @@ object JEdit extends Command {
         logger.info(s"Starting Isabelle/jEdit with logic $logic ...")
         logger.debug(s"Executing ${cli.mkString(" ")}")
 
-        Process(cli, None, bundle.env.variables.toList: _*).run(nullLogger)
+        Process(cli, None, bundle.env.variables.toList: _*).run(nullLogger).exitValue()
         ()
       }
     case Platform.Windows =>

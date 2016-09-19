@@ -41,6 +41,7 @@ object Args {
     | Available commands:
     |   build
     |   check
+    |   exec [CMD ...]
     |   jedit
     |   report [--format FORMAT] FILE [FILES ...]
     |
@@ -69,6 +70,7 @@ object Main {
   val commands: Map[String, Command] = Map(
     "build" -> Build,
     "check" -> Check,
+    "exec" -> Exec,
     "jedit" -> JEdit,
     "report" -> Report
   )
