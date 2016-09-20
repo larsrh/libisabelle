@@ -16,10 +16,10 @@ final class Environment private(context: api.Environment.Context) extends api.En
   isabelle.Future.execution_context = context.executorService
   isabelle.Isabelle_System.init(
     isabelle_home = home.toString,
-    cygwin_root = home.resolve("contrib/cygwin").toAbsolutePath.toString
+    cygwin_root = home.resolve("contrib/cygwin").toString,
+    user = user.toString,
+    init_env = variables
   )
-
-  api.Environment.patchSettings(isabelle.Isabelle_System, variables)
 
   private def destMarkup(markup: isabelle.Markup) =
     (markup.name, markup.properties)
@@ -32,6 +32,9 @@ final class Environment private(context: api.Environment.Context) extends api.En
   protected[isabelle] type Session = isabelle.Session
 
   private lazy val options = isabelle.Options.init()
+
+  protected[isabelle] def isabelleSetting(name: String): String =
+    isabelle.Isabelle_System.getenv(name)
 
   protected[isabelle] def isabellePath(path: String): String =
     isabelle.Isabelle_System.posix_path(path)

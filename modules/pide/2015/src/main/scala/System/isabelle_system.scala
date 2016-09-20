@@ -63,7 +63,7 @@ object Isabelle_System
       (2) ISABELLE_HOME process environment variable (e.g. inherited from running isabelle tool)
       (3) isabelle.home system property (e.g. via JVM application boot process)
   */
-  def init(isabelle_home: String = "", cygwin_root: String = ""): Unit = synchronized {
+  def init(isabelle_home: String = "", cygwin_root: String = "", user: String = "", init_env: Map[String, String] = Map.empty): Unit = synchronized {
     if (_settings.isEmpty) {
       import scala.collection.JavaConversions._
 
@@ -92,11 +92,13 @@ object Isabelle_System
 
         default(
           default(
-            default(sys.env + ("ISABELLE_JDK_HOME" -> posix_path(jdk_home())),
-              "TEMP_WINDOWS" -> temp_windows),
-            "HOME" -> user_home),
-          "ISABELLE_APP" -> "true")
-      }
+            default(
+              default(sys.env + ("ISABELLE_JDK_HOME" -> posix_path(jdk_home())),
+                "TEMP_WINDOWS" -> temp_windows),
+              "HOME" -> user_home),
+            "ISABELLE_APP" -> "true"),
+          "USER_HOME" -> posix_path(user))
+      } ++ init_env
 
       val system_home =
         if (isabelle_home != null && isabelle_home != "") isabelle_home

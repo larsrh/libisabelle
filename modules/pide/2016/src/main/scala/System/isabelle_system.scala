@@ -57,7 +57,7 @@ object Isabelle_System
     _settings.get
   }
 
-  def init(isabelle_root: String = "", cygwin_root: String = ""): Unit = synchronized {
+  def init(isabelle_root: String = "", cygwin_root: String = "", user: String = "", init_env: Map[String, String] = Map.empty): Unit = synchronized {
     if (_settings.isEmpty) {
       import scala.collection.JavaConversions._
 
@@ -95,11 +95,13 @@ object Isabelle_System
 
         default(
           default(
-            default(sys.env + ("ISABELLE_JDK_HOME" -> File.standard_path(jdk_home())),
-              "TEMP_WINDOWS" -> temp_windows),
-            "HOME" -> user_home),
-          "ISABELLE_APP" -> "true")
-      }
+            default(
+              default(sys.env + ("ISABELLE_JDK_HOME" -> File.standard_path(jdk_home())),
+                "TEMP_WINDOWS" -> temp_windows),
+              "HOME" -> user_home),
+            "ISABELLE_APP" -> "true"),
+          "USER_HOME" -> File.standard_path(user))
+      } ++ init_env
 
       val settings =
       {

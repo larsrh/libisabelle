@@ -15,17 +15,27 @@ import info.hupel.isabelle.System
 import info.hupel.isabelle.api._
 import info.hupel.isabelle.setup._
 
-trait DefaultSetup extends AfterAll {
+trait BasicSetup {
+
+  lazy val duration = 30.seconds
+
   val specs2Env: Env
   implicit val ee = specs2Env.executionEnv
+  import specs2Env.executionEnv.ec
 
   lazy val version: Version =
     Option(java.lang.System.getenv("ISABELLE_VERSION")).orElse(
       specs2Env.arguments.commandLine.value("isabelle.version")
     ).map(Version.apply).get
 
-  import specs2Env.executionEnv.ec
   lazy val platform: Platform = Setup.defaultPlatform.get
+
+}
+
+trait DefaultSetup extends BasicSetup with AfterAll {
+
+  import specs2Env.executionEnv.ec
+
   lazy val setup: Setup = Setup.detectSetup(platform, version).getOrElse(sys.error("no setup"))
   lazy val isabelleEnv: Future[Environment] = setup.makeEnvironment
   lazy val resources: Resources = Resources.dumpIsabelleResources().getOrElse(sys.error("no resources"))
@@ -34,8 +44,6 @@ trait DefaultSetup extends AfterAll {
 
   lazy val config: Configuration = resources.makeConfiguration(Nil, session)
   lazy val system: Future[System] = isabelleEnv.flatMap(System.create(_, config))
-
-  lazy val duration = 30.seconds
 
 
   val logger = getLogger
