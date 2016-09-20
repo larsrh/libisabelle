@@ -156,7 +156,7 @@ final case class Setup(home: Path, platform: Platform, version: Version, package
       sys.error(s"build info does not match")
 
     val constructor = env.getDeclaredConstructor(classOf[Environment.Context])
-    val context = Environment.Context(home, ec, user)
+    val context = Environment.Context(home, user)(ec)
     constructor.setAccessible(true)
     constructor.newInstance(context)
   }

@@ -22,32 +22,25 @@ object Environment {
         Version(identifier)
   }
 
-  private val instances: java.util.Map[Class[_ <: Environment], Path] =
+  private val instances: java.util.Map[Class[_ <: Environment], Context] =
     Collections.synchronizedMap(new WeakHashMap())
 
-  private def checkInstance(clazz: Class[_ <: Environment], home: Path, user: Path): Unit = instances.synchronized {
+  private def checkInstance(clazz: Class[_ <: Environment], context: Context): Unit = instances.synchronized {
     val version = getVersion(clazz)
     if (instances.containsKey(clazz)) {
-      val oldHome = instances.get(clazz)
-      if (instances.get(clazz) == home)
-        logger.warn(s"Environment for $version has already been instantiated, but with the same path $oldHome")
+      val oldContext = instances.get(clazz)
+      if (instances.get(clazz) == context)
+        logger.warn(s"Environment for $version has already been instantiated, but with the same context")
       else {
-        logger.error(s"Failed to instantiate environment for $version at $home; already existing at $oldHome")
+        logger.error(s"Failed to instantiate environment for $version; already existing with different context")
         sys.error("invalid instantiation")
       }
     }
     else {
-      logger.debug(s"Instantiating environment for $version at $home (with user storage $user)")
-      instances.put(clazz, home)
+      logger.debug(s"Instantiating environment for $version at ${context.home} (with user storage ${context.user})")
+      instances.put(clazz, context)
       ()
     }
-  }
-
-  private[isabelle] def patchSettings(instance: Any, patch: Map[String, String]) = {
-    val field = instance.getClass.getDeclaredField("_settings")
-    field.setAccessible(true)
-    val old = field.get(instance).asInstanceOf[Option[Map[String, String]]].get
-    field.set(instance, Some(old ++ patch))
   }
 
   /**
@@ -67,7 +60,7 @@ object Environment {
   sealed trait Unicode
 
   /** Bundles all requirements to instantiate an [[Environment environment]]. */
-  case class Context(home: Path, ec: ExecutionContext, user: Path) {
+  case class Context(home: Path, user: Path)(implicit val ec: ExecutionContext) {
     def executorService = ec.toExecutorService
   }
 
@@ -121,15 +114,14 @@ abstract class Environment protected(val context: Environment.Context) { self =>
   final val user = context.user.toAbsolutePath
   final implicit val executionContext: ExecutionContext = context.ec
 
-  Environment.checkInstance(getClass(), home, user)
+  Environment.checkInstance(getClass(), context)
 
   final val version: Version = Environment.getVersion(getClass())
 
-  final lazy val variables: Map[String, String] = Map(
+  final val variables: Map[String, String] = Map(
     "ISABELLE_VERSION" -> version.identifier,
     "LIBISABELLE_GIT" -> BuildInfo.gitHeadCommit.getOrElse(""),
-    "LIBISABELLE_VERSION" -> BuildInfo.version,
-    "USER_HOME" -> isabellePath(user.toString)
+    "LIBISABELLE_VERSION" -> BuildInfo.version
   )
 
   override def toString: String =
@@ -138,6 +130,7 @@ abstract class Environment protected(val context: Environment.Context) { self =>
 
   protected final val logger = getLogger
 
+  protected[isabelle] def isabelleSetting(name: String): String
   protected[isabelle] def isabellePath(path: String): String
 
   protected[isabelle] def build(config: Configuration): Int
