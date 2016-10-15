@@ -91,7 +91,7 @@ lazy val root = project.in(file("."))
     pideInterface, libisabelle, setup,
     tests, docs, examples,
     cli,
-    pide2015, pide2016,
+    pide2016, pide2016_1_RC0,
     pidePackage
   )
 
@@ -177,7 +177,7 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
   .settings(moduleName := s"pide-$version")
   .settings(standardSettings)
   .enablePlugins(GitVersioning, BuildInfoPlugin)
-  .settings(Seq(
+  .settings(
     buildInfoKeys := apiBuildInfoKeys,
     buildInfoPackage := "info.hupel.isabelle.impl",
     autoScalaLibrary := false,
@@ -192,10 +192,13 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
         Seq(dep)
     },
     assemblyJarName := s"${moduleName.value}-assembly.jar"
-  ))
+  )
 
-lazy val pide2015 = pide("2015")
 lazy val pide2016 = pide("2016")
+lazy val pide2016_1_RC0 = pide("2016-1-RC0")
+  .settings(
+    libraryDependencies += "org.tukaani" % "xz" % "1.5"
+  )
 
 
 def assemblyGenerator(p: Project): Def.Initialize[Task[Seq[File]]] =
@@ -212,8 +215,8 @@ lazy val pidePackage = project.in(file("modules/pide-package"))
   .settings(moduleName := "pide-package")
   .settings(standardSettings)
   .settings(
-    resourceGenerators in Compile <+= assemblyGenerator(pide2015),
-    resourceGenerators in Compile <+= assemblyGenerator(pide2016)
+    resourceGenerators in Compile <+= assemblyGenerator(pide2016),
+    resourceGenerators in Compile <+= assemblyGenerator(pide2016_1_RC0)
   )
 
 

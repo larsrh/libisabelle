@@ -33,9 +33,9 @@ fun join_flags
   {sequential = seq1 orelse seq2, bracket = br1 orelse br2, auto = a1 orelse a2}
 
 fun print_flags {sequential, bracket, auto} =
-  "({sequential=" ^ Markup.print_bool sequential ^ "," ^
-    "bracket=" ^ Markup.print_bool bracket ^ "," ^
-    "auto=" ^ Markup.print_bool auto ^ "})"
+  "({sequential=" ^ print_bool sequential ^ "," ^
+    "bracket=" ^ print_bool bracket ^ "," ^
+    "auto=" ^ print_bool auto ^ "})"
 
 type raw_operation = int -> XML.tree -> XML.tree
 
@@ -56,8 +56,8 @@ fun sequentialize name f =
 
 fun bracketize f id x =
   let
-    val start = [(Markup.functionN, "libisabelle_start"), ("id", Markup.print_int id)]
-    val stop = [(Markup.functionN, "libisabelle_stop"), ("id", Markup.print_int id)]
+    val start = [(Markup.functionN, "libisabelle_start"), ("id", print_int id)]
+    val stop = [(Markup.functionN, "libisabelle_stop"), ("id", print_int id)]
     val _ = Output.protocol_message start []
     val res = f id x
     val _ = Output.protocol_message stop []
@@ -84,8 +84,8 @@ fun get_operation name =
 val _ = Isabelle_Process.protocol_command "libisabelle"
   (fn id :: name :: [arg] =>
     let
-      val id = Markup.parse_int id
-      val response = [(Markup.functionN, "libisabelle_response"), ("id", Markup.print_int id)]
+      val id = parse_int id
+      val response = [(Markup.functionN, "libisabelle_response"), ("id", print_int id)]
       val args = YXML.parse arg
       fun exec f =
         let
@@ -108,7 +108,7 @@ val _ = Isabelle_Process.protocol_command "libisabelle_cancel"
     let
       fun remove id tab = (Inttab.lookup tab id, Inttab.delete_safe id tab)
       val _ =
-        map Markup.parse_int ids
+        map parse_int ids
         |> fold_map remove
         |> Synchronized.change_result requests
         |> map (fn NONE => () | SOME f => f ())

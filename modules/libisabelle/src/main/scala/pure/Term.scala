@@ -100,7 +100,7 @@ sealed abstract class Term {
     ml.Expr.uncheckedLiteral[Term => Context => Cterm]("(fn t => fn ctxt => Thm.cterm_of ctxt t)")(this).liftTry
 
   def evaluate: ml.Expr[Context => Term] =
-    ml.Expr.uncheckedLiteral[Term => Context => Term]("(fn t => fn ctxt => Value.value ctxt t)")(this)
+    ml.Expr.uncheckedLiteral[Term => Context => Term]("(fn t => fn ctxt => Value_Command.value ctxt t)")(this)
 
   def print: ml.Expr[Context => String] =
     ml.Expr.uncheckedLiteral[Term => Context => String]("(fn t => fn ctxt => YXML.content_of (Syntax.string_of_term ctxt t))")(this)
