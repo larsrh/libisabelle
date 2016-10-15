@@ -9,6 +9,7 @@ package isabelle
 
 
 import scala.collection.immutable.Queue
+import scala.util.control.NonFatal
 
 
 object Session
@@ -535,7 +536,15 @@ class Session(val resources: Resources)
           case Start(start_prover) if !prover.defined =>
             if (phase == Session.Inactive || phase == Session.Failed) {
               phase = Session.Startup
-              prover.set(start_prover(manager.send(_)))
+              try {
+                prover.set(start_prover(manager.send(_)))
+              }
+              catch {
+                case NonFatal(e) =>
+                  // hack: up to 2016, the manager was informed about startup failures
+                  // we emulate this behaviour here
+                  manager.send(new Prover.Output(XML.Elem(Markup(Markup.EXIT, List()), Nil)))
+              }
             }
 
           case Stop =>

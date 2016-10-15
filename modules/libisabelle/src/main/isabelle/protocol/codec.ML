@@ -120,7 +120,7 @@ fun variant enc dec tag = Codec
      case (body, dec idx) of
        ([tree'], SOME res) => res tree'
      | (_, SOME _) => Failure ("invalid structure", [tree])
-     | (_, NONE) => Failure ("invalid index " ^ Markup.print_int idx, [tree])))}
+     | (_, NONE) => Failure ("invalid index " ^ print_int idx, [tree])))}
 
 fun tagged tag a = Codec
   {encode = encode a #> single #> add_tag tag NONE,
@@ -151,8 +151,8 @@ end
 
 fun the_decode c = the_success o decode c
 
-val int = tagged "int" (text Markup.print_int (Exn.get_res o Exn.capture Markup.parse_int))
-val bool = tagged "bool" (text Markup.print_bool (Exn.get_res o Exn.capture Markup.parse_bool))
+val int = tagged "int" (text print_int (Exn.get_res o Exn.capture parse_int))
+val bool = tagged "bool" (text print_bool (Exn.get_res o Exn.capture parse_bool))
 val string = tagged "string" (text I SOME)
 
 val tree = tagged "XML.tree" id

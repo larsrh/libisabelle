@@ -76,7 +76,12 @@ final class Environment private(context: api.Environment.Context) extends api.En
       case _ =>
     }
 
-    session.start(receiver => isabelle.Isabelle_Process(options, logic = config.session, receiver = receiver))
+    session.start(receiver =>
+      isabelle.Isabelle_Process(
+        options,
+        logic = config.session,
+        receiver = receiver,
+        dirs = mkPaths(config.paths)))
     session
   }
 
