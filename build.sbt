@@ -91,7 +91,7 @@ lazy val root = project.in(file("."))
     pideInterface, libisabelle, setup,
     tests, docs, examples,
     cli,
-    pide2015, pide2016,
+    pide2016,
     pidePackage
   )
 
@@ -194,7 +194,6 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
     assemblyJarName := s"${moduleName.value}-assembly.jar"
   ))
 
-lazy val pide2015 = pide("2015")
 lazy val pide2016 = pide("2016")
 
 
@@ -212,7 +211,6 @@ lazy val pidePackage = project.in(file("modules/pide-package"))
   .settings(moduleName := "pide-package")
   .settings(standardSettings)
   .settings(
-    resourceGenerators in Compile <+= assemblyGenerator(pide2015),
     resourceGenerators in Compile <+= assemblyGenerator(pide2016)
   )
 
