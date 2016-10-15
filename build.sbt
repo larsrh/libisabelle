@@ -197,10 +197,7 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
 lazy val pide2016 = pide("2016")
 lazy val pide2016_1_RC0 = pide("2016-1-RC0")
   .settings(
-    libraryDependencies ++= Seq(
-      "org.tukaani" % "xz" % "1.5",
-      ("org.scala-lang" % "scala-compiler" % scalaVersion.value).exclude("org.scala-lang", "scala-library")
-    )
+    libraryDependencies += "org.tukaani" % "xz" % "1.5"
   )
 
 

@@ -8,8 +8,8 @@ Isabelle system tools: external executables or internal Scala functions.
 package isabelle
 
 import java.net.URLClassLoader
-import scala.reflect.runtime.universe
-import scala.tools.reflect.{ToolBox,ToolBoxError}
+//import scala.reflect.runtime.universe
+//import scala.tools.reflect.{ToolBox,ToolBoxError}
 
 
 object Isabelle_Tool
@@ -18,7 +18,7 @@ object Isabelle_Tool
 
   abstract class Body extends Function[List[String], Unit]
 
-  private def compile(path: Path): Body =
+  /*private def compile(path: Path): Body =
   {
     def err(msg: String): Nothing =
       cat_error(msg, "The error(s) above occurred in Isabelle/Scala tool " + path)
@@ -48,7 +48,7 @@ object Isabelle_Tool
         else
           err(e.toString)
     }
-  }
+  }*/
 
 
   /* external tools */
@@ -83,8 +83,8 @@ object Isabelle_Tool
 
   private def find_external(name: String): Option[List[String] => Unit] =
     dirs.collectFirst({
-      case dir if is_external(dir, name + ".scala") =>
-        compile(dir + Path.basic(name + ".scala"))
+      //case dir if is_external(dir, name + ".scala") =>
+      //  compile(dir + Path.basic(name + ".scala"))
       case dir if is_external(dir, name) =>
         (args: List[String]) =>
           {
