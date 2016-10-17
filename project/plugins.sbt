@@ -14,5 +14,6 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.1.1")
 addSbtPlugin("com.typesafe.sbt" % "sbt-ghpages" % "0.5.4")
 addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "0.8.1")
 addSbtPlugin("org.tpolecat" % "tut-plugin" % "0.4.3")
+addSbtPlugin("com.typesafe.sbt" % "sbt-proguard" % "0.2.2")
 
 addSbtPlugin("info.hupel" % "sbt-libisabelle" % "0.3")
