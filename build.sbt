@@ -135,7 +135,7 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
     buildInfoPackage := "info.hupel.isabelle.api",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.2",
-      "org.log4s" %% "log4s" % "1.3.0"
+      "info.hupel.fork.org.log4s" %% "log4s" % "2.0"
     )
   )
 
@@ -148,8 +148,8 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % "0.7.2",
       "org.typelevel" %% "cats-free" % "0.7.2",
-      "io.monix" %% "monix-execution" % "2.0.1",
-      "com.lihaoyi" %% "scalatags" % "0.6.0"
+      "io.monix" %% "monix-execution" % "2.0.5",
+      "com.lihaoyi" %% "scalatags" % "0.6.2"
     )
   )
 
@@ -160,12 +160,12 @@ lazy val setup = project.in(file("modules/setup"))
   .settings(warningSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "io.get-coursier" %% "coursier" % "1.0.0-M14",
-      "io.get-coursier" %% "coursier-cache" % "1.0.0-M14",
+      "io.get-coursier" %% "coursier" % "1.0.0-M14-6",
+      "io.get-coursier" %% "coursier-cache" % "1.0.0-M14-6",
       "com.github.fge" % "java7-fs-more" % "0.2.0",
       "com.google.code.findbugs" % "jsr305" % "3.0.1" % "compile",
       "org.apache.commons" % "commons-compress" % "1.12",
-      "org.apache.commons" % "commons-lang3" % "3.4"
+      "org.apache.commons" % "commons-lang3" % "3.5"
     )
   )
 
@@ -238,7 +238,7 @@ lazy val tests = project.in(file("tests"))
   .settings(noPublishSettings)
   .aggregate(offlineTest, pureTest, holTest)
 
-val specs2Version = "3.8.5"
+val specs2Version = "3.8.5.1"
 
 lazy val offlineTest = project.in(file("tests/offline"))
   .dependsOn(setup, pidePackage)
