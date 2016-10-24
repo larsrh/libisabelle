@@ -5,7 +5,7 @@ import scala.concurrent._, scala.concurrent.duration._, scala.concurrent.Executi
 
 import info.hupel.isabelle._, info.hupel.isabelle.api._, info.hupel.isabelle.setup._
 
-val setup = Setup.defaultSetup(Version("2016")).toOption.get
+val setup = Setup.default(Version("2016")).toOption.get
 
 val transaction =
   for {
