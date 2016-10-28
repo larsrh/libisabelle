@@ -7,8 +7,6 @@ import java.nio.file._
 import scala.collection.JavaConverters._
 import scala.io.Source
 
-import cats.data.Xor
-
 import org.log4s._
 
 import info.hupel.isabelle.api.{Configuration, Version}
@@ -26,7 +24,7 @@ object Resources {
    * Shorthand for `[[dumpIsabelleResources(path* dumpIsabelleResources]]
    * using a temporary path and the current class loader.
    */
-  def dumpIsabelleResources(): Xor[Error, Resources] =
+  def dumpIsabelleResources(): Either[Error, Resources] =
     dumpIsabelleResources(Files.createTempDirectory("libisabelle_resources"), getClass.getClassLoader)
 
   /**
@@ -53,7 +51,7 @@ object Resources {
    * `A/tactic.ML`, `A/ROOTS`, `B/ROOT` and `C/Seq.thy` have been written, the
    * `ROOTS` file will contain `A` and `B`, but not `C`.
    */
-  def dumpIsabelleResources(path: Path, classLoader: ClassLoader): Xor[Error, Resources] = {
+  def dumpIsabelleResources(path: Path, classLoader: ClassLoader): Either[Error, Resources] = {
     val files = classLoader.getResources(".libisabelle/.files").asScala.toList.flatMap { url =>
       logger.debug(s"Found Isabelle resource set at $url")
       Source.fromURL(url, "UTF-8").getLines.toList
@@ -65,7 +63,7 @@ object Resources {
       if (files.distinct != files) {
         val fileSet = files.toSet
         val duplicates = files diff fileSet.toList
-        Xor.left(DuplicatedFiles(duplicates))
+        Left(DuplicatedFiles(duplicates))
       }
       else {
         for (file <- files) {
@@ -89,11 +87,11 @@ object Resources {
         out.write(roots.distinct.mkString("\n"))
         out.close()
 
-        Xor.right(Resources(path))
+        Right(Resources(path))
       }
     }
     else {
-      Xor.left(Absent)
+      Left(Absent)
     }
   }
 

@@ -7,8 +7,6 @@ import java.nio.file.{Files, Path, Paths}
 import scala.concurrent.{Future, ExecutionContext}
 import scala.util._
 
-import cats.data.Xor
-
 import org.log4s._
 
 import info.hupel.isabelle.api.{BuildInfo, Environment, Version}
@@ -74,7 +72,7 @@ object Setup {
    * in the [[Platform#setupStorage:* designated path]] according to the
    * [[Platform platform]].
    */
-  def install(platform: OfficialPlatform, version: Version): Xor[SetupImpossible, Setup] = {
+  def install(platform: OfficialPlatform, version: Version): Either[SetupImpossible, Setup] = {
     Files.createDirectories(platform.setupStorage)
     val url = platform.url(version)
     logger.debug(s"Downloading setup $version from $url to ${platform.setupStorage}")
@@ -85,14 +83,14 @@ object Setup {
             case Success(path) =>
               Files.createFile(successMarker(path))
               stream.close()
-              Xor.right(Setup(path, platform, version, defaultPackageName))
+              Right(Setup(path, platform, version, defaultPackageName))
             case Failure(ex) =>
-              Xor.left(InstallationError(ex))
+              Left(InstallationError(ex))
           }
-        }.getOrElse(Xor.left(Busy(platform.lockFile)))
+        }.getOrElse(Left(Busy(platform.lockFile)))
       case Failure(ex) =>
         logger.error(ex)(s"Failed to download $url")
-        Xor.left(InstallationError(ex))
+        Left(InstallationError(ex))
     }
   }
 
@@ -100,33 +98,33 @@ object Setup {
    * Try to find an existing [[Setup setup]] in the
    * [[Platform#setupStorage:* designated path]] of the [[Platform platform]].
    */
-  def detect(platform: Platform, version: Version): Xor[NoSetup, Setup] = platform.withLock { () =>
+  def detect(platform: Platform, version: Version): Either[NoSetup, Setup] = platform.withLock { () =>
     val path = platform.setupStorage(version)
     if (Files.isDirectory(path)) {
       if (Files.isRegularFile(successMarker(path)))
-        Xor.right(Setup(path, platform, version, defaultPackageName))
+        Right(Setup(path, platform, version, defaultPackageName))
       else
-        Xor.left(Corrupted(path))
+        Left(Corrupted(path))
     }
     else
-      Xor.left(Absent)
-  }.getOrElse(Xor.left(Busy(platform.lockFile)))
+      Left(Absent)
+  }.getOrElse(Left(Busy(platform.lockFile)))
 
   /**
    * The default setup: [[Platform.guess default platform]],
    * [[detect detect existing setup]],
    * [[install install if not existing]].
    */
-  def default(version: Version): Xor[SetupImpossible, Setup] =
+  def default(version: Version): Either[SetupImpossible, Setup] =
     Platform.guess match {
       case None =>
-        Xor.left(UnknownPlatform)
+        Left(UnknownPlatform)
       case Some(platform) =>
         detect(platform, version) match {
-          case Xor.Right(install) =>     Xor.right(install)
-          case Xor.Left(Absent) =>       install(platform, version)
-          case Xor.Left(Busy(p)) =>      Xor.left(Busy(p))
-          case Xor.Left(Corrupted(p)) => Xor.left(Corrupted(p))
+          case Right(install) =>     Right(install)
+          case Left(Absent) =>       install(platform, version)
+          case Left(Busy(p)) =>      Left(Busy(p))
+          case Left(Corrupted(p)) => Left(Corrupted(p))
         }
     }
 

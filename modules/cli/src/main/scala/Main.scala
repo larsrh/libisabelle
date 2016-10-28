@@ -8,8 +8,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import org.log4s._
 
-import cats.data.Xor
-
 import info.hupel.isabelle.api._
 import info.hupel.isabelle.setup._
 
@@ -105,8 +103,8 @@ object Main {
       val dump = args.dump.getOrElse(Files.createTempDirectory("libisabelle_resources"))
 
       val resources = Resources.dumpIsabelleResources(dump, getClass.getClassLoader) match {
-        case Xor.Right(resources) => resources
-        case Xor.Left(error) => sys.error(error.explain)
+        case Right(resources) => resources
+        case Left(error) => sys.error(error.explain)
       }
 
       val configuration = args.session match {
@@ -119,8 +117,8 @@ object Main {
       val setup = args.home match {
         case None =>
           Setup.default(version) match {
-            case Xor.Right(setup) => setup
-            case Xor.Left(reason) => sys.error(reason.explain)
+            case Right(setup) => setup
+            case Left(reason) => sys.error(reason.explain)
           }
         case Some(home) =>
           Setup(home, guessPlatform, version, Setup.defaultPackageName)

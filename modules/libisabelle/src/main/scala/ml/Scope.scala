@@ -3,7 +3,7 @@ package info.hupel.isabelle.ml
 import scala.concurrent._
 import scala.math.BigInt
 
-import cats.{Monad, RecursiveTailRecM}
+import cats.Monad
 import cats.free.Free
 
 import info.hupel.isabelle._
@@ -112,7 +112,7 @@ class LocalScope extends Scope {
   }
 
   object Program {
-    implicit val localProgramMonad: Monad[Program] with RecursiveTailRecM[Program] = new Monad[Program] with RecursiveTailRecM[Program] {
+    implicit val localProgramMonad: Monad[Program] = new Monad[Program] {
       def pure[A](x: A) = new Program(Free.pure(x))
       def flatMap[A, B](fa: Program[A])(f: A => Program[B]) = fa flatMap f
       def tailRecM[A, B](a: A)(f: A => Program[Either[A,B]]) = localize {
