@@ -5,12 +5,12 @@ import scala.concurrent._, scala.concurrent.duration._, scala.concurrent.Executi
 
 import info.hupel.isabelle._, info.hupel.isabelle.api._, info.hupel.isabelle.setup._
 
-val setup = Setup.default(Version("2016")).toOption.get
+val setup = Setup.default(Version("2016")).right.get
 
 val transaction =
   for {
     env <- setup.makeEnvironment
-    resources = Resources.dumpIsabelleResources().toOption.get
+    resources = Resources.dumpIsabelleResources().right.get
     config = resources.makeConfiguration(Nil, "Protocol")
     sys <- System.create(env, config)
     response <- sys.invoke(Operation.Hello)("world")
