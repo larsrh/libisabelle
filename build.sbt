@@ -211,23 +211,22 @@ lazy val pide2016_1_RC0 = pide("2016-1-RC0")
   )
 
 
-def assemblyGenerator(p: Project): Def.Initialize[Task[Seq[File]]] =
-  (streams, ProguardKeys.proguard in Proguard in p, resourceManaged) map { (streams, sources, targetDir) =>
-    val Seq(source) = sources
-    val target = targetDir / source.getName
-    val log = streams.log
-    log.info(s"Copying assembly $source to $target ...")
-    IO.copyFile(source, target, preserveLastModified = true)
-    Seq(target)
-  }
+def assemblyGenerator(p: Project) = Def.task {
+  val Seq(source) = (ProguardKeys.proguard in Proguard in p).value
+  val target = resourceManaged.value / source.getName
+  val log = streams.value.log
+  log.info(s"Copying assembly $source to $target ...")
+  IO.copyFile(source, target, preserveLastModified = true)
+  Seq(target)
+}
 
 lazy val pidePackage = project.in(file("modules/pide-package"))
   .dependsOn(pideInterface)
   .settings(moduleName := "pide-package")
   .settings(standardSettings)
   .settings(
-    resourceGenerators in Compile <+= assemblyGenerator(pide2016),
-    resourceGenerators in Compile <+= assemblyGenerator(pide2016_1_RC0)
+    resourceGenerators in Compile += assemblyGenerator(pide2016).taskValue,
+    resourceGenerators in Compile += assemblyGenerator(pide2016_1_RC0).taskValue
   )
 
 
