@@ -200,7 +200,7 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
       "-dontwarn",
       "-ignorewarnings"
     ),
-    ProguardKeys.proguardVersion in Proguard := "5.3",
+    ProguardKeys.proguardVersion in Proguard := "5.3.1",
     ProguardKeys.outputs in Proguard := Seq(target.value / s"${moduleName.value}-assembly.jar")
   )
 
