@@ -1,6 +1,9 @@
 #!/bin/bash
 
-set -x
+set -ex
+
+curl -s https://raw.githubusercontent.com/paulp/sbt-extras/master/sbt > sbt
+chmod 0755 sbt
 
 ./sbt "++$SCALA_VERSION" compile
 ./sbt "++$SCALA_VERSION" "cli/run --version $ISABELLE_VERSION --session Protocol build"
