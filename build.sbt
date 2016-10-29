@@ -91,7 +91,7 @@ lazy val root = project.in(file("."))
     pideInterface, libisabelle, setup,
     tests, docs, examples,
     cli,
-    pide2016, pide2016_1_RC0,
+    pide2016, pide2016_1_RC1,
     pidePackage
   )
 
@@ -205,9 +205,13 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
   )
 
 lazy val pide2016 = pide("2016")
-lazy val pide2016_1_RC0 = pide("2016-1-RC0")
+lazy val pide2016_1_RC1 = pide("2016-1-RC1")
   .settings(
-    libraryDependencies += "org.tukaani" % "xz" % "1.5"
+    libraryDependencies ++= Seq(
+      "org.tukaani" % "xz" % "1.5",
+      "com.jcraft" % "jsch" % "0.1.54",
+      "com.jcraft" % "jzlib" % "1.1.3"
+    )
   )
 
 
@@ -226,7 +230,7 @@ lazy val pidePackage = project.in(file("modules/pide-package"))
   .settings(standardSettings)
   .settings(
     resourceGenerators in Compile += assemblyGenerator(pide2016).taskValue,
-    resourceGenerators in Compile += assemblyGenerator(pide2016_1_RC0).taskValue
+    resourceGenerators in Compile += assemblyGenerator(pide2016_1_RC1).taskValue
   )
 
 
