@@ -25,8 +25,4 @@ ML_cond ("2016") \<open>
   structure Value_Command = Value
 \<close>
 
-ML_cond ("2016-1-RC0") \<open>
-  structure Value_Command = Value_Command
-\<close>
-
 end
