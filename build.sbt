@@ -6,7 +6,7 @@ import sbtassembly.AssemblyPlugin.defaultShellScript
 lazy val standardSettings = Seq(
   organization := "info.hupel",
   scalaVersion := "2.11.8",
-  crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0-RC2"),
+  crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0"),
   javacOptions += "-Xlint:unchecked",
   homepage := Some(url("http://lars.hupel.info/libisabelle/")),
   licenses := Seq(
@@ -149,9 +149,9 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
   .settings(macroSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "0.8.0",
-      "org.typelevel" %% "cats-free" % "0.8.0",
-      "io.monix" %% "monix-execution" % "2.0.5",
+      "org.typelevel" %% "cats-core" % "0.8.1",
+      "org.typelevel" %% "cats-free" % "0.8.1",
+      "io.monix" %% "monix-execution" % "2.0.6",
       "com.lihaoyi" %% "scalatags" % "0.6.2",
       "info.hupel" % "classy" % "0.1.1"
     ),
@@ -168,8 +168,8 @@ lazy val setup = project.in(file("modules/setup"))
   .settings(warningSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "io.get-coursier" %% "coursier" % "1.0.0-M14-6",
-      "io.get-coursier" %% "coursier-cache" % "1.0.0-M14-6",
+      "io.get-coursier" %% "coursier" % "1.0.0-M14-7",
+      "io.get-coursier" %% "coursier-cache" % "1.0.0-M14-7",
       "com.github.fge" % "java7-fs-more" % "0.2.0",
       "com.google.code.findbugs" % "jsr305" % "3.0.1" % "compile",
       "org.apache.commons" % "commons-compress" % "1.12",
@@ -261,7 +261,7 @@ lazy val tests = project.in(file("tests"))
   .settings(noPublishSettings)
   .aggregate(offlineTest, pureTest, holTest)
 
-val specs2Version = "3.8.5.1"
+val specs2Version = "3.8.6"
 
 lazy val offlineTest = project.in(file("tests/offline"))
   .dependsOn(setup, pidePackage)
