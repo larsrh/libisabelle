@@ -32,10 +32,10 @@ package object isabelle {
       Free.liftF[Instruction, A](Instruction.Ex(mlExpr))
 
     def rawPeek[A : ml.Opaque, Repr : Codec](mlExpr: ml.Expr[A], conv: ml.Expr[A => Repr]): Program[(Ref[A], Repr)] =
-      mlExpr.rawPeek0(conv)
+      mlExpr.rawPeek(conv)
 
-    def peek[A : ml.Opaque, Repr : Codec, C](mlExpr: ml.Expr[A], conv: ml.Expr[A => Repr])(scoped: ml.Scoped[A, Repr, C]): Program[C] =
-      mlExpr.peek0(conv, scoped)
+    def peek[A : ml.Opaque, Repr : Codec, C](mlExpr: ml.Expr[A], conv: ml.Expr[A => Repr])(f: (Repr, ml.Expr[A]) => Program[C]): Program[C] =
+      mlExpr.peek(conv)(f)
 
     def operation[I, O](operation: Operation[I, O], input: I): Program[O] =
       Free.liftF[Instruction, O](Instruction.Op(operation, input))

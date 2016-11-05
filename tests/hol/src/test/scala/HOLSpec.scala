@@ -95,13 +95,9 @@ class HOLSpec(val specs2Env: Env) extends Specification
       for {
         str <- term"$n + $m"
         expr <- Expr.fromString[BigInt](ctxt, str).map(_.get)
-        terms <-
-          Cterm.eval(ctxt)(expr.untypedCertify(ctxt)).peek(Term.fromThm)(new ml.Scoped[Thm, Term, (Term, Term)] {
-            def apply(scope: ml.LocalScope)(term: Term, ref: scope.Expr[Thm]) = {
-              import scope._
-              localize(Term.fromThm)(ref).toProg.map((term, _))
-            }
-          })
+        terms <- Cterm.eval(ctxt)(expr.untypedCertify(ctxt)).peek(Term.fromThm) { (term, ref) =>
+          Term.fromThm(ref).toProg.map((term, _))
+        }
       } yield terms
 
     run(prog) must beLike[(Term, Term)] { case (t1, t2) =>
