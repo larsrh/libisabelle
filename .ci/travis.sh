@@ -13,6 +13,9 @@ if [ "$PROFILE" = "slow" ]; then
   ./sbt "++$SCALA_VERSION" "cli/run --version $ISABELLE_VERSION --session HOL-Protocol build"
   ./sbt "++$SCALA_VERSION" validateSlow
   ./sbt "++$SCALA_VERSION" "cli/assembly"
+  if [ "$DEPLOY" = "1" ]; then
+    ./sbt "++$SCALA_VERSION" tut
+  fi
 else
   ./sbt "++$SCALA_VERSION" publishLocal
 fi
