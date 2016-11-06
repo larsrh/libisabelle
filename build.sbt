@@ -15,6 +15,7 @@ lazy val standardSettings = Seq(
   ),
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
+  resolvers += Resolver.sonatypeRepo("releases"),
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (version.value.endsWith("SNAPSHOT"))
@@ -152,7 +153,7 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
       "org.typelevel" %% "cats-free" % "0.8.0",
       "io.monix" %% "monix-execution" % "2.0.5",
       "com.lihaoyi" %% "scalatags" % "0.6.2",
-      "info.hupel" % "classy" % "0.1"
+      "info.hupel" % "classy" % "0.1.1"
     ),
     isabelleSessions in Compile := Seq(
       "Protocol",
@@ -220,6 +221,14 @@ lazy val pide2016_1_RC1 = pide("2016-1-RC1")
       "com.jcraft" % "jzlib" % "1.1.3"
     )
   )
+lazy val pide2016_1_RC2 = pide("2016-1-RC2")
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.tukaani" % "xz" % "1.5",
+      "com.jcraft" % "jsch" % "0.1.54",
+      "com.jcraft" % "jzlib" % "1.1.3"
+    )
+  )
 
 
 def assemblyGenerator(p: Project) = Def.task {
@@ -236,8 +245,11 @@ lazy val pidePackage = project.in(file("modules/pide-package"))
   .settings(moduleName := "pide-package")
   .settings(standardSettings)
   .settings(
-    resourceGenerators in Compile += assemblyGenerator(pide2016).taskValue,
-    resourceGenerators in Compile += assemblyGenerator(pide2016_1_RC1).taskValue
+    resourceGenerators in Compile ++= Seq(
+      assemblyGenerator(pide2016).taskValue,
+      assemblyGenerator(pide2016_1_RC1).taskValue,
+      assemblyGenerator(pide2016_1_RC2).taskValue
+    )
   )
 
 
