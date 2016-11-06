@@ -8,7 +8,7 @@ platform:
 environment:
   matrix:
     - ISABELLE_VERSION: 2016
-    - ISABELLE_VERSION: 2016-1-RC1
+    - ISABELLE_VERSION: 2016-1-RC2
 build_script:
   - sbt compile
 test_script:
