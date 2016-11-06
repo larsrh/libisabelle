@@ -337,9 +337,9 @@ lazy val workbench = project.in(file("modules/workbench"))
       import scala.concurrent.Await
       import scala.concurrent.ExecutionContext.Implicits.global
 
-      val setup = Setup.defaultSetup(Version("2016-1-RC0")).toOption.get
+      val setup = Setup.default(Version("2016-1-RC1")).right.get
       val env = Await.result(setup.makeEnvironment, Duration.Inf)
-      val resources = Resources.dumpIsabelleResources().toOption.get
+      val resources = Resources.dumpIsabelleResources().right.get
       val config = resources.makeConfiguration(Nil, "HOL-Protocol")
       System.build(env, config)
       val system = Await.result(System.create(env, config), Duration.Inf)
