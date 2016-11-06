@@ -6,7 +6,7 @@ import sbtassembly.AssemblyPlugin.defaultShellScript
 lazy val standardSettings = Seq(
   organization := "info.hupel",
   scalaVersion := "2.11.8",
-  crossScalaVersions := Seq("2.10.6", "2.11.8"),
+  crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0-RC2"),
   javacOptions += "-Xlint:unchecked",
   homepage := Some(url("http://lars.hupel.info/libisabelle/")),
   licenses := Seq(
