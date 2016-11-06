@@ -1,5 +1,5 @@
 theory Common
-imports "../lib/classy/lib/multi-isabelle/Multi_Isabelle"
+imports "../../multi-isabelle/Multi_Isabelle"
 begin
 
 ML_cond ("2016") \<open>
