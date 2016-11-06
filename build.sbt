@@ -6,7 +6,7 @@ import sbtassembly.AssemblyPlugin.defaultShellScript
 lazy val standardSettings = Seq(
   organization := "info.hupel",
   scalaVersion := "2.11.8",
-  crossScalaVersions := Seq("2.10.6", "2.11.8"),
+  crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0-RC2"),
   javacOptions += "-Xlint:unchecked",
   homepage := Some(url("http://lars.hupel.info/libisabelle/")),
   licenses := Seq(
@@ -39,7 +39,8 @@ lazy val standardSettings = Seq(
   credentials += Credentials(
     Option(System.getProperty("build.publish.credentials")) map (new File(_)) getOrElse (Path.userHome / ".ivy2" / ".credentials")
   ),
-  autoAPIMappings := true
+  autoAPIMappings := true,
+  isabelleVersions := Seq("2016")
 )
 
 lazy val warningSettings = Seq(
@@ -141,6 +142,7 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
 
 lazy val libisabelle = project.in(file("modules/libisabelle"))
   .dependsOn(pideInterface)
+  .enablePlugins(LibisabellePlugin)
   .settings(standardSettings)
   .settings(warningSettings)
   .settings(macroSettings)
@@ -149,7 +151,12 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
       "org.typelevel" %% "cats-core" % "0.8.0",
       "org.typelevel" %% "cats-free" % "0.8.0",
       "io.monix" %% "monix-execution" % "2.0.5",
-      "com.lihaoyi" %% "scalatags" % "0.6.2"
+      "com.lihaoyi" %% "scalatags" % "0.6.2",
+      "info.hupel" % "classy" % "0.1"
+    ),
+    isabelleSessions in Compile := Seq(
+      "Protocol",
+      "HOL-Protocol"
     )
   )
 
@@ -245,6 +252,7 @@ val specs2Version = "3.8.5.1"
 
 lazy val offlineTest = project.in(file("tests/offline"))
   .dependsOn(setup, pidePackage)
+  .enablePlugins(LibisabellePlugin)
   .settings(noPublishSettings)
   .settings(standardSettings)
   .settings(warningSettings)
@@ -292,7 +300,11 @@ lazy val cli = project.in(file("modules/cli"))
     libraryDependencies += logback,
     mainClass in Compile := Some("info.hupel.isabelle.cli.Main"),
     assemblyJarName in assembly := s"isabellectl-assembly-${version.value}",
-    assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript))
+    assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript)),
+    assemblyMergeStrategy in assembly := {
+      case PathList(".libisabelle", ".files") => MergeStrategy.concat
+      case path => (assemblyMergeStrategy in assembly).value(path)
+    }
   )
   .enablePlugins(JavaAppPackaging, UniversalPlugin)
 
@@ -325,9 +337,9 @@ lazy val workbench = project.in(file("modules/workbench"))
       import scala.concurrent.Await
       import scala.concurrent.ExecutionContext.Implicits.global
 
-      val setup = Setup.defaultSetup(Version("2016-1-RC0")).toOption.get
+      val setup = Setup.default(Version("2016-1-RC1")).right.get
       val env = Await.result(setup.makeEnvironment, Duration.Inf)
-      val resources = Resources.dumpIsabelleResources().toOption.get
+      val resources = Resources.dumpIsabelleResources().right.get
       val config = resources.makeConfiguration(Nil, "HOL-Protocol")
       System.build(env, config)
       val system = Await.result(System.create(env, config), Duration.Inf)
