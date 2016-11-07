@@ -1,7 +1,6 @@
 install:
   - cinst sbt -y
   - cmd: SET PATH=%PATH%;"C:\Program Files (x86)\sbt\bin"
-  - cmd: git submodule update --init --recursive
 platform:
   - x86
   - x64
@@ -12,5 +11,5 @@ environment:
 build_script:
   - sbt compile
 test_script:
-  - sbt "cli/run --version %ISABELLE_VERSION% build"
-  - sbt "cli/run --version %ISABELLE_VERSION% check"
+  - sbt "cli/run --version %ISABELLE_VERSION% --internal --session Protocol build"
+  - sbt "cli/run --version %ISABELLE_VERSION% --internal --session Protocol check"

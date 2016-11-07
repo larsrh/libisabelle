@@ -17,7 +17,7 @@ object Exec extends Command {
         logger.info(s"Starting Isabelle with arguments ${args.mkString(" ")} ...")
         logger.debug(s"Executing ${cli.mkString(" ")}")
 
-        Process(cli, None, bundle.env.variables.toList: _*).run(connectInput = true).exitValue()
+        Process(cli, None, bundle.env.settings.toList: _*).run(connectInput = true).exitValue()
 
         logger.info("Done.")
         ()

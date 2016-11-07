@@ -1,5 +1,6 @@
 package info.hupel.isabelle.setup
 
+import java.io.File
 import java.net.URL
 import java.nio.channels.{FileChannel, FileLock}
 import java.nio.file._
@@ -8,6 +9,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 import org.apache.commons.lang3.SystemUtils
+
+import coursier._
 
 import org.log4s._
 
@@ -86,6 +89,12 @@ sealed abstract class Platform {
   final def versionedStorage: Path =
     localStorage.resolve(s"v${BuildInfo.version}")
 
+  final def coursierStorage: Path =
+    versionedStorage.resolve("coursier")
+
+  final def resourcesStorage(version: Version): Path =
+    versionedStorage.resolve("resources").resolve(version.identifier)
+
   final def lockFile: Path =
     localStorage.resolve(".lock")
 
@@ -121,6 +130,60 @@ sealed abstract class Platform {
         a
       }
     }
+
+  final def fetchArtifacts(dependencies: Set[Dependency])(implicit ec: ExecutionContext): Future[List[Path]] = {
+    val cache = coursierStorage.toFile
+
+    val repositories = Seq(
+      coursier.Cache.ivy2Local,
+      MavenRepository("https://repo1.maven.org/maven2"),
+      MavenRepository("https://oss.sonatype.org/content/repositories/releases")
+    )
+
+    val downloadLogger = new coursier.Cache.Logger {
+      override def downloadingArtifact(url: String, file: File) =
+        logger.debug(s"Downloading artifact from $url ...")
+      override def downloadedArtifact(url: String, success: Boolean) = {
+        val file = url.split('/').last
+        if (success)
+          logger.debug(s"Successfully downloaded $file")
+        else
+          logger.error(s"Failed to download $file")
+      }
+    }
+
+    val fetch = Fetch.from(
+      repositories,
+      Cache.fetch(cache = cache, logger = Some(downloadLogger), cachePolicy = CachePolicy.LocalOnly),
+      Cache.fetch(cache = cache, logger = Some(downloadLogger), cachePolicy = CachePolicy.FetchMissing)
+    )
+
+    def fetchArtifact(artifact: Artifact, cachePolicy: CachePolicy) =
+      Cache.file(artifact, cache = cache, logger = Some(downloadLogger), cachePolicy = cachePolicy)
+
+    withAsyncLock { () =>
+      for {
+        resolution <- Resolution(dependencies).process.run(fetch).toScalaFuture
+        artifacts = {
+            if (!resolution.isDone)
+              sys.error("not converged")
+            else if (!resolution.errors.isEmpty)
+              sys.error(s"errors: ${resolution.errors}")
+            else if (!resolution.conflicts.isEmpty)
+              sys.error(s"conflicts: ${resolution.conflicts}")
+            else
+              resolution.artifacts.toSet
+          }
+        res <- Future.traverse(artifacts.toList)(artifact =>
+          (fetchArtifact(artifact, CachePolicy.LocalOnly)
+             orElse fetchArtifact(artifact, CachePolicy.FetchMissing))
+            .run.toScalaFuture
+        )
+      }
+      yield
+        res.map(_.fold(err => sys.error(err.toString), _.toPath))
+    }
+  }
 
 }
 

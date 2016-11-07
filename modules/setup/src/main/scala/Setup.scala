@@ -171,7 +171,7 @@ final case class Setup(home: Path, platform: Platform, version: Version, package
    * [[Resolver.Default default resolver]].
    */
   def makeEnvironment(implicit ec: ExecutionContext): Future[Environment] =
-    makeEnvironment(Resolver.Default, None)
+    makeEnvironment(Resolver.Default, platform.userStorage(version))
 
   /**
    * Prepares a fresh [[info.hupel.isabelle.api.Environment]].
@@ -179,9 +179,7 @@ final case class Setup(home: Path, platform: Platform, version: Version, package
    * If the [[Resolver resolver]] found an appropriate classpath, this method
    * also checks for matching [[info.hupel.isabelle.api.BuildInfo build info]].
    */
-  def makeEnvironment(resolver: Resolver, user: Option[Path])(implicit ec: ExecutionContext): Future[Environment] = {
-    val user0 = user.getOrElse(platform.userStorage(version))
-    resolver.resolve(platform, version).map(paths => instantiate(paths.map(_.toUri.toURL), user0))
-  }
+  def makeEnvironment(resolver: Resolver, user: Path)(implicit ec: ExecutionContext): Future[Environment] =
+    resolver.resolve(platform, version).map(paths => instantiate(paths.map(_.toUri.toURL), user))
 
 }

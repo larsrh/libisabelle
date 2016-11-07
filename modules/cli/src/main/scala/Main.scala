@@ -1,6 +1,9 @@
 package info.hupel.isabelle.cli
 
+import java.net.URLClassLoader
 import java.nio.file._
+
+import org.apache.commons.io.FileUtils
 
 import scala.concurrent._
 import scala.concurrent.duration.Duration
@@ -8,32 +11,43 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import org.log4s._
 
+import cats.instances.either._
+import cats.instances.list._
+import cats.syntax.traverse._
+
+import coursier.Dependency
+import coursier.util.Parse
+
 import info.hupel.isabelle.api._
 import info.hupel.isabelle.setup._
 
 // FIXME rewrite using alexarchambault/case-app
 object Args {
 
-  private def parse(args: Args, rest: List[String]): Option[Args] = rest match {
+  def parse(args: Args, rest: List[String]): Option[Args] = rest match {
     case "--version" :: version :: rest if args.version.isEmpty => parse(args.copy(version = Some(Version(version))), rest)
     case "--include" :: path :: rest => parse(args.copy(include = Paths.get(path) :: args.include), rest)
     case "--session" :: session :: rest if args.session.isEmpty => parse(args.copy(session = Some(session)), rest)
     case "--home" :: home :: rest if args.home.isEmpty => parse(args.copy(home = Some(Paths.get(home))), rest)
-    case "--dump" :: dump :: rest if args.dump.isEmpty => parse(args.copy(dump = Some(Paths.get(dump))), rest)
-    case "--fresh-user" :: rest if args.user.isEmpty => parse(args.copy(user = Some(Files.createTempDirectory("libisabelle_user"))), rest)
     case "--user" :: user :: rest if args.user.isEmpty => parse(args.copy(user = Some(Paths.get(user))), rest)
+    case "--fresh-user" :: rest if args.user.isEmpty => parse(args.copy(user = Some(Files.createTempDirectory("libisabelle_user"))), rest)
+    case "--resources" :: resources :: rest if args.resources.isEmpty => parse(args.copy(resources = Some(Paths.get(resources))), rest)
+    case "--fresh-resources" :: rest if args.resources.isEmpty => parse(args.copy(resources = Some(Files.createTempDirectory("libisabelle_resources"))), rest)
+    case "--internal" :: rest if !args.internal => parse(args.copy(internal = true), rest)
+    case "--fetch" :: fetch :: rest => parse(args.copy(fetch = fetch :: args.fetch), rest)
     case cmd :: rest if !cmd.startsWith("-") => Some(args.copy(command = Some(cmd), rest = rest))
     case Nil => Some(args)
     case _ => None
   }
 
-  def parse(args: List[String]): Option[Args] =
-    parse(Args(None, Nil, None, None, None, None, None, Nil), args)
-
   val usage = """
     | Usage:
     |   isabellectl [--version VERSION] [--include PATH]* [--session SESSION]
-    |               [--home PATH] [--dump PATH] [--user PATH | --fresh-user]
+    |               [--home PATH]
+    |               [--user PATH | --fresh-user]
+    |               [--resources PATH | --fresh-resources]
+    |               [--internal]
+    |               [--fetch COORDINATE]*
     |               [CMD [extra options ...]]
     |
     | Available commands:
@@ -48,6 +62,18 @@ object Args {
     |   x-ray
     |""".stripMargin
 
+  val init: Args = Args(
+    version = None,
+    include = Nil,
+    session = None,
+    home = None,
+    user = None,
+    resources = None,
+    internal = false,
+    fetch = Nil,
+    command = None,
+    rest = Nil
+  )
 }
 
 case class Args(
@@ -55,8 +81,10 @@ case class Args(
   include: List[Path],
   session: Option[String],
   home: Option[Path],
-  dump: Option[Path],
   user: Option[Path],
+  resources: Option[Path],
+  internal: Boolean,
+  fetch: List[String],
   command: Option[String],
   rest: List[String]
 )
@@ -93,26 +121,44 @@ object Main {
       Platform.genericPlatform(Paths.get("libisabelle"))
   }
 
-  def main(args: Array[String]): Unit = Args.parse(args.toList) match {
+  def main(args: Array[String]): Unit = Args.parse(Args.init, args.toList) match {
     case Some(args) =>
       val version = args.version.orElse(guessVersion).getOrElse {
         Console.err.println(Args.usage)
         sys.error("no version specified")
       }
 
-      val dump = args.dump.getOrElse(Files.createTempDirectory("libisabelle_resources"))
+      val session = args.session.getOrElse("HOL")
 
-      val resources = Resources.dumpIsabelleResources(dump, getClass.getClassLoader) match {
-        case Right(resources) => resources
-        case Left(error) => sys.error(error.explain)
+      val user = args.user.getOrElse(guessPlatform.userStorage(version))
+
+      val dump = args.resources.getOrElse(guessPlatform.resourcesStorage(version))
+      FileUtils.deleteDirectory(dump.toFile)
+
+      logger.info(s"Dumping resources to $dump ...")
+
+      val parentClassLoader =
+        if (args.internal) getClass.getClassLoader else null
+
+      val classpath = args.fetch.traverseU(Parse.moduleVersion(_, BuildInfo.scalaBinaryVersion)) match {
+        case Right(Nil) => Future.successful { Nil }
+        case Right(modules) => guessPlatform.fetchArtifacts(modules.map { case (mod, v) => Dependency(mod, v) }.toSet)
+        case Left(error) => sys.error(s"could not parse dependency: $error")
       }
 
-      val configuration = args.session match {
-        case Some(session) => resources.makeConfiguration(args.include, session)
-        case None => resources.makeConfiguration(Nil, "Protocol")
+      val resourceClassLoader = classpath map { files =>
+        new URLClassLoader(files.map(_.toUri.toURL).toArray, parentClassLoader)
       }
 
-      logger.info(s"Using $configuration")
+      val configuration = resourceClassLoader map { classLoader =>
+        val resources = Resources.dumpIsabelleResources(dump, classLoader) match {
+          case Right(resources) => resources
+          case Left(error) => sys.error(error.explain)
+        }
+        val result = resources.makeConfiguration(args.include, session)
+        logger.info(s"Using $result")
+        result
+      }
 
       val setup = args.home match {
         case None =>
@@ -124,7 +170,10 @@ object Main {
           Setup(home, guessPlatform, version, Setup.defaultPackageName)
       }
 
-      lazy val bundle = setup.makeEnvironment(Resolver.Default, args.user).map(Bundle(_, setup, configuration))
+      lazy val bundle = for {
+        env <- setup.makeEnvironment(Resolver.Default, user)
+        c <- configuration
+      } yield Bundle(env, setup, c)
 
       val app = args.command match {
         case None => bundle.map(_ => ())
@@ -141,7 +190,6 @@ object Main {
       Await.result(app, Duration.Inf)
     case None =>
       Console.err.println(Args.usage)
-      sys.error("invalid arguments")
   }
 
 }

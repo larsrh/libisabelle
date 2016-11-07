@@ -114,9 +114,8 @@ final case class Resources(path: Path) {
    * Produces a [[info.hupel.isabelle.api.Configuration configuration]] with
    * the specified paths, preceded by the location from this object.
    */
-  def makeConfiguration(auxPaths: List[Path], name: String): Configuration = {
+  def makeConfiguration(auxPaths: List[Path], name: String): Configuration =
     Configuration(path :: auxPaths, name)
-  }
 
   /**
    * Checks presence of a theory file in this location. The input path should

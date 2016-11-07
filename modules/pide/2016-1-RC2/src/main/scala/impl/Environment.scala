@@ -96,4 +96,6 @@ final class Environment private(context: api.Environment.Context) extends api.En
   def decode(text: String @@ api.Environment.Raw): String @@ api.Environment.Unicode = tag.apply(isabelle.Symbol.decode(text))
   def encode(text: String @@ api.Environment.Unicode): String @@ api.Environment.Raw = tag.apply(isabelle.Symbol.encode(text))
 
+  def settings = isabelle.Isabelle_System.settings()
+
 }
