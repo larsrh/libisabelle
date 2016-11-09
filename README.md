@@ -40,7 +40,7 @@ This adds PIDE implementations for all supported Isabelle versions to your class
 
 `libisabelle` features a CLI called `isabellectl`.
 Currently, it only allows some basic features like downloading, building and launching Isabelle.
-You can download the latest nightly CLI executable from [Bintray](https://bintray.com/larsrh/libisabelle/isabellectl/nightly).
+You can download the latest nightly CLI executable from [Bintray](https://dl.bintray.com/larsrh/libisabelle/nightly/isabellectl).
 
 
 ### Downloading & checking your installation
