@@ -321,6 +321,20 @@ lazy val cli = project.in(file("modules/cli"))
   )
   .enablePlugins(JavaAppPackaging, UniversalPlugin)
 
+TaskKey[File]("script") := {
+  val executable = (assembly in cli).value.getCanonicalPath()
+  val script = (baseDirectory in ThisBuild).value / "isabellectl"
+  val text = s"""
+    |#!/usr/bin/env bash
+    |
+    |exec "$executable" "$$@"
+    |""".stripMargin.trim
+  streams.value.log.info(s"Writing script to $script ...")
+  IO.write(script, text)
+  script.setExecutable(true)
+  script
+}
+
 
 // Examples
 
