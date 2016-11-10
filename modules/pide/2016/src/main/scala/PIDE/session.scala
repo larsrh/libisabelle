@@ -143,7 +143,7 @@ object Session
         }
         catch {
           case exn: Throwable =>
-            Session.bad_protocol_handler(exn, name)
+            //Session.bad_protocol_handler(exn, name)
             (handlers1, functions1)
         }
 
@@ -450,7 +450,7 @@ class Session(val resources: Resources)
                     Class.forName(name).newInstance.asInstanceOf[Session.Protocol_Handler]
                   add_protocol_handler(handler)
                 }
-                catch { case exn: Throwable => Session.bad_protocol_handler(exn, name) }
+                catch { case exn: Throwable => /*Session.bad_protocol_handler(exn, name)*/ }
 
               case Protocol.Command_Timing(state_id, timing) if prover.defined =>
                 val message = XML.elem(Markup.STATUS, List(XML.Elem(Markup.Timing(timing), Nil)))
