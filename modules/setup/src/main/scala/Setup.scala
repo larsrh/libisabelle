@@ -50,13 +50,6 @@ object Setup {
   private val logger = getLogger
 
   /**
-   * Default package name of PIDE jars.
-   *
-   * @see [[info.hupel.isabelle.api.Environment]]
-   */
-  val defaultPackageName: String = "info.hupel.isabelle.impl"
-
-  /**
    * Location of the success marker file.
    *
    * Detection of setups works by looking for the success marker file in the
@@ -83,7 +76,7 @@ object Setup {
             case Success(path) =>
               Files.createFile(successMarker(path))
               stream.close()
-              Right(Setup(path, platform, version, defaultPackageName))
+              Right(Setup(path, platform, version))
             case Failure(ex) =>
               Left(InstallationError(ex))
           }
@@ -102,7 +95,7 @@ object Setup {
     val path = platform.setupStorage(version)
     if (Files.isDirectory(path)) {
       if (Files.isRegularFile(successMarker(path)))
-        Right(Setup(path, platform, version, defaultPackageName))
+        Right(Setup(path, platform, version))
       else
         Left(Corrupted(path))
     }
@@ -142,29 +135,18 @@ object Setup {
  *
  * The file system location is called ''home'' throughout `libisabelle`.
  */
-final case class Setup(home: Path, platform: Platform, version: Version, packageName: String) {
+final case class Setup(home: Path, platform: Platform, version: Version) {
 
   private val logger = getLogger
 
-  private def instantiate(urls: List[URL], user: Path)(implicit ec: ExecutionContext): Environment = {
-    logger.debug(s"Instantiating setup with classpath ${urls.mkString(":")} ...")
+  private def instantiate(classLoader: ClassLoader, user: Path)(implicit ec: ExecutionContext): Environment =
+    Environment.instantiate(version, classLoader, Environment.Context(home, user))
 
-    val classLoader = new URLClassLoader(urls.toArray, getClass.getClassLoader)
-    val env = classLoader.loadClass(s"$packageName.Environment").asSubclass(classOf[Environment])
-
-    val actualVersion = Environment.getVersion(env)
-    if (actualVersion != version)
-      sys.error(s"expected version $version, got version $actualVersion")
-
-    val info = classLoader.loadClass(s"$packageName.BuildInfo").getDeclaredMethod("toString").invoke(null)
-    if (BuildInfo.toString != info.toString)
-      sys.error(s"build info does not match")
-
-    val constructor = env.getDeclaredConstructor(classOf[Environment.Context])
-    val context = Environment.Context(home, user)(ec)
-    constructor.setAccessible(true)
-    constructor.newInstance(context)
-  }
+  def makeClassLoader(resolver: Resolver)(implicit ec: ExecutionContext): Future[ClassLoader] =
+    resolver.resolve(platform, version).map { paths =>
+      logger.debug(s"Creating setup class loader with classpath ${paths.mkString(":")} ...")
+      new URLClassLoader(paths.map(_.toUri.toURL).toArray, getClass.getClassLoader)
+    }
 
   /**
    * Prepares a fresh [[info.hupel.isabelle.api.Environment]] using the
@@ -180,6 +162,6 @@ final case class Setup(home: Path, platform: Platform, version: Version, package
    * also checks for matching [[info.hupel.isabelle.api.BuildInfo build info]].
    */
   def makeEnvironment(resolver: Resolver, user: Path)(implicit ec: ExecutionContext): Future[Environment] =
-    resolver.resolve(platform, version).map(paths => instantiate(paths.map(_.toUri.toURL), user))
+    makeClassLoader(resolver).map(instantiate(_, user))
 
 }

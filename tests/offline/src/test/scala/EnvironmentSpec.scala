@@ -20,25 +20,16 @@ class EnvironmentSpec(val specs2Env: Env) extends Specification with BasicSetup 
 
   A low-level environment
     respects the USER_HOME setting                        ${settingsPrefix must beTrue.awaitFor(duration)}
-    can be instantiated twice with the same path          ${same must exist.awaitFor(duration)}
-    cannot be instantiated with a different path          ${diff must throwAn[Exception].awaitFor(duration)}"""
+    can be instantiated                                   ${first must exist.awaitFor(duration)}
+    cannot be instantiated for a second time              ${second must throwAn[Exception].awaitFor(duration)}"""
 
-
-  // FIXME code duplication
-
-  val context = Thread.currentThread.getContextClassLoader
-  val constructor = Resolver.Default.resolve(platform, version).map { paths =>
-    val clazz = new URLClassLoader(paths.map(_.toUri.toURL).toArray, context).loadClass(s"${Setup.defaultPackageName}.Environment")
-    val constructor = clazz.getDeclaredConstructor(classOf[Environment.Context])
-    constructor.setAccessible(true)
-    constructor.asInstanceOf[Constructor[Environment]]
-  }
-
+  val classLoader = setup.makeClassLoader(Resolver.Default)
   val user = Files.createTempDirectory("libisabelle_user")
+  val context = Environment.Context(setup.home, user)
 
-  def instantiate(home: Path): Future[Environment] = constructor.map(_.newInstance(Environment.Context(home, user)))
+  def instantiate = classLoader.map(Environment.instantiate(version, _, context))
 
-  val first: Future[Environment] = instantiate(platform.setupStorage(version))
+  val first: Future[Environment] = instantiate
 
   val settingsPrefix = first.map { env =>
     val prefix = env.isabellePath(user.toAbsolutePath.toString)
@@ -47,7 +38,6 @@ class EnvironmentSpec(val specs2Env: Env) extends Specification with BasicSetup 
     }
   }
 
-  val same = first.flatMap { _ => instantiate(platform.setupStorage(version)) }
-  val diff = first.flatMap { _ => instantiate(platform.setupStorage(version).resolve(".")) }
+  val second = first.flatMap { _ => instantiate }
 
 }

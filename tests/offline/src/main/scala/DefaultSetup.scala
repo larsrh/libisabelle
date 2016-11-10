@@ -29,6 +29,7 @@ trait BasicSetup {
     ).map(Version.apply).get
 
   lazy val platform: Platform = Platform.guess.get
+  lazy val setup: Setup = Setup.detect(platform, version).right.get
 
 }
 
@@ -36,7 +37,6 @@ trait DefaultSetup extends BasicSetup with AfterAll {
 
   import specs2Env.executionEnv.ec
 
-  lazy val setup: Setup = Setup.detect(platform, version).right.get
   lazy val isabelleEnv: Future[Environment] = setup.makeEnvironment
   lazy val resources: Resources = Resources.dumpIsabelleResources().right.get
 

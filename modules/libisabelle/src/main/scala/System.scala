@@ -197,10 +197,6 @@ final class System private(val env: Environment, config: Configuration) {
    * [[Codec#encode encode]] the input argument, send it to the prover and
    * stream the results to the [[Observer observer]] of the operation.
    *
-   * The observer is automatically [[Operation#prepare instantiated]] with
-   * the underlying [[info.hupel.isabelle.api.Environment environment]]
-   * specified when [[System#create creating]] the system.
-   *
    * The returned [[scala.concurrent.Future future]] gets fulfilled when the
    * observer transitions into either
    * `[[info.hupel.isabelle.Observer.Success Success]]` or

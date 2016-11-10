@@ -14,7 +14,22 @@ object Environment {
 
   private val logger = getLogger
 
-  private[isabelle] def getVersion(clazz: Class[_ <: Environment]): Version =
+  private val instances: java.util.Map[Class[_ <: Environment], Unit] =
+    Collections.synchronizedMap(new WeakHashMap())
+
+  private def checkInstance(clazz: Class[_ <: Environment], context: Context): Unit = instances.synchronized {
+    if (instances.containsKey(clazz)) {
+      logger.error(s"Environment ${clazz} has already been instantiated")
+      sys.error("invalid instantiation")
+    }
+    else {
+      logger.debug(s"Instantiating environment at ${context.home} (with user storage ${context.user})")
+      instances.put(clazz, ())
+      ()
+    }
+  }
+
+  private def getVersion(clazz: Class[_ <: Environment]): Version =
     Option(clazz.getAnnotation(classOf[Implementation]).identifier) match {
       case None =>
         sys.error("malformed implementation")
@@ -22,26 +37,25 @@ object Environment {
         Version(identifier)
   }
 
-  private val instances: java.util.Map[Class[_ <: Environment], Context] =
-    Collections.synchronizedMap(new WeakHashMap())
+  private val packageName: String = "info.hupel.isabelle.impl"
 
-  private def checkInstance(clazz: Class[_ <: Environment], context: Context): Unit = instances.synchronized {
-    val version = getVersion(clazz)
-    if (instances.containsKey(clazz)) {
-      val oldContext = instances.get(clazz)
-      if (instances.get(clazz) == context)
-        logger.warn(s"Environment for $version has already been instantiated, but with the same context")
-      else {
-        logger.error(s"Failed to instantiate environment for $version; already existing with different context")
-        sys.error("invalid instantiation")
-      }
-    }
-    else {
-      logger.debug(s"Instantiating environment for $version at ${context.home} (with user storage ${context.user})")
-      instances.put(clazz, context)
-      ()
-    }
+  def instantiate(version: Version, classLoader: ClassLoader, context: Context) = {
+    val env = classLoader.loadClass(s"$packageName.Environment").asSubclass(classOf[Environment])
+
+    val actualVersion = Environment.getVersion(env)
+    if (actualVersion != version)
+      sys.error(s"expected version $version, got version $actualVersion")
+
+    val info = classLoader.loadClass(s"$packageName.BuildInfo").getDeclaredMethod("toString").invoke(null)
+    if (BuildInfo.toString != info.toString)
+      sys.error(s"build info does not match")
+
+    val constructor = env.getDeclaredConstructor(classOf[Environment.Context])
+    constructor.setAccessible(true)
+
+    constructor.newInstance(context)
   }
+
 
   /**
    * Marker trait indicating raw (encoded) Isabelle symbol text.
@@ -110,11 +124,11 @@ object Environment {
  */
 abstract class Environment protected(val context: Environment.Context) { self =>
 
+  Environment.checkInstance(getClass(), context)
+
   final val home = context.home.toAbsolutePath
   final val user = context.user.toAbsolutePath
   final implicit val executionContext: ExecutionContext = context.ec
-
-  Environment.checkInstance(getClass(), context)
 
   final val version: Version = Environment.getVersion(getClass())
 

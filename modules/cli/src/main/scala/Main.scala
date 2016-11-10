@@ -167,7 +167,7 @@ object Main {
             case Left(reason) => sys.error(reason.explain)
           }
         case Some(home) =>
-          Setup(home, guessPlatform, version, Setup.defaultPackageName)
+          Setup(home, guessPlatform, version)
       }
 
       lazy val bundle = for {
