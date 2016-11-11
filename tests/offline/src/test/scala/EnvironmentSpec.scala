@@ -19,25 +19,18 @@ class EnvironmentSpec(val specs2Env: Env) extends Specification with BasicSetup 
   Environment handling
 
   A low-level environment
-    respects the USER_HOME setting                        ${settingsPrefix must beTrue.awaitFor(duration)}
-    can be instantiated                                   ${first must exist.awaitFor(duration)}
-    cannot be instantiated for a second time              ${second must throwAn[Exception].awaitFor(duration)}"""
+    respects the USER_HOME setting                        ${settingsPrefix must beTrue.awaitFor(duration)}"""
 
-  val classLoader = setup.makeClassLoader(Resolver.Default)
+  val classpath = Resolver.Default.resolve(platform, version)
   val user = Files.createTempDirectory("libisabelle_user")
   val context = Environment.Context(setup.home, user)
 
-  def instantiate = classLoader.map(Environment.instantiate(version, _, context))
-
-  val first: Future[Environment] = instantiate
-
-  val settingsPrefix = first.map { env =>
+  val settingsPrefix = classpath.map { paths =>
+    val env = Environment.instantiate(version, paths, context)
     val prefix = env.isabellePath(user.toAbsolutePath.toString)
     List("ISABELLE_BROWSER_INFO", "ISABELLE_OUTPUT", "ISABELLE_HOME_USER").forall { setting =>
       env.isabelleSetting(setting).startsWith(prefix)
     }
   }
-
-  val second = first.flatMap { _ => instantiate }
 
 }

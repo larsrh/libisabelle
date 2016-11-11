@@ -1,7 +1,6 @@
 package info.hupel.isabelle.setup
 
 import java.io.File
-import java.net.{URL, URLClassLoader}
 import java.nio.file.{Files, Path, Paths}
 
 import scala.concurrent.{Future, ExecutionContext}
@@ -137,17 +136,6 @@ object Setup {
  */
 final case class Setup(home: Path, platform: Platform, version: Version) {
 
-  private val logger = getLogger
-
-  private def instantiate(classLoader: ClassLoader, user: Path)(implicit ec: ExecutionContext): Environment =
-    Environment.instantiate(version, classLoader, Environment.Context(home, user))
-
-  def makeClassLoader(resolver: Resolver)(implicit ec: ExecutionContext): Future[ClassLoader] =
-    resolver.resolve(platform, version).map { paths =>
-      logger.debug(s"Creating setup class loader with classpath ${paths.mkString(":")} ...")
-      new URLClassLoader(paths.map(_.toUri.toURL).toArray, getClass.getClassLoader)
-    }
-
   /**
    * Prepares a fresh [[info.hupel.isabelle.api.Environment]] using the
    * [[Resolver.Default default resolver]].
@@ -162,6 +150,6 @@ final case class Setup(home: Path, platform: Platform, version: Version) {
    * also checks for matching [[info.hupel.isabelle.api.BuildInfo build info]].
    */
   def makeEnvironment(resolver: Resolver, user: Path)(implicit ec: ExecutionContext): Future[Environment] =
-    makeClassLoader(resolver).map(instantiate(_, user))
+    resolver.resolve(platform, version).map(Environment.instantiate(version, _, Environment.Context(home, user)))
 
 }

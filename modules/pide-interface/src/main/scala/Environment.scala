@@ -1,7 +1,7 @@
 package info.hupel.isabelle.api
 
 import java.util.concurrent.{AbstractExecutorService, TimeUnit}
-import java.util.{Collections, WeakHashMap}
+import java.net.URLClassLoader
 import java.nio.file.Path
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService}
@@ -14,21 +14,6 @@ object Environment {
 
   private val logger = getLogger
 
-  private val instances: java.util.Map[Class[_ <: Environment], Unit] =
-    Collections.synchronizedMap(new WeakHashMap())
-
-  private def checkInstance(clazz: Class[_ <: Environment], context: Context): Unit = instances.synchronized {
-    if (instances.containsKey(clazz)) {
-      logger.error(s"Environment ${clazz} has already been instantiated")
-      sys.error("invalid instantiation")
-    }
-    else {
-      logger.debug(s"Instantiating environment at ${context.home} (with user storage ${context.user})")
-      instances.put(clazz, ())
-      ()
-    }
-  }
-
   private def getVersion(clazz: Class[_ <: Environment]): Version =
     Option(clazz.getAnnotation(classOf[Implementation]).identifier) match {
       case None =>
@@ -39,10 +24,12 @@ object Environment {
 
   private val packageName: String = "info.hupel.isabelle.impl"
 
-  def instantiate(version: Version, classLoader: ClassLoader, context: Context) = {
+  def instantiate(version: Version, classpath: List[Path], context: Context) = {
+    logger.debug(s"Creating environment with classpath ${classpath.mkString(":")} ...")
+    val classLoader = new URLClassLoader(classpath.map(_.toUri.toURL).toArray, getClass.getClassLoader)
     val env = classLoader.loadClass(s"$packageName.Environment").asSubclass(classOf[Environment])
 
-    val actualVersion = Environment.getVersion(env)
+    val actualVersion = getVersion(env)
     if (actualVersion != version)
       sys.error(s"expected version $version, got version $actualVersion")
 
@@ -124,7 +111,9 @@ object Environment {
  */
 abstract class Environment protected(val context: Environment.Context) { self =>
 
-  Environment.checkInstance(getClass(), context)
+  protected final val logger = getLogger
+
+  logger.debug(s"Instantiating environment at ${context.home} (with user storage ${context.user})")
 
   final val home = context.home.toAbsolutePath
   final val user = context.user.toAbsolutePath
@@ -140,9 +129,6 @@ abstract class Environment protected(val context: Environment.Context) { self =>
 
   override def toString: String =
     s"$version at $home"
-
-
-  protected final val logger = getLogger
 
   protected[isabelle] def isabelleSetting(name: String): String
   protected[isabelle] def isabellePath(path: String): String
