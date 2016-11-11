@@ -18,4 +18,9 @@ package object isabelle
   val quote = Library.quote _
   val commas = Library.commas _
   val commas_quote = Library.commas_quote _
+
+  object sys {
+    def exit(rc: Int) = throw info.hupel.isabelle.api.ExitTrap(rc)
+    def env = _root_.scala.sys.env
+  }
 }

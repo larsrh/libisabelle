@@ -92,5 +92,10 @@ final class Environment private(context: api.Environment.Context) extends api.En
   def encode(text: String @@ api.Environment.Unicode): String @@ api.Environment.Raw = tag.apply(isabelle.Symbol.encode(text))
 
   def settings = isabelle.Isabelle_System.settings()
+  def exec(tool: String, args: List[String]) = {
+    val (out, rc) = isabelle.Isabelle_System.isabelle_tool(tool, args: _*)
+    print(out)
+    rc
+  }
 
 }

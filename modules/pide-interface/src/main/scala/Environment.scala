@@ -10,6 +10,8 @@ import org.log4s._
 
 import shapeless.tag._
 
+case class ExitTrap(rc: Int) extends RuntimeException
+
 object Environment {
 
   private val logger = getLogger
@@ -151,5 +153,7 @@ abstract class Environment protected(val context: Environment.Context) { self =>
   def encode(text: String @@ Environment.Unicode): String @@ Environment.Raw
 
   def settings: Map[String, String]
+
+  def exec(tool: String, args: List[String]): Int
 
 }
