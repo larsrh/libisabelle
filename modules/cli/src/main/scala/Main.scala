@@ -151,11 +151,15 @@ object Main {
       }
 
       val configuration = resourceClassLoader map { classLoader =>
-        val resources = Resources.dumpIsabelleResources(dump, classLoader) match {
-          case Right(resources) => resources
-          case Left(error) => sys.error(error.explain)
+        val result = Resources.dumpIsabelleResources(dump, classLoader) match {
+          case Right(resources) =>
+            resources.makeConfiguration(args.include, session)
+          case Left(Resources.Absent) =>
+            logger.warn("No resources on classpath")
+            Configuration(args.include, session)
+          case Left(error) =>
+            sys.error(error.explain)
         }
-        val result = resources.makeConfiguration(args.include, session)
         logger.info(s"Using $result")
         result
       }
