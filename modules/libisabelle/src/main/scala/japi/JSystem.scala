@@ -16,7 +16,7 @@ object JSystem {
 
 }
 
-class JSystem private(system: System, timeout: Duration) {
+final class JSystem private(system: System, timeout: Duration) {
 
   def getSystem(): System = system
   def getTimeout(): Duration = timeout

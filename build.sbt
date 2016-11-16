@@ -155,6 +155,14 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
       "com.lihaoyi" %% "scalatags" % "0.6.2",
       "info.hupel" % "classy" % "0.1.1"
     ),
+    libraryDependencies += {
+      val version =
+        if (scalaVersion.value.startsWith("2.10"))
+          "0.5.0"
+        else
+          "0.8.0"
+      "org.scala-lang.modules" %% "scala-java8-compat" % version
+    },
     isabelleSessions in Compile := Seq(
       "Protocol",
       "HOL-Protocol"

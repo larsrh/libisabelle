@@ -90,9 +90,6 @@ object Operation {
 
   def UseThys: Operation[List[String], Unit] = UseThys(())((_, _) => (), _ => ())
 
-  protected[isabelle] def UseThys_Java(processor: MarkupProcessor): Operation[JList[String], Void] =
-    UseThys(())((_, tree) => processor.markup(tree), _ => processor.finish).map(_.asScala.toList, _ => null)
-
 }
 
 /**

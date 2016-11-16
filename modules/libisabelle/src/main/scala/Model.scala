@@ -72,6 +72,9 @@ final case class Region(range: Range, markup: Vector[Markup], body: Vector[XML.T
 
   def pretty: String = pretty(0)
 
+  def subMap(f: Region => Region): Region = copy(subRegions = subRegions.map(f))
+  def subFilter(f: Region => Boolean): Region = copy(subRegions = subRegions.filter(f))
+
 }
 
 object Regions {
@@ -94,6 +97,9 @@ final case class Regions(items: List[Region]) {
 
     consume(iter, items)
   }
+
+  def map(f: Region => Region): Regions = Regions(items map f)
+  def filter(f: Region => Boolean): Regions = Regions(items filter f)
 
   def pretty(indent: Int): String =
     items.map(_.pretty(indent)).mkString("\n")
