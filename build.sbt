@@ -137,7 +137,7 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
     buildInfoPackage := "info.hupel.isabelle.api",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.2",
-      "info.hupel.fork.org.log4s" %% "log4s" % "2.0"
+      "org.log4s" %% "log4s" % "1.3.3"
     )
   )
 
