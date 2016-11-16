@@ -11,6 +11,7 @@ object Report extends Command {
 
   sealed abstract class Format
   case object RawXML extends Format
+  case object Model extends Format
   case object XRay extends Format
 
   def print(reports: Reports, env: Environment, format: Format): Unit = format match {
@@ -18,6 +19,10 @@ object Report extends Command {
       println(s"<?xml version='1.0' ?>\n<dump home='${env.home}'>\n")
       reports.items.foreach(tree => println(tree.pretty(2)))
       println("\n</dump>")
+    case Model =>
+      val model = reports.interpret(env)
+
+      println(model.pretty)
     case XRay =>
       val model = reports.interpret(env)
 
@@ -28,6 +33,7 @@ object Report extends Command {
   def run(bundle: Bundle, args: List[String])(implicit ec: ExecutionContext): Future[Unit] = {
     val (format, files) = args match {
       case "--format" :: "raw-xml" :: files => (RawXML, files)
+      case "--format" :: "model" :: files => (Model, files)
       case "--format" :: "x-ray" :: files => (XRay, files)
       case "--format" :: _ => sys.error("unknown format")
       case _ => (RawXML, args)

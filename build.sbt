@@ -151,7 +151,7 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % "0.8.1",
       "org.typelevel" %% "cats-free" % "0.8.1",
-      "io.monix" %% "monix-execution" % "2.0.6",
+      "io.monix" %% "monix-execution" % "2.1.0",
       "com.lihaoyi" %% "scalatags" % "0.6.2",
       "info.hupel" % "classy" % "0.1.1"
     ),
@@ -168,8 +168,8 @@ lazy val setup = project.in(file("modules/setup"))
   .settings(warningSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "io.get-coursier" %% "coursier" % "1.0.0-M14-7",
-      "io.get-coursier" %% "coursier-cache" % "1.0.0-M14-7",
+      "io.get-coursier" %% "coursier" % "1.0.0-M14-8",
+      "io.get-coursier" %% "coursier-cache" % "1.0.0-M14-8",
       "com.github.fge" % "java7-fs-more" % "0.2.0",
       "com.google.code.findbugs" % "jsr305" % "3.0.1" % "compile",
       "org.apache.commons" % "commons-compress" % "1.12",

@@ -15,6 +15,6 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-ghpages" % "0.5.4")
 addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "0.8.1")
 addSbtPlugin("com.typesafe.sbt" % "sbt-proguard" % "0.2.2")
 addSbtPlugin("org.tpolecat" % "tut-plugin" % "0.4.6")
-addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0-M14-7")
+addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0-M14-8")
 
 addSbtPlugin("info.hupel" % "sbt-libisabelle" % "0.3.2")
