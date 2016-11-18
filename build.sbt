@@ -327,7 +327,6 @@ lazy val cli = project.in(file("modules/cli"))
       case path => (assemblyMergeStrategy in assembly).value(path)
     }
   )
-  .enablePlugins(JavaAppPackaging, UniversalPlugin)
 
 TaskKey[File]("script") := {
   val executable = (assembly in cli).value.getCanonicalPath()
@@ -342,6 +341,20 @@ TaskKey[File]("script") := {
   script.setExecutable(true)
   script
 }
+
+lazy val `package` = project.in(file("modules/package"))
+  .dependsOn(setup, pidePackage)
+  .settings(standardSettings)
+  .settings(warningSettings)
+  .settings(noPublishSettings)
+  .settings(
+    libraryDependencies += logback,
+    assemblyJarName in assembly := s"libisabelle-package-${version.value}.jar",
+    assemblyMergeStrategy in assembly := {
+      case PathList(".libisabelle", ".files") => MergeStrategy.concat
+      case path => (assemblyMergeStrategy in assembly).value(path)
+    }
+  )
 
 
 // Examples
