@@ -342,7 +342,7 @@ TaskKey[File]("script") := {
   script
 }
 
-lazy val `package` = project.in(file("modules/package"))
+lazy val libisabellePackage = project.in(file("modules/package"))
   .dependsOn(setup, pidePackage)
   .settings(standardSettings)
   .settings(warningSettings)
