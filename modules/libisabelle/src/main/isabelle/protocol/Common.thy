@@ -30,6 +30,13 @@ ML_cond ("2016-1-RC3") \<open>
   val parse_bool = Value.parse_bool
 \<close>
 
+ML_cond ("2016-1-RC4") \<open>
+  val print_int = Value.print_int
+  val parse_int = Value.parse_int
+  val print_bool = Value.print_bool
+  val parse_bool = Value.parse_bool
+\<close>
+
 ML\<open>
 local
   (* code copied and adapted from Isabelle/Pure *)

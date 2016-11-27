@@ -93,7 +93,7 @@ lazy val root = project.in(file("."))
     pideInterface, libisabelle, setup,
     tests, docs, examples,
     cli,
-    pide2016, pide2016_1_RC1, pide2016_1_RC2, pide2016_1_RC3,
+    pide2016, pide2016_1_RC1, pide2016_1_RC2, pide2016_1_RC3, pide2016_1_RC4,
     pidePackage
   )
 
@@ -153,7 +153,7 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
       "org.typelevel" %% "cats-free" % "0.8.1",
       "io.monix" %% "monix-execution" % "2.1.0",
       "com.lihaoyi" %% "scalatags" % "0.6.2",
-      "info.hupel" % "classy" % "0.1.2"
+      "info.hupel" % "classy" % "0.1.3"
     ),
     libraryDependencies += {
       val version =
@@ -221,32 +221,19 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
     ProguardKeys.outputs in Proguard := Seq(target.value / s"${moduleName.value}-assembly.jar")
   )
 
-lazy val pide2016 = pide("2016")
-lazy val pide2016_1_RC1 = pide("2016-1-RC1")
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.tukaani" % "xz" % "1.5",
-      "com.jcraft" % "jsch" % "0.1.54",
-      "com.jcraft" % "jzlib" % "1.1.3"
-    )
+lazy val pideExtraSettings = Seq(
+  libraryDependencies ++= Seq(
+    "org.tukaani" % "xz" % "1.5",
+    "com.jcraft" % "jsch" % "0.1.54",
+    "com.jcraft" % "jzlib" % "1.1.3"
   )
-lazy val pide2016_1_RC2 = pide("2016-1-RC2")
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.tukaani" % "xz" % "1.5",
-      "com.jcraft" % "jsch" % "0.1.54",
-      "com.jcraft" % "jzlib" % "1.1.3"
-    )
-  )
-lazy val pide2016_1_RC3 = pide("2016-1-RC3")
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.tukaani" % "xz" % "1.5",
-      "com.jcraft" % "jsch" % "0.1.54",
-      "com.jcraft" % "jzlib" % "1.1.3"
-    )
-  )
+)
 
+lazy val pide2016 = pide("2016")
+lazy val pide2016_1_RC1 = pide("2016-1-RC1").settings(pideExtraSettings)
+lazy val pide2016_1_RC2 = pide("2016-1-RC2").settings(pideExtraSettings)
+lazy val pide2016_1_RC3 = pide("2016-1-RC3").settings(pideExtraSettings)
+lazy val pide2016_1_RC4 = pide("2016-1-RC4").settings(pideExtraSettings)
 
 def assemblyGenerator(p: Project) = Def.task {
   val Seq(source) = (ProguardKeys.proguard in Proguard in p).value
@@ -266,7 +253,8 @@ lazy val pidePackage = project.in(file("modules/pide-package"))
       assemblyGenerator(pide2016).taskValue,
       assemblyGenerator(pide2016_1_RC1).taskValue,
       assemblyGenerator(pide2016_1_RC2).taskValue,
-      assemblyGenerator(pide2016_1_RC3).taskValue
+      assemblyGenerator(pide2016_1_RC3).taskValue,
+      assemblyGenerator(pide2016_1_RC4).taskValue
     )
   )
 
