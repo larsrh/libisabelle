@@ -2,8 +2,8 @@ language: java
 env:
   matrix:
     - ISABELLE_VERSION=2016 SCALA_VERSION=2.11.8 PROFILE=quick
-    - ISABELLE_VERSION=2016-1-RC2 SCALA_VERSION=2.11.8 PROFILE=quick
     - ISABELLE_VERSION=2016-1-RC3 SCALA_VERSION=2.11.8 PROFILE=quick
+    - ISABELLE_VERSION=2016-1-RC4 SCALA_VERSION=2.11.8 PROFILE=quick
   global:
     secure: DCZQfH8QMiLX9nd9ToywysUdD8eEOw6JURZG5JpC8d28XPcZnrdrVZlfGHAp1yCrlldw2anFuLPyz+lmcfirW4vxRpSHlLj4BOybrjPSKTAGfMkQ8tx/8Q2HYilmhK+Le7Qd7vQ61fzOAw7c97pzPT723jA8aAQdqx+LkRPam8w=
 install:
@@ -44,14 +44,14 @@ matrix:
         apt:
           packages:
             - lib32stdc++6
-    - env: ISABELLE_VERSION=2016-1-RC3 SCALA_VERSION=2.11.8 PROFILE=slow
+    - env: ISABELLE_VERSION=2016-1-RC4 SCALA_VERSION=2.11.8 PROFILE=slow
       os: linux
       jdk: oraclejdk8
       addons:
         apt:
           packages:
             - lib32stdc++6
-    - env: ISABELLE_VERSION=2016-1-RC3 SCALA_VERSION=2.12.0 PROFILE=slow
+    - env: ISABELLE_VERSION=2016-1-RC4 SCALA_VERSION=2.12.0 PROFILE=slow
       os: linux
       jdk: oraclejdk8
       addons:
