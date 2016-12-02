@@ -7,13 +7,12 @@ title: Setup
 
 To get started with the repository, follow these steps:
 
-1. Make sure you have checked out and/or updated all submodules.
-   This can be done easily by running `git submodule update --init --recursive`.
-2. Run the `sbt` script to fetch all required Scala dependencies.
+1. [Install sbt](http://www.scala-sbt.org/download.html).
+2. Start `sbt` to fetch all required Scala dependencies.
    After this is done, you are in the SBT shell.
 3. Compile the sources with `compile`.
 4. Bootstrap an Isabelle installation using `cli/run --version 2016 build`, which will download and extract the latest supported Isabelle version for you.
-   Additionally, it will build the minimal Isabelle session required to use `libisabelle`.
+   Additionally, it will build a default Isabelle session.
 
 On some systems, you might need to install Perl, Python, and/or some additional libraries.
 
@@ -52,7 +51,8 @@ Example:
 ```
 $ cd libisabelle
 $ ./sbt
-> cli/run --version 2016 --session HOL-Protocol build
+> cli/run --version 2016 --session Protocol --internal build
+> cli/run --version 2016 --session HOL-Protocol --internal build
 > testOnly * -- isabelle.version 2016
 ```
 
@@ -61,9 +61,11 @@ or:
 ```
 $ cd libisabelle
 $ ISABELLE_VERSION=2016 ./sbt
-> cli/run --version 2016 --session HOL-Protocol build
+> cli/run --version 2016 --session Protocol --internal build
+> cli/run --version 2016 --session HOL-Protocol --internal build
 > test
 ```
 
 Make sure to have bootstrapped the installation as described above for the appropriate Isabelle version, otherwise the tests will fail.
-Also note that the tests require the extra session `HOL-Protocol` to be built (as shown in the examples above).
+Also note that the tests require the extra sessions `Protocol` and `HOL-Protocol` to be built (as shown in the examples above).
+You only have to do that once after cloning or updating Isabelle code.

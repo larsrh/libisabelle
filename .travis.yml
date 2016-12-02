@@ -6,8 +6,6 @@ env:
     - ISABELLE_VERSION=2016-1-RC4 SCALA_VERSION=2.11.8 PROFILE=quick
   global:
     secure: DCZQfH8QMiLX9nd9ToywysUdD8eEOw6JURZG5JpC8d28XPcZnrdrVZlfGHAp1yCrlldw2anFuLPyz+lmcfirW4vxRpSHlLj4BOybrjPSKTAGfMkQ8tx/8Q2HYilmhK+Le7Qd7vQ61fzOAw7c97pzPT723jA8aAQdqx+LkRPam8w=
-install:
-  - git submodule update --init --recursive
 os:
   - osx
 script:
