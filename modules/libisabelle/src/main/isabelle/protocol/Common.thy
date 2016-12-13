@@ -9,28 +9,7 @@ ML_cond ("2016") \<open>
   val parse_bool = Markup.parse_bool
 \<close>
 
-ML_cond ("2016-1-RC1") \<open>
-  val print_int = Value.print_int
-  val parse_int = Value.parse_int
-  val print_bool = Value.print_bool
-  val parse_bool = Value.parse_bool
-\<close>
-
-ML_cond ("2016-1-RC2") \<open>
-  val print_int = Value.print_int
-  val parse_int = Value.parse_int
-  val print_bool = Value.print_bool
-  val parse_bool = Value.parse_bool
-\<close>
-
-ML_cond ("2016-1-RC3") \<open>
-  val print_int = Value.print_int
-  val parse_int = Value.parse_int
-  val print_bool = Value.print_bool
-  val parse_bool = Value.parse_bool
-\<close>
-
-ML_cond ("2016-1-RC4") \<open>
+ML_cond ("2016-1") \<open>
   val print_int = Value.print_int
   val parse_int = Value.parse_int
   val print_bool = Value.print_bool
