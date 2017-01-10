@@ -3,6 +3,9 @@ package info.hupel
 import scala.concurrent._
 import scala.util._
 
+import monix.execution.CancelableFuture
+import monix.execution.cancelables.MultiAssignmentCancelable
+
 import cats.free.Free
 
 import scalatags.Text
@@ -40,6 +43,20 @@ package object isabelle {
     def operation[I, O](operation: Operation[I, O], input: I): Program[O] =
       Free.liftF[Instruction, O](Instruction.Op(operation, input))
 
+  }
+
+  final implicit class CancelableFutureOps[A](future: CancelableFuture[A]) {
+    def flatMapC[B](cont: A => CancelableFuture[B])(implicit ec: ExecutionContext): CancelableFuture[B] = {
+      val conn = MultiAssignmentCancelable()
+      val c1 = future.flatMap { a =>
+        val c2 = cont(a)
+        conn.orderedUpdate(c2, order = 2)
+        c2
+      }
+
+      conn.orderedUpdate(c1, order = 1)
+      CancelableFuture(c1, conn)
+    }
   }
 
 }

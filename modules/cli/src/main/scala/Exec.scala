@@ -7,7 +7,7 @@ import info.hupel.isabelle.setup.Platform
 
 object Exec extends Command {
 
-  def run(bundle: Bundle, args: List[String])(implicit ec: ExecutionContext): Future[Unit] = args match {
+  override def run(bundle: Bundle, args: List[String])(implicit ec: ExecutionContext): Future[Unit] = args match {
     case tool :: args =>
       Future.successful {
         logger.info(s"Starting Isabelle tool $tool with arguments ${args.mkString(" ")} ...")

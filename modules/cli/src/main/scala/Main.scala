@@ -9,6 +9,8 @@ import scala.concurrent._
 import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import monix.execution.{Cancelable, CancelableFuture}
+
 import org.log4s._
 
 import cats.instances.either._
@@ -175,7 +177,7 @@ object Main {
       }
 
       lazy val bundle = for {
-        env <- setup.makeEnvironment(Resolver.Default, user)
+        env <- CancelableFuture(setup.makeEnvironment(Resolver.Default, user), Cancelable.empty)
         c <- configuration
       } yield Bundle(env, setup, c)
 
@@ -187,10 +189,15 @@ object Main {
               Console.err.println(Args.usage)
               sys.error(s"no such command `$cmd`")
             case Some(cmd) =>
-              bundle.flatMap(cmd.run(_, args.rest))
+              bundle.flatMapC(cmd.cancelableRun(_, args.rest))
           }
       }
 
+      Runtime.getRuntime().addShutdownHook(new Thread() {
+        override def run(): Unit =
+          logger.info("Canceling execution ...")
+          app.cancel()
+      })
       Await.result(app, Duration.Inf)
     case None =>
       Console.err.println(Args.usage)

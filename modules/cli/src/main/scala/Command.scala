@@ -2,6 +2,8 @@ package info.hupel.isabelle.cli
 
 import scala.concurrent._
 
+import monix.execution.{Cancelable, CancelableFuture}
+
 import org.log4s._
 
 import info.hupel.isabelle.api._
@@ -18,6 +20,10 @@ trait Command {
 
   protected val logger = getLogger(getClass)
 
-  def run(bundle: Bundle, args: List[String])(implicit ec: ExecutionContext): Future[Unit]
+  def run(bundle: Bundle, args: List[String])(implicit ec: ExecutionContext): Future[Unit] =
+    cancelableRun(bundle, args)
+
+  def cancelableRun(bundle: Bundle, args: List[String])(implicit ec: ExecutionContext): CancelableFuture[Unit] =
+    CancelableFuture(run(bundle, args), Cancelable.empty)
 
 }

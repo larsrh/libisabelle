@@ -7,7 +7,7 @@ import info.hupel.isabelle.setup.Platform
 
 object JEdit extends Command {
 
-  def run(bundle: Bundle, args: List[String])(implicit ec: ExecutionContext): Future[Unit] = Future.successful {
+  override def run(bundle: Bundle, args: List[String])(implicit ec: ExecutionContext): Future[Unit] = Future.successful {
     val logic = bundle.configuration.session
     val dirs = bundle.configuration.paths.flatMap(p => List("-d", p.toString))
 

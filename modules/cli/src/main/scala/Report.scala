@@ -30,7 +30,7 @@ object Report extends Command {
       println(model.toHTML)
   }
 
-  def run(bundle: Bundle, args: List[String])(implicit ec: ExecutionContext): Future[Unit] = {
+  override def run(bundle: Bundle, args: List[String])(implicit ec: ExecutionContext): Future[Unit] = {
     val (format, files) = args match {
       case "--format" :: "raw-xml" :: files => (RawXML, files)
       case "--format" :: "model" :: files => (Model, files)
