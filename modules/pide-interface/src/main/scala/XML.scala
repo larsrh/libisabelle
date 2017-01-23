@@ -21,6 +21,7 @@ object XML {
     def pretty(indent: Int): String
     final def pretty: String = pretty(0)
     def compact: String
+    def stripMarkup: String
   }
 
   final case class Elem(markup: Markup, body: Body) extends Tree {
@@ -41,12 +42,14 @@ object XML {
       val compactAttrs = attrs.map { case (k, v) => s"""$k="$v"""" }.mkString(" ")
       s"<$name $compactAttrs>${body.map(_.compact).mkString("")}</$name>"
     }
+    def stripMarkup = body.map(_.stripMarkup).mkString(" ")
   }
 
   final case class Text(content: String) extends Tree {
     def pretty(indent: Int) =
       " " * indent + prettyEscape(content)
     def compact = content
+    def stripMarkup = content
   }
 
   type Body = List[Tree]

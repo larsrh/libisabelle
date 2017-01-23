@@ -141,6 +141,7 @@ abstract class Environment protected(val context: Environment.Context) { self =>
   protected[isabelle] val protocolTag: String
   protected[isabelle] val initTag: String
   protected[isabelle] val exitTag: String
+  protected[isabelle] val printTags: Set[String]
 
   protected[isabelle] type Session
 

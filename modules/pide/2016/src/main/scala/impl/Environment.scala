@@ -28,6 +28,7 @@ final class Environment private(context: api.Environment.Context) extends api.En
   protected[isabelle] val functionTag = isabelle.Markup.FUNCTION
   protected[isabelle] val initTag = isabelle.Markup.INIT
   protected[isabelle] val protocolTag = isabelle.Markup.PROTOCOL
+  protected[isabelle] val printTags = isabelle.Markup.messages.keySet
 
   protected[isabelle] type Session = isabelle.Session
 

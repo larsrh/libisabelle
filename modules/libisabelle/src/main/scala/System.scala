@@ -10,6 +10,8 @@ import cats.instances.future._
 
 import monix.execution.{Cancelable, CancelableFuture}
 
+import org.log4s._
+
 import info.hupel.isabelle.api._
 
 /** Functions to build and create [[System systems]]. */
@@ -118,6 +120,8 @@ object System {
  */
 final class System private(val env: Environment, config: Configuration) {
 
+  private val logger = getLogger
+
   /**
    * The [[scala.concurrent.ExecutionContext execution context]] used
    * internally for bi-directional communication with the prover.
@@ -153,6 +157,10 @@ final class System private(val env: Environment, config: Configuration) {
       initPromise.tryFailure(new System.StartupException())
       exitPromise.success(())
       ()
+    case ((tag, _), body) if env.printTags contains tag =>
+      body.foreach { tree =>
+        logger.trace(s"Output ($tag): ${tree.stripMarkup}")
+      }
     case _ =>
       synchronized {
         pending =
