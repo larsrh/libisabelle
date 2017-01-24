@@ -1,7 +1,9 @@
 ## Quickstart
 
 ```tut:book
-import scala.concurrent._, scala.concurrent.duration._, scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent._, scala.concurrent.duration._
+
+import monix.execution.Scheduler.Implicits.global
 
 import info.hupel.isabelle._, info.hupel.isabelle.api._, info.hupel.isabelle.setup._
 

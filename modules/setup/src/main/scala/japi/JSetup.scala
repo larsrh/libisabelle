@@ -3,8 +3,9 @@ package info.hupel.isabelle.japi
 import java.nio.file.Path
 
 import scala.concurrent.{Await, Future}
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
+
+import monix.execution.Scheduler.Implicits.global
 
 import info.hupel.isabelle.api._
 import info.hupel.isabelle.setup._

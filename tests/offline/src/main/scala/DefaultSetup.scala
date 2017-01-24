@@ -1,6 +1,7 @@
 package info.hupel.isabelle.tests
 
 import java.nio.file.Paths
+import java.util.concurrent.Executors
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
@@ -10,6 +11,9 @@ import org.log4s._
 import org.specs2.Specification
 import org.specs2.specification.AfterAll
 import org.specs2.specification.core.Env
+
+import monix.execution.schedulers.ExecutionModel.AlwaysAsyncExecution
+import monix.execution.{Scheduler, UncaughtExceptionReporter}
 
 import info.hupel.isabelle.System
 import info.hupel.isabelle.api._
@@ -22,6 +26,13 @@ trait BasicSetup {
   val specs2Env: Env
   implicit val ee = specs2Env.executionEnv
   import specs2Env.executionEnv.ec
+
+  lazy implicit val scheduler: Scheduler = Scheduler(
+    Executors.newSingleThreadScheduledExecutor(),
+    ec,
+    UncaughtExceptionReporter(ec.reportFailure),
+    AlwaysAsyncExecution
+  )
 
   lazy val version: Version =
     Option(java.lang.System.getenv("ISABELLE_VERSION")).orElse(
