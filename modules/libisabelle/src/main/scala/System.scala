@@ -20,7 +20,12 @@ object System {
 
   private val logger = getLogger
 
-  class StartupException(msg: String) extends RuntimeException(s"System startup failed: $msg")
+  object StartupException {
+    sealed abstract class Reason(val explain: String)
+    case object Exited extends Reason("exited (session not built?)")
+    case object NoPong extends Reason("ping operation timeout (wrong session?)")
+  }
+  case class StartupException(reason: StartupException.Reason) extends RuntimeException(s"System startup failed: ${reason.explain}")
 
   /**
    * Synchronously build a
@@ -120,7 +125,7 @@ object System {
       FutureUtils.timeoutTo(
         pong,
         pingTimeout,
-        Future.failed(new StartupException("ping operation timeout (wrong session?)"))
+        Future.failed(StartupException(StartupException.NoPong))
       )
     }.map(_ => system)
   }
@@ -172,7 +177,7 @@ final class System private(val env: Environment, config: Configuration) {
       initPromise.success(())
       ()
     case ((env.exitTag, _), _) =>
-      initPromise.tryFailure(new System.StartupException("exited (session not built?)"))
+      initPromise.tryFailure(System.StartupException(System.StartupException.Exited))
       logger.debug("Session terminated")
       exitPromise.success(())
       ()
