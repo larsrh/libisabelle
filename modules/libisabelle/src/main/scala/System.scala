@@ -3,10 +3,8 @@ package info.hupel.isabelle
 import scala.concurrent._
 import scala.concurrent.duration._
 import scala.util.control.Exception._
-import scala.util.control.NoStackTrace
 
 import cats.arrow.FunctionK
-import cats.data.EitherT
 import cats.instances.future._
 
 import monix.execution.{Cancelable, CancelableFuture, FutureUtils, Scheduler}

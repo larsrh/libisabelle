@@ -1,9 +1,6 @@
 package info.hupel.isabelle.cli
 
 import scala.concurrent._
-import scala.sys.process._
-
-import info.hupel.isabelle.setup.Platform
 
 object Exec extends Command {
 

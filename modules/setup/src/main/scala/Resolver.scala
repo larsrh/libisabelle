@@ -1,8 +1,7 @@
 package info.hupel.isabelle.setup
 
-import java.io.{File, FileNotFoundException}
+import java.io.FileNotFoundException
 import java.nio.file._
-import java.net.URL
 
 import scala.concurrent.{Future, ExecutionContext}
 

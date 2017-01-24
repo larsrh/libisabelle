@@ -1,12 +1,8 @@
 package info.hupel.isabelle
 
-import java.util.{List => JList}
-
-import scala.collection.JavaConverters._
 import scala.util.control.NoStackTrace
 
 import info.hupel.isabelle.api.XML
-import info.hupel.isabelle.japi.MarkupProcessor
 
 /** Combinators for creating [[Operation operations]] and basic operations. */
 object Operation {

@@ -1,6 +1,5 @@
 package info.hupel.isabelle.tests
 
-import java.nio.file.Paths
 import java.util.concurrent.Executors
 
 import scala.concurrent.{Await, Future}
@@ -8,7 +7,6 @@ import scala.concurrent.duration._
 
 import org.log4s._
 
-import org.specs2.Specification
 import org.specs2.specification.AfterAll
 import org.specs2.specification.core.Env
 

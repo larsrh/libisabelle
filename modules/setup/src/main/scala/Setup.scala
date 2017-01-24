@@ -1,7 +1,6 @@
 package info.hupel.isabelle.setup
 
-import java.io.File
-import java.nio.file.{Files, Path, Paths}
+import java.nio.file.{Files, Path}
 
 import scala.concurrent.Future
 import scala.util._
@@ -10,7 +9,7 @@ import org.log4s._
 
 import monix.execution.Scheduler
 
-import info.hupel.isabelle.api.{BuildInfo, Environment, Version}
+import info.hupel.isabelle.api.{Environment, Version}
 
 /**
  * Detecting and creating [[Setup setups]].

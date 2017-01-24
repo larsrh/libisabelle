@@ -1,7 +1,5 @@
 package info.hupel.isabelle.api
 
-import java.nio.file.Path
-
 /**
  * Represents the version of an Isabelle release.
  *

@@ -1,6 +1,5 @@
 package info.hupel.isabelle.api
 
-import java.util.concurrent.{AbstractExecutorService, TimeUnit}
 import java.net.URLClassLoader
 import java.nio.file.Path
 

@@ -1,6 +1,5 @@
 package info.hupel.isabelle.setup
 
-import java.net.URL
 import java.nio.charset.Charset
 import java.nio.file._
 
@@ -9,7 +8,7 @@ import scala.io.Source
 
 import org.log4s._
 
-import info.hupel.isabelle.api.{Configuration, Version}
+import info.hupel.isabelle.api.Configuration
 
 /** Utilities to extract [[Resources resources]] from the classpath. */
 object Resources {

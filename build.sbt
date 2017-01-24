@@ -215,6 +215,7 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
       "-dontoptimize",
       "-dontobfuscate",
       "-dontwarn",
+      "-dontnote",
       "-ignorewarnings"
     ),
     ProguardKeys.proguardVersion in Proguard := "5.3.1",

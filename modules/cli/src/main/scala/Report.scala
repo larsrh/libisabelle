@@ -1,7 +1,5 @@
 package info.hupel.isabelle.cli
 
-import java.nio.file.{Path, Paths}
-
 import scala.concurrent._
 
 import info.hupel.isabelle._
