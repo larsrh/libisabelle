@@ -3,12 +3,10 @@ package info.hupel.isabelle.ml
 import scala.concurrent._
 import scala.math.BigInt
 
-import cats.Monad
 import cats.free.Free
 
 import info.hupel.isabelle._
 import info.hupel.isabelle.api.XML
-import info.hupel.isabelle.pure.Term
 
 sealed abstract class Expr[A] {
 

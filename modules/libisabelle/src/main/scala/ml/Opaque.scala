@@ -1,7 +1,5 @@
 package info.hupel.isabelle.ml
 
-import info.hupel.isabelle.Codec
-
 trait Opaque[A] {
   val table: String
 }

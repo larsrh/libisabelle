@@ -9,8 +9,6 @@ import org.specs2.Specification
 import org.specs2.specification.core.Env
 
 import info.hupel.isabelle._
-import info.hupel.isabelle.api._
-import info.hupel.isabelle.hol._
 import info.hupel.isabelle.pure._
 
 class LibisabelleSpec(val specs2Env: Env) extends Specification

@@ -137,6 +137,7 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
     buildInfoPackage := "info.hupel.isabelle.api",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.2",
+      "io.monix" %% "monix-execution" % "2.1.1",
       "org.log4s" %% "log4s" % "1.3.3"
     )
   )
@@ -151,7 +152,6 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % "0.8.1",
       "org.typelevel" %% "cats-free" % "0.8.1",
-      "io.monix" %% "monix-execution" % "2.1.1",
       "com.lihaoyi" %% "scalatags" % "0.6.2",
       "info.hupel" % "classy" % "0.1.4"
     ),
@@ -215,6 +215,7 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
       "-dontoptimize",
       "-dontobfuscate",
       "-dontwarn",
+      "-dontnote",
       "-ignorewarnings"
     ),
     ProguardKeys.proguardVersion in Proguard := "5.3.1",

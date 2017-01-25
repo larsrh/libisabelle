@@ -3,7 +3,6 @@ package info.hupel.isabelle.pure
 import scala.math.BigInt
 
 import info.hupel.isabelle._
-import info.hupel.isabelle.api._
 
 object Typ {
   implicit lazy val typCodec: Codec[Typ] = new Codec.Variant[Typ]("typ") {

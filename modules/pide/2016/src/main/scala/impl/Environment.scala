@@ -1,7 +1,6 @@
 package info.hupel.isabelle.impl
 
 import java.nio.file.Path
-import java.util.concurrent.{Executors, ThreadFactory}
 
 import scala.concurrent.ExecutionContext
 

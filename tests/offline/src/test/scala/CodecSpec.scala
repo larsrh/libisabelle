@@ -8,7 +8,6 @@ import org.scalacheck._
 import org.scalacheck.Prop.forAll
 
 import info.hupel.isabelle._
-import info.hupel.isabelle.api._
 
 class CodecSpec extends Specification with ScalaCheck { def is = s2"""
 

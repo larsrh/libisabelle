@@ -1,10 +1,9 @@
 package info.hupel.isabelle.api
 
-import java.util.concurrent.{AbstractExecutorService, TimeUnit}
 import java.net.URLClassLoader
 import java.nio.file.Path
 
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService}
+import monix.execution.Scheduler
 
 import org.log4s._
 
@@ -63,8 +62,8 @@ object Environment {
   sealed trait Unicode
 
   /** Bundles all requirements to instantiate an [[Environment environment]]. */
-  case class Context(home: Path, user: Path)(implicit val ec: ExecutionContext) {
-    def executorService = ec.toExecutorService
+  case class Context(home: Path, user: Path)(implicit val scheduler: Scheduler) {
+    def executorService = scheduler.toExecutorService
   }
 
 }
@@ -119,7 +118,7 @@ abstract class Environment protected(val context: Environment.Context) { self =>
 
   final val home = context.home.toAbsolutePath
   final val user = context.user.toAbsolutePath
-  final implicit val executionContext: ExecutionContext = context.ec
+  final implicit val scheduler: Scheduler = context.scheduler
 
   final val version: Version = Environment.getVersion(getClass())
 

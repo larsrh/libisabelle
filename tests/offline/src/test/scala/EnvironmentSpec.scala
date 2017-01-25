@@ -1,18 +1,12 @@
 package info.hupel.isabelle.tests
 
-import java.lang.reflect.Constructor
-import java.net.URLClassLoader
-import java.nio.file.{Files, Path, Paths}
-
-import scala.concurrent.Future
-import scala.concurrent.duration._
+import java.nio.file.Files
 
 import org.specs2.Specification
 import org.specs2.specification.core.Env
 
-import info.hupel.isabelle._
 import info.hupel.isabelle.api._
-import info.hupel.isabelle.setup.{Resolver, Setup}
+import info.hupel.isabelle.setup.Resolver
 
 class EnvironmentSpec(val specs2Env: Env) extends Specification with BasicSetup with IsabelleMatchers { def is = s2"""
 

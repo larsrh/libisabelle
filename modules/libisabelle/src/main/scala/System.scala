@@ -1,14 +1,13 @@
 package info.hupel.isabelle
 
 import scala.concurrent._
+import scala.concurrent.duration._
 import scala.util.control.Exception._
-import scala.util.control.NoStackTrace
 
 import cats.arrow.FunctionK
-import cats.data.EitherT
 import cats.instances.future._
 
-import monix.execution.{Cancelable, CancelableFuture}
+import monix.execution.{Cancelable, CancelableFuture, FutureUtils, Scheduler}
 
 import org.log4s._
 
@@ -17,7 +16,14 @@ import info.hupel.isabelle.api._
 /** Functions to build and create [[System systems]]. */
 object System {
 
-  class StartupException() extends RuntimeException("System startup failed")
+  private val logger = getLogger
+
+  object StartupException {
+    sealed abstract class Reason(val explain: String)
+    case object Exited extends Reason("exited (session not built?)")
+    case object NoPong extends Reason("ping operation timeout (wrong session?)")
+  }
+  case class StartupException(reason: StartupException.Reason) extends RuntimeException(s"System startup failed: ${reason.explain}")
 
   /**
    * Synchronously build a
@@ -103,9 +109,23 @@ object System {
    *
    * Build products will be read from `~/.isabelle` on the file system.
    */
-  def create(env: Environment, config: Configuration): Future[System] = {
+  def create(env: Environment, config: Configuration, pingTimeout: FiniteDuration = 5.seconds): Future[System] = {
+    val Ping = Operation.implicitly[Unit, Unit]("ping")
+    import env.scheduler
+
     val system = new System(env, config)
-    system.initPromise.future.map(_ => system)(env.executionContext)
+    system.initPromise.future.flatMap { _ =>
+      logger.debug("Pinging system ...")
+      val pong = system.invoke(Ping)(())
+      pong.foreach { _ =>
+        logger.debug("Ping operation successful")
+      }
+      FutureUtils.timeoutTo(
+        pong,
+        pingTimeout,
+        Future.failed(StartupException(StartupException.NoPong))
+      )
+    }.map(_ => system)
   }
 
 }
@@ -139,7 +159,7 @@ final class System private(val env: Environment, config: Configuration) {
    *
    * @see [[dispose]]
    */
-  implicit val executionContext: ExecutionContext = env.executionContext
+  implicit val scheduler: Scheduler = env.scheduler
 
 
   private val initPromise = Promise[Unit]
@@ -151,10 +171,12 @@ final class System private(val env: Environment, config: Configuration) {
   private def consumer(markup: Markup, body: XML.Body): Unit = (markup, body) match {
     case ((env.initTag, _), _) =>
       env.sendOptions(session)
+      logger.debug("Session started")
       initPromise.success(())
       ()
     case ((env.exitTag, _), _) =>
-      initPromise.tryFailure(new System.StartupException())
+      initPromise.tryFailure(System.StartupException(System.StartupException.Exited))
+      logger.debug("Session terminated")
       exitPromise.success(())
       ()
     case ((tag, _), body) if env.printTags contains tag =>
@@ -170,6 +192,7 @@ final class System private(val env: Environment, config: Configuration) {
       }
   }
 
+  logger.debug("Starting session ...")
   private val session = env.create(config, consumer)
 
   /**

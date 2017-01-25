@@ -1,13 +1,11 @@
 package info.hupel.isabelle
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.math.BigInt
 
 import cats.instances.option._
 import cats.instances.list._
 import cats.syntax.traverse._
 
-import info.hupel.isabelle._
 import info.hupel.isabelle.pure._
 
 package hol {

@@ -1,14 +1,15 @@
 package info.hupel.isabelle.setup
 
-import java.io.File
-import java.nio.file.{Files, Path, Paths}
+import java.nio.file.{Files, Path}
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.Future
 import scala.util._
 
 import org.log4s._
 
-import info.hupel.isabelle.api.{BuildInfo, Environment, Version}
+import monix.execution.Scheduler
+
+import info.hupel.isabelle.api.{Environment, Version}
 
 /**
  * Detecting and creating [[Setup setups]].
@@ -140,7 +141,7 @@ final case class Setup(home: Path, platform: Platform, version: Version) {
    * Prepares a fresh [[info.hupel.isabelle.api.Environment]] using the
    * [[Resolver.Default default resolver]].
    */
-  def makeEnvironment(implicit ec: ExecutionContext): Future[Environment] =
+  def makeEnvironment(implicit scheduler: Scheduler): Future[Environment] =
     makeEnvironment(Resolver.Default, platform.userStorage(version))
 
   /**
@@ -149,7 +150,7 @@ final case class Setup(home: Path, platform: Platform, version: Version) {
    * If the [[Resolver resolver]] found an appropriate classpath, this method
    * also checks for matching [[info.hupel.isabelle.api.BuildInfo build info]].
    */
-  def makeEnvironment(resolver: Resolver, user: Path)(implicit ec: ExecutionContext): Future[Environment] =
+  def makeEnvironment(resolver: Resolver, user: Path)(implicit scheduler: Scheduler): Future[Environment] =
     resolver.resolve(platform, version).map(Environment.instantiate(version, _, Environment.Context(home, user)))
 
 }

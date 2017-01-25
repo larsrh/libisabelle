@@ -7,9 +7,9 @@ import org.apache.commons.io.FileUtils
 
 import scala.concurrent._
 import scala.concurrent.duration.Duration
-import scala.concurrent.ExecutionContext.Implicits.global
 
 import monix.execution.{Cancelable, CancelableFuture}
+import monix.execution.Scheduler.Implicits.global
 
 import org.log4s._
 
@@ -195,7 +195,7 @@ object Main {
 
       Runtime.getRuntime().addShutdownHook(new Thread() {
         override def run(): Unit =
-          logger.info("Canceling execution ...")
+          logger.info("Shutting down ...")
           app.cancel()
       })
       Await.result(app, Duration.Inf)

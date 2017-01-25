@@ -3,8 +3,6 @@ package info.hupel.isabelle
 import scala.concurrent._
 import scala.math.BigInt
 
-import cats.free.Free
-
 import info.hupel.isabelle.ml.{Expr, Opaque}
 
 sealed trait Instruction[A] {

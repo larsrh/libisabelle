@@ -1,7 +1,6 @@
 package info.hupel.isabelle.tests
 
 import scala.concurrent._
-import scala.concurrent.duration._
 import scala.math.BigInt
 
 import org.specs2.{ScalaCheck, Specification}
@@ -12,7 +11,6 @@ import org.scalacheck._
 import org.scalacheck.Prop.forAll
 
 import info.hupel.isabelle._
-import info.hupel.isabelle.api._
 import info.hupel.isabelle.hol._
 import info.hupel.isabelle.pure._
 

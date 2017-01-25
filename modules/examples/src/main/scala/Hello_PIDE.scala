@@ -2,7 +2,8 @@ package info.hupel.isabelle.examples.scala
 
 import scala.concurrent._
 import scala.concurrent.duration._
-import scala.concurrent.ExecutionContext.Implicits.global
+
+import monix.execution.Scheduler.Implicits.global
 
 import info.hupel.isabelle._
 import info.hupel.isabelle.api._
