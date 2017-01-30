@@ -375,7 +375,7 @@ lazy val workbench = project.in(file("modules/workbench"))
       import info.hupel.isabelle.setup._
       import scala.concurrent.duration.Duration
       import scala.concurrent.Await
-      import scala.concurrent.ExecutionContext.Implicits.global
+      import monix.execution.Scheduler.Implicits.global
 
       val setup = Setup.default(Version("2016-1")).right.get
       val env = Await.result(setup.makeEnvironment, Duration.Inf)
