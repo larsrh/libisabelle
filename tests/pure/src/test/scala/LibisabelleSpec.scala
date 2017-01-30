@@ -18,16 +18,17 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification
   Basic protocol interaction
 
   An Isabelle session
-    can be started          ${system must exist.awaitFor(duration)}
-    supports term parsing   ${parseCheck must beSuccess(Option.empty[String]).awaitFor(duration)}
-    can parse terms         ${parsed must beSome.awaitFor(duration)}
-    can't parse wrong terms ${parseFailed must beNone.awaitFor(duration)}
-    can load theories       ${loaded must beSuccess(()).awaitFor(duration)}
-    handles errors          ${error must beFailure.awaitFor(duration)}
-    can cancel requests     ${cancelled.failed must beAnInstanceOf[CancellationException].awaitFor(duration)}"""
+    can be started             ${system must exist.awaitFor(duration)}
+    supports term parsing      ${parseCheck must beSuccess(Option.empty[String]).awaitFor(duration)}
+    can parse terms            ${parsed must beSome.awaitFor(duration)}
+    can't parse wrong terms    ${parseFailed must beNone.awaitFor(duration)}
+    handles missing operations ${missingOperation must beFailure.awaitFor(duration)}
+    can load theories          ${loaded must beSuccess(()).awaitFor(duration)}
+    handles operation errors   ${operationError must beFailure.awaitFor(duration)}
+    can cancel requests        ${cancelled.failed must beAnInstanceOf[CancellationException].awaitFor(duration)}"""
 
 
-  // Pure/HOL operations
+  // Pure operations
 
   val thy = Theory.get("Pure")
   val ctxt = Context.initGlobal(thy)
@@ -38,13 +39,18 @@ class LibisabelleSpec(val specs2Env: Env) extends Specification
   val parseFailed = system.flatMap(_.run(Expr.fromString[Prop](ctxt, "TERM"), "Protocol_Pure"))
 
 
+  val AbsentOperation = Operation.implicitly[Unit, Unit]("absent_operation")
+
+  val missingOperation = system.flatMap(_.invoke(AbsentOperation)(()))
+
+
   // Loading auxiliary files
 
   val loaded = system.flatMap(_.invoke(Operation.UseThys)(List(resources.findTheory(Paths.get("tests/Sleepy.thy")).get)))
 
   val Sleepy = Operation.implicitly[BigInt, Unit]("sleepy")
 
-  val error =
+  val operationError =
     for {
       s <- system
       _ <- loaded

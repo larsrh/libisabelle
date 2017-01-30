@@ -79,7 +79,7 @@ fun add_operation name {from_lib, to_lib, action} {sequential, bracket, ...} =
 fun get_operation name =
   case Symtab.lookup (Synchronized.value operations) name of
     SOME operation => operation
-  | NONE => fn _ => raise Fail "libisabelle: unknown command"
+  | NONE => fn _ => error "libisabelle: unknown command"
 
 val _ = Isabelle_Process.protocol_command "libisabelle"
   (fn id :: name :: [arg] =>
@@ -91,7 +91,7 @@ val _ = Isabelle_Process.protocol_command "libisabelle"
         let
           val future = Future.fork (fn () =>
             let
-              val res = Exn.interruptible_capture (f id) args
+              val res = Exn.interruptible_capture (fn () => f id args) ()
               val yxml = YXML.string_of (Codec.encode (Codec.exn_result Codec.id) res)
             in
               Output.protocol_message response [yxml]
