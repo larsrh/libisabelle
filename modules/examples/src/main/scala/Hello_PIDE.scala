@@ -12,12 +12,12 @@ import info.hupel.isabelle.setup._
 object Hello_PIDE extends App {
 
   val setup = Setup.default(Version("2016")).right.get // yolo
+  val resources = Resources.dumpIsabelleResources().right.get // yolo
+  val config = resources.makeConfiguration(Nil, Nil, "Protocol")
 
   val transaction =
     for {
-      env <- setup.makeEnvironment
-      resources = Resources.dumpIsabelleResources().right.get // yolo
-      config = resources.makeConfiguration(Nil, "Protocol")
+      env <- setup.makeEnvironment(config)
       sys <- System.create(env, config)
       response <- sys.invoke(Operation.Hello)("world")
       _ = println(response.unsafeGet)

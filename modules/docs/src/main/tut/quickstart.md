@@ -8,12 +8,12 @@ import monix.execution.Scheduler.Implicits.global
 import info.hupel.isabelle._, info.hupel.isabelle.api._, info.hupel.isabelle.setup._
 
 val setup = Setup.default(Version("2016")).right.get
+val resources = Resources.dumpIsabelleResources().right.get
+val config = resources.makeConfiguration(Nil, Nil, "Protocol")
 
 val transaction =
   for {
-    env <- setup.makeEnvironment
-    resources = Resources.dumpIsabelleResources().right.get
-    config = resources.makeConfiguration(Nil, "Protocol")
+    env <- setup.makeEnvironment(config)
     sys <- System.create(env, config)
     response <- sys.invoke(Operation.Hello)("world")
     () <- sys.dispose

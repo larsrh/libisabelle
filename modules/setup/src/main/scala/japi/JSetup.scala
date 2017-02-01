@@ -19,10 +19,10 @@ object JSetup {
   def defaultSetup(version: Version): Setup =
     defaultSetup(version, Duration.Inf)
 
-  def makeEnvironment(setup: Setup, timeout: Duration): Environment =
-    Await.result(setup.makeEnvironment, timeout)
+  def makeEnvironment(setup: Setup, config: Configuration, timeout: Duration): Environment =
+    Await.result(setup.makeEnvironment(config), timeout)
 
-  def makeEnvironment(setup: Setup): Environment =
-    makeEnvironment(setup, Duration.Inf)
+  def makeEnvironment(setup: Setup, config: Configuration): Environment =
+    makeEnvironment(setup, config, Duration.Inf)
 
 }

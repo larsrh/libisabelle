@@ -1,7 +1,8 @@
 package info.hupel.isabelle.api
 
 import java.net.URLClassLoader
-import java.nio.file.Path
+import java.nio.charset.Charset
+import java.nio.file._
 
 import monix.execution.Scheduler
 
@@ -62,7 +63,7 @@ object Environment {
   sealed trait Unicode
 
   /** Bundles all requirements to instantiate an [[Environment environment]]. */
-  case class Context(home: Path, user: Path)(implicit val scheduler: Scheduler) {
+  case class Context(home: Path, user: Path, components: List[Path])(implicit val scheduler: Scheduler) {
     def executorService = scheduler.toExecutorService
   }
 
@@ -114,7 +115,7 @@ abstract class Environment protected(val context: Environment.Context) { self =>
 
   protected final val logger = getLogger
 
-  logger.debug(s"Instantiating environment at ${context.home} (with user storage ${context.user})")
+  logger.debug(s"Instantiating environment at ${context.home} (with user storage ${context.user}) ...")
 
   final val home = context.home.toAbsolutePath
   final val user = context.user.toAbsolutePath
@@ -127,6 +128,32 @@ abstract class Environment protected(val context: Environment.Context) { self =>
     "LIBISABELLE_GIT" -> BuildInfo.gitHeadCommit.getOrElse(""),
     "LIBISABELLE_VERSION" -> BuildInfo.version
   )
+
+  final val etc = user.resolve(".isabelle").resolve(s"Isabelle${version.identifier}").resolve("etc")
+  final val etcComponents = etc.resolve("components")
+
+  final def setEtcComponents(): Unit =
+    if (!context.components.isEmpty) {
+      logger.debug(s"Initializing components ...")
+
+      Files.createDirectories(etc)
+
+      if (Files.exists(etcComponents))
+        logger.error(s"Components catalog $etcComponents already exists")
+
+      val out = Files.newBufferedWriter(etcComponents, Charset.forName("UTF-8"), StandardOpenOption.CREATE_NEW)
+      context.components.foreach { c =>
+        out.write(isabellePath(c.toAbsolutePath().toString))
+      }
+      out.write("\n")
+      out.close()
+    }
+
+  final def cleanEtcComponents(): Unit = {
+    Files.deleteIfExists(etcComponents)
+    ()
+  }
+
 
   override def toString: String =
     s"$version at $home"

@@ -17,7 +17,7 @@ import java.nio.file.Path
  * through an existing [[info.hupel.isabelle.setup.Resources$ resources]]
  * object.
  */
-final case class Configuration(paths: List[Path], session: String) {
+final case class Configuration(paths: List[Path], components: List[Path], session: String) {
   override def toString: String =
     s"session $session" + (paths match {
       case Nil => ""

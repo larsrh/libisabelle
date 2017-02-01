@@ -57,7 +57,7 @@ object Isabelle_System
     _settings.get
   }
 
-  def init(isabelle_root: String = "", cygwin_root: String = "", user: String = "", init_env: Map[String, String] = Map.empty): Unit = synchronized {
+  def init(isabelle_root: String = "", cygwin_root: String = "", user: String = "", init_env: Map[String, String] = Map.empty, hook: () => Unit = () => ()): Unit = synchronized {
     if (_settings.isEmpty) {
       import scala.collection.JavaConversions._
 
@@ -78,6 +78,7 @@ object Isabelle_System
       }
 
       set_cygwin_root()
+      hook()
 
       def default(env: Map[String, String], entry: (String, String)): Map[String, String] =
         if (env.isDefinedAt(entry._1) || entry._2 == "") env

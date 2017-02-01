@@ -17,8 +17,10 @@ final class Environment private(context: api.Environment.Context) extends api.En
     isabelle_root = home.toString,
     cygwin_root = home.resolve("contrib/cygwin").toString,
     user = user.toString,
-    init_env = variables
+    init_env = variables,
+    hook = setEtcComponents _
   )
+  cleanEtcComponents()
 
   private def destMarkup(markup: isabelle.Markup) =
     (markup.name, markup.properties)

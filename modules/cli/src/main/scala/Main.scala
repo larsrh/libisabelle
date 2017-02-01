@@ -28,8 +28,9 @@ object Args {
 
   def parse(args: Args, rest: List[String]): Option[Args] = rest match {
     case "--version" :: version :: rest if args.version.isEmpty => parse(args.copy(version = Some(Version(version))), rest)
-    case "--include" :: path :: rest => parse(args.copy(include = Paths.get(path) :: args.include), rest)
     case "--session" :: session :: rest if args.session.isEmpty => parse(args.copy(session = Some(session)), rest)
+    case "--include" :: path :: rest => parse(args.copy(include = Paths.get(path) :: args.include), rest)
+    case "--component" :: path :: rest => parse(args.copy(components = Paths.get(path) :: args.components), rest)
     case "--home" :: home :: rest if args.home.isEmpty => parse(args.copy(home = Some(Paths.get(home))), rest)
     case "--user" :: user :: rest if args.user.isEmpty => parse(args.copy(user = Some(Paths.get(user))), rest)
     case "--fresh-user" :: rest if args.user.isEmpty => parse(args.copy(user = Some(Files.createTempDirectory("libisabelle_user"))), rest)
@@ -44,7 +45,8 @@ object Args {
 
   val usage = """
     | Usage:
-    |   isabellectl [--version VERSION] [--include PATH]* [--session SESSION]
+    |   isabellectl [--version VERSION] [--session SESSION]
+    |               [--include PATH]* [--component PATH]*
     |               [--home PATH]
     |               [--user PATH | --fresh-user]
     |               [--resources PATH | --fresh-resources]
@@ -66,8 +68,9 @@ object Args {
 
   val init: Args = Args(
     version = None,
-    include = Nil,
     session = None,
+    include = Nil,
+    components = Nil,
     home = None,
     user = None,
     resources = None,
@@ -80,8 +83,9 @@ object Args {
 
 case class Args(
   version: Option[Version],
-  include: List[Path],
   session: Option[String],
+  include: List[Path],
+  components: List[Path],
   home: Option[Path],
   user: Option[Path],
   resources: Option[Path],
@@ -155,10 +159,10 @@ object Main {
       val configuration = resourceClassLoader map { classLoader =>
         val result = Resources.dumpIsabelleResources(dump, classLoader) match {
           case Right(resources) =>
-            resources.makeConfiguration(args.include, session)
+            resources.makeConfiguration(args.include, args.components, session)
           case Left(Resources.Absent) =>
             logger.warn("No resources on classpath")
-            Configuration(args.include, session)
+            Configuration(args.include, args.components, session)
           case Left(error) =>
             sys.error(error.explain)
         }
@@ -166,7 +170,7 @@ object Main {
         result
       }
 
-      val setup = args.home match {
+      lazy val setup = args.home match {
         case None =>
           Setup.default(version) match {
             case Right(setup) => setup
@@ -177,8 +181,8 @@ object Main {
       }
 
       lazy val bundle = for {
-        env <- CancelableFuture(setup.makeEnvironment(Resolver.Default, user), Cancelable.empty)
-        c <- configuration
+        c <- CancelableFuture(configuration, Cancelable.empty)
+        env <- setup.makeEnvironment(Resolver.Default, user, c.components)
       } yield Bundle(env, setup, c)
 
       val app = args.command match {

@@ -56,6 +56,19 @@ object Resources {
       Source.fromURL(url, "UTF-8").getLines.toList
     }
 
+    def filterFor(markers: String*) =
+      (for {
+        file <- files
+        subdir = Paths.get(file).subpath(0, 1)
+        if markers.exists(m => files.contains(s"$subdir/$m"))
+      } yield subdir).distinct
+
+    def writeList(target: Path, list: List[Path]) = {
+      val out = Files.newBufferedWriter(target, Charset.forName("UTF-8"), StandardOpenOption.CREATE_NEW)
+      out.write(list.distinct.mkString("\n"))
+      out.close()
+    }
+
     if (files.nonEmpty) {
       logger.debug(s"Dumping Isabelle resources to $path ...")
 
@@ -73,17 +86,19 @@ object Resources {
           in.close()
         }
 
-        val roots =
-          (for {
-            file <- files
-            subdir = Paths.get(file).subpath(0, 1)
-            if files.contains(s"$subdir/ROOT") || files.contains(s"$subdir/ROOTS")
-          } yield subdir).distinct
+        val components = filterFor("etc/settings")
+        components.foreach(subdir => logger.debug(s"Found component at $path/$subdir"))
+        val target = path resolve "etc"
+        Files.createDirectories(target)
+        writeList(target resolve "components", components)
 
+        val roots = filterFor("ROOT", "ROOTS") diff components
         roots.foreach(subdir => logger.debug(s"Found session root at $path/$subdir"))
+        writeList(path resolve "ROOTS", roots)
 
-        val out = Files.newBufferedWriter(path resolve "ROOTS", Charset.forName("UTF-8"), StandardOpenOption.CREATE_NEW)
-        out.write(roots.distinct.mkString("\n"))
+
+        val out = Files.newBufferedWriter(target resolve "settings", Charset.forName("UTF-8"), StandardOpenOption.CREATE_NEW)
+        out.write("""LIBISABELLE_RESOURCES_HOME="$COMPONENT"""")
         out.close()
 
         Right(Resources(path))
@@ -113,8 +128,8 @@ final case class Resources(path: Path) {
    * Produces a [[info.hupel.isabelle.api.Configuration configuration]] with
    * the specified paths, preceded by the location from this object.
    */
-  def makeConfiguration(auxPaths: List[Path], name: String): Configuration =
-    Configuration(path :: auxPaths, name)
+  def makeConfiguration(auxPaths: List[Path], auxComponents: List[Path], name: String): Configuration =
+    Configuration(auxPaths, path :: auxComponents, name)
 
   /**
    * Checks presence of a theory file in this location. The input path should

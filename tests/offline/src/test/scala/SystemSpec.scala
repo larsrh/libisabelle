@@ -14,7 +14,7 @@ class SystemSpec(val specs2Env: Env) extends Specification with DefaultSetup wit
     detects missing protocol   $missingProtocol"""
 
   def create(session: String) =
-    isabelleEnv.flatMap(System.create(_, resources.makeConfiguration(Nil, session)))
+    isabelleEnv.flatMap(System.create(_, resources.makeConfiguration(Nil, Nil, session)))
 
   def check(session: String, reason: System.StartupException.Reason) =
     create(session).failed must be_===(System.StartupException(reason): Throwable).awaitFor(duration)
