@@ -83,7 +83,7 @@ lazy val apiBuildInfoKeys = Seq[BuildInfoKey](
   git.gitHeadCommit
 )
 
-lazy val logback = "ch.qos.logback" % "logback-classic" % "1.1.7"
+lazy val logback = "ch.qos.logback" % "logback-classic" % "1.1.9"
 
 
 lazy val root = project.in(file("."))
@@ -138,8 +138,8 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
     buildInfoPackage := "info.hupel.isabelle.api",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.2",
-      "io.monix" %% "monix-execution" % "2.1.1",
-      "org.log4s" %% "log4s" % "1.3.3"
+      "io.monix" %% "monix-execution" % "2.2.1",
+      "org.log4s" %% "log4s" % "1.3.4"
     )
   )
 
@@ -151,8 +151,8 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
   .settings(macroSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "0.8.1",
-      "org.typelevel" %% "cats-free" % "0.8.1",
+      "org.typelevel" %% "cats-core" % "0.9.0",
+      "org.typelevel" %% "cats-free" % "0.9.0",
       "com.lihaoyi" %% "scalatags" % "0.6.2",
       "info.hupel" % "classy" % "0.1.4"
     ),
@@ -177,11 +177,11 @@ lazy val setup = project.in(file("modules/setup"))
   .settings(warningSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "io.get-coursier" %% "coursier" % "1.0.0-M15",
-      "io.get-coursier" %% "coursier-cache" % "1.0.0-M15",
+      "io.get-coursier" %% "coursier" % "1.0.0-M15-1",
+      "io.get-coursier" %% "coursier-cache" % "1.0.0-M15-1",
       "com.github.fge" % "java7-fs-more" % "0.2.0",
       "com.google.code.findbugs" % "jsr305" % "3.0.1" % "compile",
-      "org.apache.commons" % "commons-compress" % "1.12",
+      "org.apache.commons" % "commons-compress" % "1.13",
       "org.apache.commons" % "commons-lang3" % "3.5",
       "commons-io" % "commons-io" % "2.5"
     )
@@ -202,7 +202,7 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
     libraryDependencies += "org.scala-lang" % "scala-library" % scalaVersion.value % "provided",
     libraryDependencies ++= {
       val dep =
-        ("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4").exclude("org.scala-lang", "scala-library")
+        ("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.5").exclude("org.scala-lang", "scala-library")
 
       if (scalaVersion.value startsWith "2.10")
         Seq()
@@ -219,7 +219,7 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
       "-dontnote",
       "-ignorewarnings"
     ),
-    ProguardKeys.proguardVersion in Proguard := "5.3.1",
+    ProguardKeys.proguardVersion in Proguard := "5.3.2",
     ProguardKeys.outputs in Proguard := Seq(target.value / s"${moduleName.value}-assembly.jar")
   )
 
@@ -262,7 +262,7 @@ lazy val tests = project.in(file("tests"))
   .settings(noPublishSettings)
   .aggregate(offlineTest, pureTest, holTest)
 
-val specs2Version = "3.8.6"
+val specs2Version = "3.8.7"
 
 lazy val offlineTest = project.in(file("tests/offline"))
   .dependsOn(setup, pidePackage)

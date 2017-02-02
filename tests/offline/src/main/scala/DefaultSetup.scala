@@ -10,8 +10,7 @@ import org.log4s._
 import org.specs2.specification.AfterAll
 import org.specs2.specification.core.Env
 
-import monix.execution.schedulers.ExecutionModel.AlwaysAsyncExecution
-import monix.execution.{Scheduler, UncaughtExceptionReporter}
+import monix.execution.{ExecutionModel, Scheduler, UncaughtExceptionReporter}
 
 import info.hupel.isabelle.System
 import info.hupel.isabelle.api._
@@ -29,7 +28,7 @@ trait BasicSetup {
     Executors.newSingleThreadScheduledExecutor(),
     ec,
     UncaughtExceptionReporter(ec.reportFailure),
-    AlwaysAsyncExecution
+    ExecutionModel.AlwaysAsyncExecution
   )
 
   lazy val version: Version =
