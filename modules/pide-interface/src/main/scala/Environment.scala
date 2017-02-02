@@ -143,9 +143,11 @@ abstract class Environment protected(val context: Environment.Context) { self =>
 
       val out = Files.newBufferedWriter(etcComponents, Charset.forName("UTF-8"), StandardOpenOption.CREATE_NEW)
       context.components.foreach { c =>
-        out.write(isabellePath(c.toAbsolutePath().toString))
+        val path = isabellePath(c.toAbsolutePath().toString)
+        logger.debug(s"Adding component $path ...")
+        out.write(path)
+        out.write("\n")
       }
-      out.write("\n")
       out.close()
     }
 
