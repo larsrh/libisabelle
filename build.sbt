@@ -179,8 +179,6 @@ lazy val setup = project.in(file("modules/setup"))
     libraryDependencies ++= Seq(
       "io.get-coursier" %% "coursier" % "1.0.0-M15-1",
       "io.get-coursier" %% "coursier-cache" % "1.0.0-M15-1",
-      "com.github.fge" % "java7-fs-more" % "0.2.0",
-      "com.google.code.findbugs" % "jsr305" % "3.0.1" % "compile",
       "org.apache.commons" % "commons-compress" % "1.13",
       "org.apache.commons" % "commons-lang3" % "3.5",
       "commons-io" % "commons-io" % "2.5"
