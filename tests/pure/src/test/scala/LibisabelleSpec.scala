@@ -13,7 +13,7 @@ import info.hupel.isabelle.pure._
 
 class LibisabelleSpec(val specs2Env: Env) extends Specification
   with DefaultSetup
-  with IsabelleMatchers { def is = s2"""
+  with IsabelleMatchers { def is = sequential ^ s2"""
 
   Basic protocol interaction
 
