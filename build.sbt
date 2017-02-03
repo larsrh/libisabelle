@@ -405,6 +405,9 @@ lazy val workbench = project.in(file("modules/workbench"))
 
 import ReleaseTransformations._
 
+releaseVcsSign := true
+releaseCrossBuild := true
+
 releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,
   inquireVersions,
@@ -415,7 +418,7 @@ releaseProcess := Seq[ReleaseStep](
   ReleaseStep(action = Command.process("publishSigned", _), enableCrossBuild = true),
   setNextVersion,
   commitNextVersion,
-  ReleaseStep(action = Command.process("sonatypeReleaseAll", _), enableCrossBuild = true)
+  ReleaseStep(action = Command.process("sonatypeRelease", _))
 )
 
 
