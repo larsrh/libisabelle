@@ -120,11 +120,19 @@ object System {
       pong.foreach { _ =>
         logger.debug("Ping operation successful")
       }
+      val noPong = Future.failed(StartupException(StartupException.NoPong))
       FutureUtils.timeoutTo(
         pong,
         pingTimeout,
-        Future.failed(StartupException(StartupException.NoPong))
-      )
+        system.dispose.flatMap(_ => noPong)
+      ).recoverWith { case _: CancellationException =>
+        noPong
+        // Why `noPong` twice? Race condition.
+        // `system.dispose` will cancel all the pending operations (including `pong`), which means
+        // that before `system.dispose` could complete, `pong` will complete (in a cancelled
+        // state). Hence, we "recover" a cancellation at this stage by switching the error cause
+        // to `noPong`.
+      }
     }.map(_ => system)
   }
 
