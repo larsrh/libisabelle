@@ -41,12 +41,18 @@ trait BasicSetup {
 
 }
 
-trait DefaultSetup extends BasicSetup with AfterAll {
+trait DefaultSetup extends BasicSetup {
 
   import specs2Env.executionEnv.ec
 
   lazy val resources: Resources = Resources.dumpIsabelleResources().right.get
   lazy val isabelleEnv: Future[Environment] = setup.makeEnvironment(resources)
+
+}
+
+trait FullSetup extends DefaultSetup with AfterAll {
+
+  import specs2Env.executionEnv.ec
 
   def session: String = "Protocol"
 

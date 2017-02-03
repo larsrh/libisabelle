@@ -15,7 +15,7 @@ import info.hupel.isabelle.hol._
 import info.hupel.isabelle.pure._
 
 class HOLSpec(val specs2Env: Env) extends Specification
-  with DefaultSetup
+  with FullSetup
   with IsabelleMatchers
   with ScalaCheck { def is = s2"""
 
