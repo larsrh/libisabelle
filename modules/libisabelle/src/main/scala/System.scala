@@ -220,6 +220,7 @@ final class System private(val env: Environment, config: Configuration) {
    */
   def dispose: Future[Unit] = {
     env.dispose(session)
+    pending.foreach { case (_, state) => state.promise.tryFailure(new CancellationException()) }
     exitPromise.future
   }
 

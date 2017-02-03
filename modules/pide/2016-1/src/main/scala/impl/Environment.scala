@@ -87,8 +87,11 @@ final class Environment private(context: api.Environment.Context) extends api.En
     session
   }
 
-  protected[isabelle] def sendCommand(session: Session, name: String, args: List[String]) =
+  protected[isabelle] def sendCommand(session: Session, name: String, args: List[String]) = {
+    if (session.phase != isabelle.Session.Ready)
+      sys.error("session not ready")
     session.protocol_command(name, args: _*)
+  }
 
   protected[isabelle] def sendOptions(session: Session) =
     session.protocol_command("Prover.options", isabelle.YXML.string_of_body(options.encode))
