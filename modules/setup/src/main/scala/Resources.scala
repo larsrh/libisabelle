@@ -44,11 +44,24 @@ object Resources {
    * the specified location. Path names are expected to be encoded in UTF-8,
    * which is the standard encoding Isabelle uses.
    *
-   * After that, a `ROOTS` file will be created, listing all direct
-   * subdirectories that have been created below the specified path and that
-   * are also session root directories. For example, if the files
-   * `A/tactic.ML`, `A/ROOTS`, `B/ROOT` and `C/Seq.thy` have been written, the
-   * `ROOTS` file will contain `A` and `B`, but not `C`.
+   * The specified path will then be turned into an Isabelle "component" (refer
+   * to the Isabelle system manual for information about components) by
+   * creating an `etc/settings` file, which we will call ''resources
+   * component''. The root directory of the resources component is available
+   * in the environment variable `LIBISABELLE_RESOURCES_HOME`.
+   *
+   * Resources are checked for contained components and session root
+   * directories. This is done by looking for `ROOT`, `ROOTS`, and
+   * `etc/settings` in direct subdirectories that have been created below the
+   * specified path. Components are added as subcomponents to the resources
+   * component (`$LIBISABELLE_RESOURCES_HOME/etc/components`) and session root
+   * directories to `$LIBISABELLE_RESOURCES_HOME/ROOTS`. Session roots that are
+   * also components are only added as components, because components are
+   * automatically discovered as session roots.
+   *
+   * Note that this will only work correctly if the specified path ultimately
+   * gets registered as an Isabelle component. Otherwise, subcomponents that
+   * are also session roots do not get discovered properly.
    */
   def dumpIsabelleResources(path: Path, classLoader: ClassLoader): Either[Error, Resources] = {
     val files = classLoader.getResources(".libisabelle/.files").asScala.toList.flatMap { url =>
@@ -92,16 +105,15 @@ object Resources {
         Files.createDirectories(target)
         writeList(target resolve "components", components)
 
-        val roots = filterFor("ROOT", "ROOTS") diff components
+        val roots = filterFor("ROOT", "ROOTS")
         roots.foreach(subdir => logger.debug(s"Found session root at $path/$subdir"))
-        writeList(path resolve "ROOTS", roots)
-
+        writeList(path resolve "ROOTS", roots diff components)
 
         val out = Files.newBufferedWriter(target resolve "settings", Charset.forName("UTF-8"), StandardOpenOption.CREATE_NEW)
         out.write("""LIBISABELLE_RESOURCES_HOME="$COMPONENT"""")
         out.close()
 
-        Right(Resources(path))
+        Right(Resources(path, roots.map(path.resolve)))
       }
     }
     else {
@@ -117,19 +129,15 @@ object Resources {
  * In almost all cases, instances of this object should be produced using
  * `[[Resources.dumpIsabelleResources(path* Resources.dumpIsabelleResources]]`
  * (see its documentation for details).
- *
- * In case you manage Isabelle source files yourself, this class is unneeded
- * and you may want to construct
- * [[info.hupel.isabelle.api.Configuration configurations]] yourself.
  */
-final case class Resources(path: Path) {
+final case class Resources private(component: Path, roots: List[Path]) {
 
   /**
    * Produces a [[info.hupel.isabelle.api.Configuration configuration]] with
    * the specified paths, preceded by the location from this object.
    */
-  def makeConfiguration(auxPaths: List[Path], auxComponents: List[Path], name: String): Configuration =
-    Configuration(auxPaths, path :: auxComponents, name)
+  def asSessionsConfiguration(auxPaths: List[Path], name: String): Configuration =
+    Configuration(roots ::: auxPaths, name)
 
   /**
    * Checks presence of a theory file in this location. The input path should
@@ -138,8 +146,9 @@ final case class Resources(path: Path) {
    * (e.g. `src/HOL/ex/Seq`).
    */
   def findTheory(theory: Path): Option[String] = {
-    val fullPath = path.resolve(theory)
+    val fullPath = component.resolve(theory)
     if (Files.exists(fullPath))
+      // FIXME this probably doesn't work on Windows
       Some(fullPath.toRealPath().toString.stripSuffix(".thy"))
     else
       None

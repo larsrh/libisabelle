@@ -23,8 +23,8 @@ class JResources private(resources: Resources) {
 
   def getResources(): Resources = resources
 
-  def makeConfiguration(auxPaths: JList[Path], auxComponents: JList[Path], name: String): Configuration =
-    resources.makeConfiguration(auxPaths.asScala.toList, auxComponents.asScala.toList, name)
+  def asSessionsConfiguration(auxPaths: JList[Path], name: String): Configuration =
+    resources.asSessionsConfiguration(auxPaths.asScala.toList, name)
 
   def findTheory(theory: Path): String =
     resources.findTheory(theory).getOrElse(throw new FileNotFoundException(theory.toString))

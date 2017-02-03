@@ -46,11 +46,11 @@ trait DefaultSetup extends BasicSetup with AfterAll {
   import specs2Env.executionEnv.ec
 
   lazy val resources: Resources = Resources.dumpIsabelleResources().right.get
-  lazy val isabelleEnv: Future[Environment] = setup.makeEnvironment(Resolver.Default, platform.userStorage(version), List(resources.path))
+  lazy val isabelleEnv: Future[Environment] = setup.makeEnvironment(resources)
 
   def session: String = "Protocol"
 
-  lazy val config: Configuration = resources.makeConfiguration(Nil, Nil, session)
+  lazy val config: Configuration = Configuration.simple(session)
   lazy val system: Future[System] = isabelleEnv.flatMap(System.create(_, config))
 
 

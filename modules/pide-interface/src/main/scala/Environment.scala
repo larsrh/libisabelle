@@ -24,7 +24,7 @@ object Environment {
         Version(identifier)
   }
 
-  private val packageName: String = "info.hupel.isabelle.impl"
+  val packageName: String = "info.hupel.isabelle.impl"
 
   def instantiate(version: Version, classpath: List[Path], context: Context) = {
     logger.debug(s"Creating environment with classpath ${classpath.mkString(":")} ...")
@@ -87,8 +87,8 @@ object Environment {
  *
  * While implementations may be created freely by users, it is recommended to
  * only use the bundled implementations for the supported Isabelle versions.
- * By convention, they live in the package `info.hupel.isabelle.impl`. See also
- * `[[info.hupel.isabelle.setup.Setup.defaultPackageName Setup.defaultPackageName]]`.
+ * By convention, they live in the package specified in
+ * `[[Environment.packageName]]`.
  *
  * ''Contract''
  *

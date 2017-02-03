@@ -13,11 +13,11 @@ object Hello_PIDE extends App {
 
   val setup = Setup.default(Version("2016")).right.get // yolo
   val resources = Resources.dumpIsabelleResources().right.get // yolo
-  val config = resources.makeConfiguration(Nil, Nil, "Protocol")
+  val config = Configuration.simple("Protocol")
 
   val transaction =
     for {
-      env <- setup.makeEnvironment(config)
+      env <- setup.makeEnvironment(resources)
       sys <- System.create(env, config)
       response <- sys.invoke(Operation.Hello)("world")
       _ = println(response.unsafeGet)

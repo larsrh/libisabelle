@@ -156,18 +156,19 @@ object Main {
         new URLClassLoader(files.map(_.toUri.toURL).toArray, parentClassLoader)
       }
 
-      val configuration = resourceClassLoader map { classLoader =>
-        val result = Resources.dumpIsabelleResources(dump, classLoader) match {
+      val configuration = Configuration(args.include, session)
+      logger.info(s"Using $configuration")
+
+      val components = resourceClassLoader map { classLoader =>
+        Resources.dumpIsabelleResources(dump, classLoader) match {
           case Right(resources) =>
-            resources.makeConfiguration(args.include, args.components, session)
+            resources.component :: args.components
           case Left(Resources.Absent) =>
             logger.warn("No resources on classpath")
-            Configuration(args.include, args.components, session)
+            args.components
           case Left(error) =>
             sys.error(error.explain)
         }
-        logger.info(s"Using $result")
-        result
       }
 
       lazy val setup = args.home match {
@@ -181,9 +182,9 @@ object Main {
       }
 
       lazy val bundle = for {
-        c <- CancelableFuture(configuration, Cancelable.empty)
-        env <- setup.makeEnvironment(Resolver.Default, user, c.components)
-      } yield Bundle(env, setup, c)
+        cs <- CancelableFuture(components, Cancelable.empty)
+        env <- setup.makeEnvironment(Resolver.Default, user, cs)
+      } yield Bundle(env, setup, configuration)
 
       val app = args.command match {
         case None => bundle.map(_ => ())

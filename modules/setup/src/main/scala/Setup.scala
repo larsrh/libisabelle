@@ -141,8 +141,8 @@ final case class Setup(home: Path, platform: Platform, version: Version) {
    * Prepares a fresh [[info.hupel.isabelle.api.Environment]] using the
    * [[Resolver.Default default resolver]].
    */
-  def makeEnvironment(configuration: Configuration)(implicit scheduler: Scheduler): Future[Environment] =
-    makeEnvironment(Resolver.Default, platform.userStorage(version), configuration.components)
+  def makeEnvironment(resources: Resources)(implicit scheduler: Scheduler): Future[Environment] =
+    makeEnvironment(Resolver.Default, platform.userStorage(version), List(resources.component))
 
   /**
    * Prepares a fresh [[info.hupel.isabelle.api.Environment]].

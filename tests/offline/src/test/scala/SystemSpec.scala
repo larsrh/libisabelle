@@ -4,6 +4,7 @@ import org.specs2.Specification
 import org.specs2.specification.core.Env
 
 import info.hupel.isabelle._
+import info.hupel.isabelle.api.Configuration
 
 class SystemSpec(val specs2Env: Env) extends Specification with DefaultSetup with IsabelleMatchers { def is = s2"""
 
@@ -14,7 +15,7 @@ class SystemSpec(val specs2Env: Env) extends Specification with DefaultSetup wit
     detects missing protocol   $missingProtocol"""
 
   def create(session: String) =
-    isabelleEnv.flatMap(System.create(_, resources.makeConfiguration(Nil, Nil, session)))
+    isabelleEnv.flatMap(System.create(_, Configuration.simple(session)))
 
   def check(session: String, reason: System.StartupException.Reason) =
     create(session).failed must be_===(System.StartupException(reason): Throwable).awaitFor(duration)
