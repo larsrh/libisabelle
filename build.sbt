@@ -384,10 +384,15 @@ lazy val workbench = project.in(file("modules/workbench"))
       val system = Await.result(System.create(env, config), Duration.Inf)
 
       val main = Theory.get("Protocol_Main")
-      val ctxt = Context.initGlobal(main)""",
+      val ctxt = Context.initGlobal(main)
+      """,
+    cleanupCommands in console := """
+      system.dispose
+      """,
     sourceGenerators in Compile += Def.task {
       val contents = s"""object Test {
         ${(initialCommands in console).value}
+        ${(cleanupCommands in console).value}
       }"""
       val file = (sourceManaged in Test).value / "test.scala"
       IO.write(file, contents)
