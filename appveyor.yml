@@ -12,4 +12,4 @@ build_script:
   - sbt compile
 test_script:
   - sbt "cli/run --version %ISABELLE_VERSION% --internal --session Protocol build"
-  - sbt "cli/run --version %ISABELLE_VERSION% --internal --session Protocol check"
+  - sbt validateQuick
