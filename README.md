@@ -46,21 +46,21 @@ You can download the latest nightly CLI executable from [Bintray](https://dl.bin
 ### Downloading & checking your installation
 
 ```
-isabellectl --version 2016 check
+isabellectl check
 ```
 
 
 ### Launching Isabelle/jEdit
 
 ```
-isabellectl --version 2016 --session HOL-Probability jedit
+isabellectl -s HOL-Probability jedit
 ```
 
 
 ### Using Isabelle tools
 
 ```
-isabellectl --version 2016 exec getenv ISABELLE_HOME
+isabellectl exec getenv ISABELLE_HOME
 ```
 
 
