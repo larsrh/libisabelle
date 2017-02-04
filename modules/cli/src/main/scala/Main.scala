@@ -17,7 +17,7 @@ import cats.instances.either._
 import cats.instances.list._
 import cats.syntax.traverse._
 
-import coursier.Dependency
+import coursier.{Dependency, Module}
 import coursier.util.Parse
 
 import info.hupel.isabelle.api._
@@ -38,6 +38,7 @@ object Args {
     case "--fresh-resources" :: rest if args.resources.isEmpty => parse(args.copy(resources = Some(Files.createTempDirectory("libisabelle_resources"))), rest)
     case "--internal" :: rest if !args.internal => parse(args.copy(internal = true), rest)
     case "--fetch" :: fetch :: rest => parse(args.copy(fetch = fetch :: args.fetch), rest)
+    case "--afp" :: rest if !args.afp => parse(args.copy(afp = true), rest)
     case cmd :: rest if !cmd.startsWith("-") => Some(args.copy(command = Some(cmd), rest = rest))
     case Nil => Some(args)
     case _ => None
@@ -51,7 +52,7 @@ object Args {
     |               [--user PATH | --fresh-user]
     |               [--resources PATH | --fresh-resources]
     |               [--internal]
-    |               [--fetch COORDINATE]*
+    |               [--fetch COORDINATE]* [--afp]
     |               [CMD [extra options ...]]
     |
     | Available commands:
@@ -76,6 +77,7 @@ object Args {
     resources = None,
     internal = false,
     fetch = Nil,
+    afp = false,
     command = None,
     rest = Nil
   )
@@ -91,6 +93,7 @@ case class Args(
   resources: Option[Path],
   internal: Boolean,
   fetch: List[String],
+  afp: Boolean,
   command: Option[String],
   rest: List[String]
 )
@@ -146,9 +149,15 @@ object Main {
       val parentClassLoader =
         if (args.internal) getClass.getClassLoader else null
 
+      val afp =
+        if (args.afp)
+          Set(Dependency(Module(s"${BuildInfo.organization}.afp", s"afp-${version.identifier}"), "1.0.+"))
+        else
+          Set()
+
       val classpath = args.fetch.traverseU(Parse.moduleVersion(_, BuildInfo.scalaBinaryVersion)) match {
-        case Right(Nil) => Future.successful { Nil }
-        case Right(modules) => guessPlatform.fetchArtifacts(modules.map { case (mod, v) => Dependency(mod, v) }.toSet)
+        case Right(Nil) if !args.afp => Future.successful { Nil }
+        case Right(modules) => guessPlatform.fetchArtifacts(modules.map { case (mod, v) => Dependency(mod, v) }.toSet ++ afp)
         case Left(error) => sys.error(s"could not parse dependency: $error")
       }
 
