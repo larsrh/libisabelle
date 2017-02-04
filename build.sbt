@@ -312,12 +312,9 @@ lazy val cli = project.in(file("modules/cli"))
     libraryDependencies += logback,
     mainClass in Compile := Some("info.hupel.isabelle.cli.Main"),
     assemblyJarName in assembly := s"isabellectl-assembly-${version.value}",
-    assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript)),
-    assemblyMergeStrategy in assembly := {
-      case PathList(".libisabelle", ".files") => MergeStrategy.concat
-      case path => (assemblyMergeStrategy in assembly).value(path)
-    }
+    assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript))
   )
+  .enablePlugins(LibisabellePlugin)
 
 TaskKey[File]("script") := {
   val executable = (assembly in cli).value.getCanonicalPath()
