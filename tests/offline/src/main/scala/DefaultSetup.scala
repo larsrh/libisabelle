@@ -12,11 +12,15 @@ import org.specs2.specification.core.Env
 
 import monix.execution.{ExecutionModel, Scheduler, UncaughtExceptionReporter}
 
+import io.rbricks.scalog.{Level, LoggingBackend}
+
 import info.hupel.isabelle.System
 import info.hupel.isabelle.api._
 import info.hupel.isabelle.setup._
 
 trait BasicSetup {
+
+  LoggingBackend.console("info.hupel" -> Level.Trace)
 
   lazy val duration = 30.seconds
 

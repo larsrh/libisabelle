@@ -75,6 +75,17 @@ lazy val macroSettings = Seq(
   )
 )
 
+lazy val loggingSettings = Seq(
+  libraryDependencies ++= Seq(
+    "io.rbricks" %% "scalog-backend" % "0.2.1",
+    "io.rbricks" %% "scalog-mdc" % "0.2.1",
+    // scalac requires this pseudo-transitive dependency of scalog to be present,
+    // even though we don't use its functionality here
+    // this seems to be an issue for Scala <= 2.11.x
+    "com.typesafe" % "config" % "1.3.1" % "provided"
+  )
+)
+
 lazy val apiBuildInfoKeys = Seq[BuildInfoKey](
   version,
   scalaVersion,
@@ -82,9 +93,6 @@ lazy val apiBuildInfoKeys = Seq[BuildInfoKey](
   organization,
   git.gitHeadCommit
 )
-
-lazy val logback = "ch.qos.logback" % "logback-classic" % "1.1.9"
-
 
 lazy val root = project.in(file("."))
   .settings(standardSettings)
@@ -107,8 +115,8 @@ lazy val docs = project.in(file("modules/docs"))
   .settings(tutSettings)
   .settings(site.settings ++ site.includeScaladoc("api/nightly"))
   .settings(ghpages.settings)
+  .settings(loggingSettings)
   .settings(
-    libraryDependencies += logback,
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(pideInterface, libisabelle, setup),
     doc in Compile := (doc in ScalaUnidoc).value,
     target in unidoc in ScalaUnidoc := crossTarget.value / "api",
@@ -268,13 +276,13 @@ lazy val offlineTest = project.in(file("tests/offline"))
   .settings(noPublishSettings)
   .settings(standardSettings)
   .settings(warningSettings)
+  .settings(loggingSettings)
   .settings(
     isabellePackage := "tests",
     parallelExecution in Test := false,
     libraryDependencies ++= Seq(
       "org.specs2" %% "specs2-core" % specs2Version,
-      "org.specs2" %% "specs2-scalacheck" % specs2Version % "test",
-      logback
+      "org.specs2" %% "specs2-scalacheck" % specs2Version % "test"
     )
   )
 
@@ -309,11 +317,9 @@ lazy val cli = project.in(file("modules/cli"))
   .settings(standardSettings)
   .settings(warningSettings)
   .settings(macroSettings)
+  .settings(loggingSettings)
   .settings(
-    libraryDependencies ++= Seq(
-      logback,
-      "com.github.alexarchambault" %% "case-app" % "1.1.3"
-    ),
+    libraryDependencies += "com.github.alexarchambault" %% "case-app" % "1.1.3",
     mainClass in Compile := Some("info.hupel.isabelle.cli.Main"),
     assemblyJarName in assembly := s"isabellectl-assembly-${version.value}",
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript))
@@ -334,20 +340,6 @@ TaskKey[File]("script") := {
   script
 }
 
-lazy val libisabellePackage = project.in(file("modules/package"))
-  .dependsOn(setup, pidePackage)
-  .settings(standardSettings)
-  .settings(warningSettings)
-  .settings(noPublishSettings)
-  .settings(
-    libraryDependencies += logback,
-    assemblyJarName in assembly := s"libisabelle-package-${version.value}.jar",
-    assemblyMergeStrategy in assembly := {
-      case PathList(".libisabelle", ".files") => MergeStrategy.concat
-      case path => (assemblyMergeStrategy in assembly).value(path)
-    }
-  )
-
 
 // Examples
 
@@ -356,7 +348,10 @@ lazy val examples = project.in(file("modules/examples"))
   .settings(noPublishSettings)
   .settings(standardSettings)
   .settings(warningSettings)
-  .settings(libraryDependencies += logback)
+  .settings(
+    // logback because Java
+    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.9"
+  )
 
 
 // Workbench
@@ -365,9 +360,12 @@ lazy val workbench = project.in(file("modules/workbench"))
   .dependsOn(setup, pidePackage)
   .settings(noPublishSettings)
   .settings(standardSettings)
+  .settings(loggingSettings)
   .settings(
-    libraryDependencies += logback,
     initialCommands in console := """
+      import io.rbricks.scalog.{Level, LoggingBackend}
+      LoggingBackend.console("info.hupel" -> Level.Trace)
+
       import info.hupel.isabelle._
       import info.hupel.isabelle.api._
       import info.hupel.isabelle.hol._

@@ -6,6 +6,8 @@ import org.log4s._
 
 import caseapp._
 
+import io.rbricks.scalog._
+
 import info.hupel.isabelle.api.{BuildInfo, Configuration, Version}
 import info.hupel.isabelle.setup.Platform
 
@@ -61,7 +63,10 @@ case class Options(
   fetch: List[String],
 
   @HelpMessage("add AFP as resource")
-  afp: Boolean = false
+  afp: Boolean = false,
+
+  @HelpMessage("verbose logging output")
+  verbose: Boolean = false
 ) {
 
   lazy val userPath: Path = (user, freshUser) match {
@@ -84,7 +89,7 @@ case class Options(
 
 object Options {
 
-  private val logger = getLogger(getClass)
+  private lazy val logger = getLogger
 
   val commands: Map[String, Command] = Map(
     "build" -> Build,
@@ -110,6 +115,13 @@ object Options {
 
   def parse[T](args: List[String])(f: (Options, List[String]) => T): T = CaseApp.parseWithHelp[Options](args) match {
     case Right((options, help, usage, rest)) =>
+      LoggingBackend.console("info.hupel" -> {
+        if (options.verbose)
+          Level.Info
+        else
+          Level.Warn
+      })
+
       if (usage || help) {
         CaseApp.printHelp[Options](err = true)
         Console.err.println(s"Available commands: ${commands.keys.mkString(" ")}")

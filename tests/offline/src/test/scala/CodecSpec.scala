@@ -3,13 +3,14 @@ package info.hupel.isabelle.tests
 import scala.math.BigInt
 
 import org.specs2.{ScalaCheck, Specification}
+import org.specs2.specification.core.Env
 
 import org.scalacheck._
 import org.scalacheck.Prop.forAll
 
 import info.hupel.isabelle._
 
-class CodecSpec extends Specification with ScalaCheck { def is = s2"""
+class CodecSpec(val specs2Env: Env) extends Specification with BasicSetup with ScalaCheck { def is = s2"""
 
   Round-trip property of Codecs
 

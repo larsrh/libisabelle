@@ -1,5 +1,10 @@
 ## Quickstart
 
+```tut:invisible
+import io.rbricks.scalog.{Level, LoggingBackend}
+LoggingBackend.console("info.hupel" -> Level.Info)
+```
+
 ```tut:book
 import scala.concurrent._, scala.concurrent.duration._
 

@@ -27,7 +27,7 @@ import info.hupel.isabelle.setup._
 
 object Main {
 
-  private val logger = getLogger(getClass)
+  private lazy val logger = getLogger
 
   def main(args: Array[String]): Unit = Options.parse(args.toList) { (options, rest) =>
     val parentClassLoader =

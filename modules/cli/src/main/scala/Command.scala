@@ -18,7 +18,7 @@ final case class Bundle(env: Environment, setup: Setup, configuration: Configura
 
 trait Command {
 
-  protected val logger = getLogger(getClass)
+  protected lazy val logger = getLogger(getClass)
 
   def run(bundle: Bundle, args: List[String])(implicit ec: ExecutionContext): Future[Unit] =
     cancelableRun(bundle, args)
