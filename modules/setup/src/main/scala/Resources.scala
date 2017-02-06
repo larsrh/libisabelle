@@ -67,7 +67,7 @@ object Resources {
     val files = classLoader.getResources(".libisabelle/.files").asScala.toList.flatMap { url =>
       logger.debug(s"Found Isabelle resource set at $url")
       Source.fromURL(url, "UTF-8").getLines.toList
-    }
+    }.filterNot(_.isEmpty)
 
     def filterFor(markers: String*) =
       (for {
