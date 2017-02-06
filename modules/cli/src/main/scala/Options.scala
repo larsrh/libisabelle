@@ -77,7 +77,7 @@ case class Options(
   }
 
   lazy val resourcePath: Path = (resources, freshResources) match {
-    case (None, true) => Files.createTempDirectory("libisabelle_user")
+    case (None, true) => Files.createTempDirectory("libisabelle_resources")
     case (None, false) => Options.platform.resourcesStorage(version)
     case (Some(path), false) => path
     case (Some(_), true) => Options.usageAndExit("Option conflict: --resources and --fresh-resources are mutually exclusive")
@@ -117,7 +117,7 @@ object Options {
     case Right((options, help, usage, rest)) =>
       LoggingBackend.console("info.hupel" -> {
         if (options.verbose)
-          Level.Info
+          Level.Debug
         else
           Level.Warn
       })
