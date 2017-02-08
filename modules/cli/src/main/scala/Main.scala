@@ -51,12 +51,9 @@ object Main {
     }
 
     logger.info(s"Dumping resources to ${options.resourcePath} ...")
-    if (Files.exists(options.resourcePath)) {
-      // clear out directory contents, not the whole directory
-      Files.list(options.resourcePath).iterator.asScala.foreach { path =>
-        FileUtils.deleteDirectory(path.toFile)
-      }
-    }
+    if (Files.exists(options.resourcePath))
+      FileUtils.cleanDirectory(options.resourcePath.toFile)
+
     val components = resourceClassLoader map { classLoader =>
       Resources.dumpIsabelleResources(options.resourcePath, classLoader) match {
         case Right(resources) =>
