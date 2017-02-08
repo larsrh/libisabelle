@@ -282,7 +282,7 @@ lazy val offlineTest = project.in(file("tests/offline"))
     parallelExecution in Test := false,
     libraryDependencies ++= Seq(
       "org.specs2" %% "specs2-core" % specs2Version,
-      "org.specs2" %% "specs2-scalacheck" % specs2Version % "test"
+      "org.specs2" %% "specs2-scalacheck" % specs2Version
     )
   )
 
