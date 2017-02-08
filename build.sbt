@@ -161,7 +161,7 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % "0.9.0",
       "org.typelevel" %% "cats-free" % "0.9.0",
-      "com.lihaoyi" %% "scalatags" % "0.6.2",
+      "com.lihaoyi" %% "scalatags" % "0.6.3",
       "info.hupel" % "classy" % "0.1.4"
     ),
     libraryDependencies += {
@@ -350,7 +350,7 @@ lazy val examples = project.in(file("modules/examples"))
   .settings(warningSettings)
   .settings(
     // logback because Java
-    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.9"
+    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.10"
   )
 
 

@@ -2,12 +2,14 @@ package info.hupel.isabelle
 
 import java.nio.file.{Path, Paths}
 
+import scala.io.Codec.UTF8
 import scala.io.Source
 import scala.util.Try
 
 import info.hupel.isabelle.api._
 
 import scalatags.Text.all._
+import scalatags.Text.tags2.style
 import shapeless.tag
 
 private[isabelle] final case class CodepointIterator(string: String, offset: Int) {
@@ -192,11 +194,14 @@ final case class Model(env: Environment, regions: Map[Path, Regions] = Map.empty
 
   def toHTML: HTML = {
     val sections = regions.map { case (path, regions) => section(path, regions) }.toList
+    val source = Source.fromURL(getClass.getClassLoader.getResource("xray.css"))(UTF8)
+    val css = source.mkString
+    source.close()
 
     html(
       head(
         meta(charset := "UTF-8"),
-        link(rel := "stylesheet", `type` := "text/css", href := "libisabelle/src/main/resources/xray.css")
+        style(css)
       ),
       body(sections)
     )
