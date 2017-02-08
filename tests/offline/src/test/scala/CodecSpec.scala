@@ -9,6 +9,7 @@ import org.scalacheck._
 import org.scalacheck.Prop.forAll
 
 import info.hupel.isabelle._
+import info.hupel.isabelle.api.XML
 
 class CodecSpec(val specs2Env: Env) extends Specification with BasicSetup with ScalaCheck { def is = s2"""
 
@@ -33,8 +34,15 @@ class CodecSpec(val specs2Env: Env) extends Specification with BasicSetup with S
     of type Either[String, BigInt]    ${propCodec[Either[String, BigInt]]}
   """
 
-  def propCodec[A : Codec : Arbitrary] = forAll { (a: A) =>
-    Codec[A].decode(Codec[A].encode(a)) must beRight(a)
-  }
+  def propCodec[A : Codec : Arbitrary] = properties(new Properties("props") {
+    property("encode/decode") = forAll { (a: A) =>
+      Codec[A].decode(Codec[A].encode(a)) must beRight(a)
+    }
+
+    property("YXML") = forAll { (a: A) =>
+      val encoded = Codec[A].encode(a)
+      XML.fromYXML(encoded.toYXML) must be_===(encoded)
+    }
+  })
 
 }
