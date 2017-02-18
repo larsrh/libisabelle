@@ -63,7 +63,7 @@ parse_translation\<open>
 let
   fun translation args =
     let
-      fun err () = raise TERM ("Splice.term_translation", args)
+      fun err () = raise TERM ("Common._cartouche_xml", args)
       fun input s pos = Symbol_Pos.implode (Symbol_Pos.cartouche_content (Symbol_Pos.explode (s, pos)))
       val eval = Codec.the_decode Codec.term o XML.parse
     in
