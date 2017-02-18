@@ -4,13 +4,15 @@ import java.net.URLClassLoader
 import java.nio.charset.Charset
 import java.nio.file._
 
+import scala.util.control.ControlThrowable
+
 import monix.execution.Scheduler
 
 import org.log4s._
 
 import shapeless.tag._
 
-case class ExitTrap(rc: Int) extends RuntimeException
+case class ExitTrap(rc: Int) extends ControlThrowable
 
 object Environment {
 

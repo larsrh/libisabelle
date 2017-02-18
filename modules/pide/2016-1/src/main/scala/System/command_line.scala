@@ -28,7 +28,7 @@ object Command_Line
     val rc =
       try { body }
       catch {
-        case exn: Throwable =>
+        case exn: Exception =>
           if (debug) exn.printStackTrace
           Output.error_message(Exn.message(exn))
           Exn.return_code(exn, 2)
