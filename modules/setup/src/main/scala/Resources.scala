@@ -148,7 +148,6 @@ final case class Resources private(component: Path, roots: List[Path]) {
   def findTheory(theory: Path): Option[String] = {
     val fullPath = component.resolve(theory)
     if (Files.exists(fullPath))
-      // FIXME this probably doesn't work on Windows
       Some(fullPath.toRealPath().toString.stripSuffix(".thy"))
     else
       None
