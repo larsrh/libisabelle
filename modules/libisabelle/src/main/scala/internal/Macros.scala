@@ -32,9 +32,7 @@ class Macros(val c: whitebox.Context { type PrefixType <: ExprStringContext.term
 
   import c.universe.{Expr => _, _}
 
-  // FIXME this should be c.prefix, debug MatchError
-  private val q"""${_}(${_}(..$parts)).${_}.apply[..${_}](..${_})""" =
-    c.macroApplication
+  private val q"""${_}(${_}(..$parts)).term""" = c.prefix.tree
 
   private def embed(arg: Tree): Tree = {
     if (arg.tpe <:< typeOf[Term])
