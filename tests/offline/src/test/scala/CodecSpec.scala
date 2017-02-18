@@ -43,6 +43,6 @@ class CodecSpec(val specs2Env: Env) extends Specification with BasicSetup with S
       val encoded = Codec[A].encode(a)
       XML.fromYXML(encoded.toYXML) must be_===(encoded)
     }
-  })
+  }) ^ bt ^ br
 
 }
