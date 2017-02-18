@@ -147,7 +147,9 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.2",
       "io.monix" %% "monix-execution" % "2.2.1",
-      "org.log4s" %% "log4s" % "1.3.4"
+      "org.log4s" %% "log4s" % "1.3.4",
+      "org.scodec" %% "scodec-core" % "1.10.3",
+      "org.scodec" %% "scodec-cats" % "0.3.0"
     )
   )
 
@@ -161,6 +163,7 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % "0.9.0",
       "org.typelevel" %% "cats-free" % "0.9.0",
+      "org.scodec" %% "scodec-cats" % "0.3.0",
       "com.lihaoyi" %% "scalatags" % "0.6.3",
       "info.hupel" % "classy" % "0.1.4"
     ),
