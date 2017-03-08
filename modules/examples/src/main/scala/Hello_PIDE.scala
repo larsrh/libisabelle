@@ -11,7 +11,7 @@ import info.hupel.isabelle.setup._
 
 object Hello_PIDE extends App {
 
-  val setup = Setup.default(Version("2016")).right.get // yolo
+  val setup = Setup.default(Version.Stable("2016")).right.get // yolo
   val resources = Resources.dumpIsabelleResources().right.get // yolo
   val config = Configuration.simple("Protocol")
 

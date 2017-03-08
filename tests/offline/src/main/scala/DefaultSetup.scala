@@ -35,12 +35,12 @@ trait BasicSetup {
     ExecutionModel.AlwaysAsyncExecution
   )
 
-  lazy val version: Version =
+  lazy val version: Version.Stable =
     Option(java.lang.System.getenv("ISABELLE_VERSION")).orElse(
       specs2Env.arguments.commandLine.value("isabelle.version")
-    ).map(Version.apply).get
+    ).map(Version.Stable.apply).get
 
-  lazy val platform: Platform = Platform.guess.get
+  lazy val platform: Platform = Setup.guessPlatform.get
   lazy val setup: Setup = Setup.detect(platform, version).right.get
 
 }

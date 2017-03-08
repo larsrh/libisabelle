@@ -375,7 +375,7 @@ lazy val workbench = project.in(file("modules/workbench"))
       import scala.concurrent.Await
       import monix.execution.Scheduler.Implicits.global
 
-      val setup = Setup.default(Version("2016-1")).right.get
+      val setup = Setup.default(Version.Stable("2016-1")).right.get
       val resources = Resources.dumpIsabelleResources().right.get
       val config = Configuration.simple("HOL-Protocol")
       val env = Await.result(setup.makeEnvironment(resources), Duration.Inf)

@@ -36,13 +36,18 @@ object Main {
 
     val afp =
       if (options.afp)
-        Set(Dependency(Module(s"${BuildInfo.organization}.afp", s"afp-${options.version.identifier}"), "1.0.+"))
+        options.isabelleVersion match {
+          case Version.Devel =>
+            Options.usageAndExit("Option conflict: --devel and --afp are mutually exclusive")
+          case Version.Stable(identifier) =>
+            Set(Dependency(Module(s"${BuildInfo.organization}.afp", s"afp-$identifier"), "1.0.+"))
+        }
       else
         Set()
 
     val classpath = options.fetch.traverseU(Parse.moduleVersion(_, BuildInfo.scalaBinaryVersion)) match {
       case Right(Nil) if !options.afp => Future.successful { Nil }
-      case Right(modules) => Options.platform.fetchArtifacts(modules.map { case (mod, v) => Dependency(mod, v) }.toSet ++ afp)
+      case Right(modules) => Artifacts.fetch(Options.platform, modules.map { case (mod, v) => Dependency(mod, v) }.toSet ++ afp)
       case Left(error) => sys.error(s"could not parse dependency: $error")
     }
 
@@ -68,12 +73,17 @@ object Main {
 
     lazy val setup = options.home match {
       case None =>
-        Setup.default(options.version) match {
-          case Right(setup) => setup
-          case Left(reason) => sys.error(reason.explain)
+        options.isabelleVersion match {
+          case Version.Devel =>
+            Options.usageAndExit("Option conflict: --devel requires --home")
+          case v: Version.Stable =>
+            Setup.default(v) match {
+              case Right(setup) => setup
+              case Left(reason) => sys.error(reason.explain)
+            }
         }
       case Some(home) =>
-        Setup(home, Options.platform, options.version)
+        Setup(home, Options.platform, options.isabelleVersion)
     }
 
     logger.info(s"Using ${options.configuration}")

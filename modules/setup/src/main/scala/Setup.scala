@@ -5,6 +5,8 @@ import java.nio.file.{Files, Path}
 import scala.concurrent.Future
 import scala.util._
 
+import org.apache.commons.lang3.SystemUtils
+
 import org.log4s._
 
 import monix.execution.Scheduler
@@ -50,6 +52,21 @@ object Setup {
   private val logger = getLogger
 
   /**
+   * Make an educated guess at the
+   * [[info.hupel.isabelle.api.Platform platform]], not guaranteed to be
+   * correct.
+   */
+  def guessPlatform: Option[OfficialPlatform] =
+    if (SystemUtils.IS_OS_LINUX)
+      Some(Platform.Linux)
+    else if (SystemUtils.IS_OS_WINDOWS)
+      Some(Platform.Windows)
+    else if (SystemUtils.IS_OS_MAC_OSX)
+      Some(Platform.OSX)
+    else
+      None
+
+  /**
    * Location of the success marker file.
    *
    * Detection of setups works by looking for the success marker file in the
@@ -65,7 +82,7 @@ object Setup {
    * in the [[Platform#setupStorage:* designated path]] according to the
    * [[Platform platform]].
    */
-  def install(platform: OfficialPlatform, version: Version): Either[SetupImpossible, Setup] = {
+  def install(platform: OfficialPlatform, version: Version.Stable): Either[SetupImpossible, Setup] = {
     Files.createDirectories(platform.setupStorage)
     val url = platform.url(version)
     logger.debug(s"Downloading setup $version from $url to ${platform.setupStorage}")
@@ -91,7 +108,7 @@ object Setup {
    * Try to find an existing [[Setup setup]] in the
    * [[Platform#setupStorage:* designated path]] of the [[Platform platform]].
    */
-  def detect(platform: Platform, version: Version): Either[NoSetup, Setup] = platform.withLock { () =>
+  def detect(platform: Platform, version: Version.Stable): Either[NoSetup, Setup] = platform.withLock { () =>
     val path = platform.setupStorage(version)
     if (Files.isDirectory(path)) {
       if (Files.isRegularFile(successMarker(path)))
@@ -104,12 +121,12 @@ object Setup {
   }.getOrElse(Left(Busy(platform.lockFile)))
 
   /**
-   * The default setup: [[Platform.guess default platform]],
+   * The default setup: [[guessPlatform default platform]],
    * [[detect detect existing setup]],
    * [[install install if not existing]].
    */
-  def default(version: Version): Either[SetupImpossible, Setup] =
-    Platform.guess match {
+  def default(version: Version.Stable): Either[SetupImpossible, Setup] =
+    guessPlatform match {
       case None =>
         Left(UnknownPlatform)
       case Some(platform) =>
@@ -150,7 +167,12 @@ final case class Setup(home: Path, platform: Platform, version: Version) {
    * If the [[Resolver resolver]] found an appropriate classpath, this method
    * also checks for matching [[info.hupel.isabelle.api.BuildInfo build info]].
    */
-  def makeEnvironment(resolver: Resolver, user: Path, components: List[Path])(implicit scheduler: Scheduler): Future[Environment] =
-    resolver.resolve(platform, version).map(Environment.instantiate(version, _, Environment.Context(home, user, components)))
+  def makeEnvironment(resolver: Resolver, user: Path, components: List[Path])(implicit scheduler: Scheduler): Future[Environment] = {
+    val context = Environment.Context(home, user, components, platform)
+    version match {
+      case Version.Devel => Future.successful { new GenericEnvironment(context) }
+      case v: Version.Stable => resolver.resolve(platform, v).map(Environment.instantiate(version, _, context))
+    }
+  }
 
 }

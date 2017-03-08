@@ -19,11 +19,13 @@ object Environment {
   private val logger = getLogger
 
   private def getVersion(clazz: Class[_ <: Environment]): Version =
-    Option(clazz.getAnnotation(classOf[Implementation]).identifier) match {
-      case None =>
+    Option(clazz.getAnnotation(classOf[Implementation])) match {
+      case Some(annot) =>
+        Version.Stable(annot.identifier)
+      case None if clazz == classOf[GenericEnvironment] =>
+        Version.Devel
+      case _ =>
         sys.error("malformed implementation")
-      case Some(identifier) =>
-        Version(identifier)
   }
 
   val packageName: String = "info.hupel.isabelle.impl"
@@ -65,7 +67,7 @@ object Environment {
   sealed trait Unicode
 
   /** Bundles all requirements to instantiate an [[Environment environment]]. */
-  case class Context(home: Path, user: Path, components: List[Path])(implicit val scheduler: Scheduler) {
+  case class Context(home: Path, user: Path, components: List[Path], platform: Platform)(implicit val scheduler: Scheduler) {
     def executorService = scheduler.toExecutorService
   }
 
@@ -126,12 +128,17 @@ abstract class Environment protected(val context: Environment.Context) { self =>
   final val version: Version = Environment.getVersion(getClass())
 
   final val variables: Map[String, String] = Map(
-    "ISABELLE_VERSION" -> version.identifier,
     "LIBISABELLE_GIT" -> BuildInfo.gitHeadCommit.getOrElse(""),
     "LIBISABELLE_VERSION" -> BuildInfo.version
-  )
+  ) ++ (version match {
+    case Version.Devel => Map()
+    case Version.Stable(identifier) => Map("ISABELLE_VERSION" -> identifier)
+  })
 
-  final val etc = user.resolve(".isabelle").resolve(s"Isabelle${version.identifier}").resolve("etc")
+  final val etc = version match {
+    case Version.Devel => user.resolve(".isabelle").resolve("etc")
+    case Version.Stable(identifier) => user.resolve(".isabelle").resolve(s"Isabelle$identifier").resolve("etc")
+  }
   final val etcComponents = etc.resolve("components")
 
   final def setEtcComponents(): Unit =

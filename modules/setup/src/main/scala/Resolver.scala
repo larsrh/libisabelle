@@ -9,7 +9,7 @@ import coursier._
 
 import org.log4s._
 
-import info.hupel.isabelle.api.{BuildInfo, Version}
+import info.hupel.isabelle.api.{BuildInfo, Platform, Version}
 
 /**
  * Function preparing a classpath containing an appropriate
@@ -19,10 +19,10 @@ import info.hupel.isabelle.api.{BuildInfo, Version}
  */
 trait Resolver { self =>
 
-  def resolve(platform: Platform, version: Version)(implicit ec: ExecutionContext): Future[List[Path]]
+  def resolve(platform: Platform, version: Version.Stable)(implicit ec: ExecutionContext): Future[List[Path]]
 
   def orElse(that: Resolver) = new Resolver {
-    def resolve(platform: Platform, version: Version)(implicit ec: ExecutionContext) =
+    def resolve(platform: Platform, version: Version.Stable)(implicit ec: ExecutionContext) =
       // recoverWith instead of fallbackTo because the latter is eager
       // we don't want to run the second future unless necessary
       self.resolve(platform, version).recoverWith { case _ => that.resolve(platform, version) }
@@ -53,7 +53,7 @@ object Resolver {
 
     private val logger = getLogger
 
-    def resolve(platform: Platform, version: Version)(implicit ec: ExecutionContext) = {
+    def resolve(platform: Platform, version: Version.Stable)(implicit ec: ExecutionContext) = {
       val classLoader = getClass.getClassLoader
       val fileName = s"pide-${version.identifier}-assembly.jar"
       Option(classLoader.getResourceAsStream(fileName)) match {
@@ -81,12 +81,12 @@ object Resolver {
 
     private val logger = getLogger
 
-    def resolve(platform: Platform, version: Version)(implicit ec: ExecutionContext) = {
+    def resolve(platform: Platform, version: Version.Stable)(implicit ec: ExecutionContext) = {
       val dependency = Dependency(
         Module(BuildInfo.organization, s"pide-${version.identifier}_${BuildInfo.scalaBinaryVersion}"),
         BuildInfo.version
       )
-      platform.fetchArtifacts(Set(dependency))
+      Artifacts.fetch(platform, Set(dependency))
     }
 
   }

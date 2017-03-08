@@ -5,6 +5,7 @@ import java.nio.file.Files
 import org.specs2.Specification
 import org.specs2.specification.core.Env
 
+import info.hupel.isabelle.api.Platform
 import info.hupel.isabelle.setup._
 
 class SetupSpec(val specs2Env: Env) extends Specification with DefaultSetup { def is = s2"""

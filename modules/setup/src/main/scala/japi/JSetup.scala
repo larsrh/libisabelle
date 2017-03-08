@@ -10,13 +10,13 @@ import info.hupel.isabelle.setup._
 
 object JSetup {
 
-  def defaultSetup(version: Version, timeout: Duration): Setup =
+  def defaultSetup(version: Version.Stable, timeout: Duration): Setup =
     Setup.default(version) match {
       case Left(reason) => sys.error(reason.explain)
       case Right(setup) => setup
     }
 
-  def defaultSetup(version: Version): Setup =
+  def defaultSetup(version: Version.Stable): Setup =
     defaultSetup(version, Duration.Inf)
 
   def makeEnvironment(setup: Setup, resources: JResources, timeout: Duration): Environment =

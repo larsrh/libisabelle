@@ -11,7 +11,7 @@ package object cli {
   implicit val pathParser: ArgParser[Path] =
     ArgParser.instance[Path] { s => Right(Paths.get(s)) }
 
-  implicit val versionParser: ArgParser[Version] =
-    ArgParser.instance[Version] { s => Right(Version(s)) }
+  implicit val versionParser: ArgParser[Version.Stable] =
+    ArgParser.instance[Version.Stable] { s => Right(Version.Stable(s)) }
 
 }

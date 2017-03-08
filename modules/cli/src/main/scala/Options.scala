@@ -8,8 +8,8 @@ import caseapp._
 
 import io.rbricks.scalog._
 
-import info.hupel.isabelle.api.{BuildInfo, Configuration, Version}
-import info.hupel.isabelle.setup.Platform
+import info.hupel.isabelle.api._
+import info.hupel.isabelle.setup.Setup
 
 @AppName("libisabelle")
 @AppVersion(BuildInfo.version)
@@ -17,9 +17,12 @@ import info.hupel.isabelle.setup.Platform
 case class Options(
 
   @ValueDescription("version")
-  @HelpMessage("Isabelle version")
+  @HelpMessage("stable Isabelle version")
   @ExtraName("v")
-  version: Version = Version("2016-1"),
+  version: Option[Version.Stable] = None,
+
+  @HelpMessage("devel Isabelle version (reduced feature set; --home needs to be specified; conflicts with --version and --afp")
+  devel: Boolean = false,
 
   @ValueDescription("session")
   @HelpMessage("Isabelle session (directory needs to be known; either through --internal, --include, --component or --fetch)")
@@ -69,16 +72,23 @@ case class Options(
   verbose: Boolean = false
 ) {
 
+  lazy val isabelleVersion: Version = (version, devel) match {
+    case (None, false) => Version.Stable("2016-1")
+    case (None, true) => Version.Devel
+    case (Some(v), false) => v
+    case (Some(_), true) => Options.usageAndExit("Option conflict: --version and --devel are mutually exclusive")
+  }
+
   lazy val userPath: Path = (user, freshUser) match {
     case (None, true) => Files.createTempDirectory("libisabelle_user")
-    case (None, false) => Options.platform.userStorage(version)
+    case (None, false) => Options.platform.userStorage(isabelleVersion)
     case (Some(path), false) => path
     case (Some(_), true) => Options.usageAndExit("Option conflict: --user and --fresh-user are mutually exclusive")
   }
 
   lazy val resourcePath: Path = (resources, freshResources) match {
     case (None, true) => Files.createTempDirectory("libisabelle_resources")
-    case (None, false) => Options.platform.resourcesStorage(version)
+    case (None, false) => Options.platform.resourcesStorage(isabelleVersion)
     case (Some(path), false) => path
     case (Some(_), true) => Options.usageAndExit("Option conflict: --resources and --fresh-resources are mutually exclusive")
   }
@@ -106,7 +116,7 @@ object Options {
     sys.exit(1)
   }
 
-  lazy val platform: Platform = Platform.guess match {
+  lazy val platform: Platform = Setup.guessPlatform match {
     case Some(platform) => platform
     case None =>
       logger.debug("Falling back to generic platform, will write temporary data into `./libisabelle`")
