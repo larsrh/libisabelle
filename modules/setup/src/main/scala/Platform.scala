@@ -132,8 +132,6 @@ sealed abstract class Platform {
     }
 
   final def fetchArtifacts(dependencies: Set[Dependency])(implicit ec: ExecutionContext): Future[List[Path]] = {
-    val cache = coursierStorage.toFile
-
     val repositories = Seq(
       coursier.Cache.ivy2Local,
       MavenRepository("https://repo1.maven.org/maven2"),
@@ -152,14 +150,18 @@ sealed abstract class Platform {
       }
     }
 
+    def cache(policy: CachePolicy) =
+      Cache.fetch(cache = coursierStorage.toFile, logger = Some(downloadLogger), cachePolicy = policy)
+
     val fetch = Fetch.from(
       repositories,
-      Cache.fetch(cache = cache, logger = Some(downloadLogger), cachePolicy = CachePolicy.LocalOnly),
-      Cache.fetch(cache = cache, logger = Some(downloadLogger), cachePolicy = CachePolicy.FetchMissing)
+      cache(CachePolicy.LocalUpdateChanging),
+      cache(CachePolicy.LocalOnly),
+      cache(CachePolicy.FetchMissing)
     )
 
     def fetchArtifact(artifact: Artifact, cachePolicy: CachePolicy) =
-      Cache.file(artifact, cache = cache, logger = Some(downloadLogger), cachePolicy = cachePolicy)
+      Cache.file(artifact, cache = coursierStorage.toFile, logger = Some(downloadLogger), cachePolicy = cachePolicy)
 
     withAsyncLock { () =>
       for {
