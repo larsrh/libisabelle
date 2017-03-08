@@ -69,9 +69,9 @@ lazy val noPublishSettings = Seq(
 lazy val macroSettings = Seq(
   libraryDependencies ++= Seq(
     "org.typelevel" %% "macro-compat" % "1.1.1",
-    "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
-    "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
-    compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
+    scalaOrganization.value % "scala-compiler" % scalaVersion.value % "provided",
+    scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided",
+    compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.patch)
   )
 )
 
@@ -146,7 +146,7 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
     buildInfoPackage := "info.hupel.isabelle.api",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.2",
-      "io.monix" %% "monix-execution" % "2.2.1",
+      "io.monix" %% "monix-execution" % "2.2.2",
       "org.log4s" %% "log4s" % "1.3.4"
     )
   )
@@ -185,8 +185,8 @@ lazy val setup = project.in(file("modules/setup"))
   .settings(warningSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "io.get-coursier" %% "coursier" % "1.0.0-M15-1",
-      "io.get-coursier" %% "coursier-cache" % "1.0.0-M15-1",
+      "io.get-coursier" %% "coursier" % "1.0.0-M15-4",
+      "io.get-coursier" %% "coursier-cache" % "1.0.0-M15-4",
       "org.apache.commons" % "commons-compress" % "1.13",
       "org.apache.commons" % "commons-lang3" % "3.5",
       "commons-io" % "commons-io" % "2.5"
@@ -268,7 +268,7 @@ lazy val tests = project.in(file("tests"))
   .settings(noPublishSettings)
   .aggregate(offlineTest, pureTest, holTest)
 
-val specs2Version = "3.8.8"
+val specs2Version = "3.8.9"
 
 lazy val offlineTest = project.in(file("tests/offline"))
   .dependsOn(setup, pidePackage)
@@ -350,7 +350,7 @@ lazy val examples = project.in(file("modules/examples"))
   .settings(warningSettings)
   .settings(
     // logback because Java
-    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.10"
+    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.1"
   )
 
 
