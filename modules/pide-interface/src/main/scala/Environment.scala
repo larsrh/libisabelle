@@ -183,8 +183,6 @@ abstract class Environment protected(val context: Environment.Context) { self =>
   def decode(text: String @@ Environment.Raw): String @@ Environment.Unicode
   def encode(text: String @@ Environment.Unicode): String @@ Environment.Raw
 
-  def settings: Map[String, String]
-
   def exec(tool: String, args: List[String]): Int
 
 }
