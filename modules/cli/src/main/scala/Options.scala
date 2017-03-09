@@ -8,8 +8,8 @@ import caseapp._
 
 import io.rbricks.scalog._
 
+import info.hupel.isabelle.Platform
 import info.hupel.isabelle.api._
-import info.hupel.isabelle.setup.Setup
 
 @AppName("libisabelle")
 @AppVersion(BuildInfo.version)
@@ -116,7 +116,7 @@ object Options {
     sys.exit(1)
   }
 
-  lazy val platform: Platform = Setup.guessPlatform match {
+  lazy val platform: Platform = Platform.guess match {
     case Some(platform) => platform
     case None =>
       logger.debug("Falling back to generic platform, will write temporary data into `./libisabelle`")

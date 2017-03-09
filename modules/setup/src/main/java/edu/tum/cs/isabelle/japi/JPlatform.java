@@ -2,7 +2,7 @@ package info.hupel.isabelle.japi;
 
 import scala.Option;
 
-import info.hupel.isabelle.api.*;
+import info.hupel.isabelle.*;
 import info.hupel.isabelle.setup.*;
 
 public class JPlatform {
@@ -22,7 +22,7 @@ public class JPlatform {
     Platform.OSX$.MODULE$;
 
   public static OfficialPlatform guess() {
-    Option<OfficialPlatform> option = Setup.guessPlatform();
+    Option<OfficialPlatform> option = Platform.guess();
     if (option.isDefined())
       return option.get();
     else

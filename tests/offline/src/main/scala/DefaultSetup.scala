@@ -14,7 +14,7 @@ import monix.execution.{ExecutionModel, Scheduler, UncaughtExceptionReporter}
 
 import io.rbricks.scalog.{Level, LoggingBackend}
 
-import info.hupel.isabelle.System
+import info.hupel.isabelle.{Platform, System}
 import info.hupel.isabelle.api._
 import info.hupel.isabelle.setup._
 
@@ -40,7 +40,7 @@ trait BasicSetup {
       specs2Env.arguments.commandLine.value("isabelle.version")
     ).map(Version.Stable.apply).get
 
-  lazy val platform: Platform = Setup.guessPlatform.get
+  lazy val platform: Platform = Platform.guess.get
   lazy val setup: Setup = Setup.detect(platform, version).right.get
 
 }

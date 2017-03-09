@@ -5,12 +5,11 @@ import java.nio.file.{Files, Path}
 import scala.concurrent.Future
 import scala.util._
 
-import org.apache.commons.lang3.SystemUtils
-
 import org.log4s._
 
 import monix.execution.Scheduler
 
+import info.hupel.isabelle._
 import info.hupel.isabelle.api._
 
 /**
@@ -51,20 +50,6 @@ object Setup {
 
   private val logger = getLogger
 
-  /**
-   * Make an educated guess at the
-   * [[info.hupel.isabelle.api.Platform platform]], not guaranteed to be
-   * correct.
-   */
-  def guessPlatform: Option[OfficialPlatform] =
-    if (SystemUtils.IS_OS_LINUX)
-      Some(Platform.Linux)
-    else if (SystemUtils.IS_OS_WINDOWS)
-      Some(Platform.Windows)
-    else if (SystemUtils.IS_OS_MAC_OSX)
-      Some(Platform.OSX)
-    else
-      None
 
   /**
    * Location of the success marker file.
@@ -121,12 +106,12 @@ object Setup {
   }.getOrElse(Left(Busy(platform.lockFile)))
 
   /**
-   * The default setup: [[guessPlatform default platform]],
+   * The default setup: [[info.hupel.isabelle.Platform.guess default platform]],
    * [[detect detect existing setup]],
    * [[install install if not existing]].
    */
   def default(version: Version.Stable): Either[SetupImpossible, Setup] =
-    guessPlatform match {
+    Platform.guess match {
       case None =>
         Left(UnknownPlatform)
       case Some(platform) =>
@@ -168,9 +153,12 @@ final case class Setup(home: Path, platform: Platform, version: Version) {
    * also checks for matching [[info.hupel.isabelle.api.BuildInfo build info]].
    */
   def makeEnvironment(resolver: Resolver, user: Path, components: List[Path])(implicit scheduler: Scheduler): Future[Environment] = {
-    val context = Environment.Context(home, user, components, platform)
+    val context = Environment.Context(home, user, components)
     version match {
-      case Version.Devel => Future.successful { new GenericEnvironment(context) }
+      case Version.Devel => GenericEnvironment(context, platform) match {
+        case Right(env) => Future.successful(env)
+        case Left(err) => Future.failed(new RuntimeException(err.explain))
+      }
       case v: Version.Stable => resolver.resolve(platform, v).map(Environment.instantiate(version, _, context))
     }
   }

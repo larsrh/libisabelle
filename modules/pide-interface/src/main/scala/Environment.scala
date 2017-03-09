@@ -18,12 +18,10 @@ object Environment {
 
   private val logger = getLogger
 
-  private def getVersion(clazz: Class[_ <: Environment]): Version =
+  private def getVersion(clazz: Class[_ <: Environment]): Version.Stable =
     Option(clazz.getAnnotation(classOf[Implementation])) match {
       case Some(annot) =>
         Version.Stable(annot.identifier)
-      case None if clazz == classOf[GenericEnvironment] =>
-        Version.Devel
       case _ =>
         sys.error("malformed implementation")
   }
@@ -67,7 +65,7 @@ object Environment {
   sealed trait Unicode
 
   /** Bundles all requirements to instantiate an [[Environment environment]]. */
-  case class Context(home: Path, user: Path, components: List[Path], platform: Platform)(implicit val scheduler: Scheduler) {
+  case class Context(home: Path, user: Path, components: List[Path])(implicit val scheduler: Scheduler) {
     def executorService = scheduler.toExecutorService
   }
 
@@ -115,7 +113,7 @@ object Environment {
  * loader. This is the primary reason why this class exists in the first place,
  * to enable seamless abstraction over multiple PIDEs.
  */
-abstract class Environment protected(val context: Environment.Context) { self =>
+abstract class Environment protected(val context: Environment.Context, versionOverride: Option[Version] = None) { self =>
 
   protected final val logger = getLogger
 
@@ -125,7 +123,7 @@ abstract class Environment protected(val context: Environment.Context) { self =>
   final val user = context.user.toAbsolutePath
   final implicit val scheduler: Scheduler = context.scheduler
 
-  final val version: Version = Environment.getVersion(getClass())
+  final val version: Version = versionOverride.getOrElse(Environment.getVersion(getClass()))
 
   final val variables: Map[String, String] = Map(
     "LIBISABELLE_GIT" -> BuildInfo.gitHeadCommit.getOrElse(""),

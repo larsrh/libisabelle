@@ -162,6 +162,7 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
       "org.typelevel" %% "cats-core" % "0.9.0",
       "org.typelevel" %% "cats-free" % "0.9.0",
       "com.lihaoyi" %% "scalatags" % "0.6.3",
+      "org.apache.commons" % "commons-lang3" % "3.5",
       "info.hupel" % "classy" % "0.1.4"
     ),
     libraryDependencies += {
@@ -188,7 +189,6 @@ lazy val setup = project.in(file("modules/setup"))
       "io.get-coursier" %% "coursier" % "1.0.0-M15-4",
       "io.get-coursier" %% "coursier-cache" % "1.0.0-M15-4",
       "org.apache.commons" % "commons-compress" % "1.13",
-      "org.apache.commons" % "commons-lang3" % "3.5",
       "commons-io" % "commons-io" % "2.5"
     )
   )

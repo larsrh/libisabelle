@@ -9,7 +9,7 @@ import coursier._
 
 import org.log4s._
 
-import info.hupel.isabelle.api.Platform
+import info.hupel.isabelle.Platform
 
 object Artifacts {
 

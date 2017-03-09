@@ -17,7 +17,7 @@ class EnvironmentSpec(val specs2Env: Env) extends Specification with BasicSetup 
 
   val classpath = Resolver.Default.resolve(platform, version)
   val user = Files.createTempDirectory("libisabelle_user")
-  val context = Environment.Context(setup.home, user, Nil, platform)
+  val context = Environment.Context(setup.home, user, Nil)
 
   val settingsPrefix = classpath.map { paths =>
     val env = Environment.instantiate(version, paths, context)

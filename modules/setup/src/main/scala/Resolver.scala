@@ -9,7 +9,8 @@ import coursier._
 
 import org.log4s._
 
-import info.hupel.isabelle.api.{BuildInfo, Platform, Version}
+import info.hupel.isabelle.Platform
+import info.hupel.isabelle.api.{BuildInfo, Version}
 
 /**
  * Function preparing a classpath containing an appropriate

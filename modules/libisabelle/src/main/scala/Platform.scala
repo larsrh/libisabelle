@@ -1,4 +1,4 @@
-package info.hupel.isabelle.api
+package info.hupel.isabelle
 
 import java.io.File
 import java.net.URL
@@ -7,8 +7,13 @@ import java.nio.file._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
+import scala.sys.Prop
+
+import org.apache.commons.lang3.SystemUtils
 
 import org.log4s._
+
+import info.hupel.isabelle.api.{BuildInfo, Version}
 
 /**
  * Detection of the machine's [[Platform platform]].
@@ -18,19 +23,19 @@ object Platform {
   /** Universal Linux platform for both 32- and 64-bit machines. */
   case object Linux extends OfficialPlatform("linux") {
     def localStorage =
-      Paths.get(System.getProperty("user.home")).resolve(".local/share/libisabelle").toAbsolutePath
+      Prop[File]("user.home").value.toPath.resolve(".local/share/libisabelle").toAbsolutePath
   }
 
   /** Universal Windows platform for both 32- and 64-bit machines. */
   case object Windows extends OfficialPlatform("windows") {
     def localStorage =
-      Paths.get(System.getenv("LOCALAPPDATA")).resolve("libisabelle").toAbsolutePath
+      Paths.get(sys.env("LOCALAPPDATA")).resolve("libisabelle").toAbsolutePath
   }
 
   /** Universal OS X platform for both 32- and 64-bit machines. */
   case object OSX extends OfficialPlatform("macos") {
     def localStorage =
-      Paths.get(System.getProperty("user.home")).resolve("Library/Preferences/libisabelle").toAbsolutePath
+      Prop[File]("user.home").value.toPath.resolve("Library/Preferences/libisabelle").toAbsolutePath
   }
 
   /**
@@ -43,6 +48,20 @@ object Platform {
     new Platform {
       val localStorage = localStorage0.toAbsolutePath
     }
+
+  /**
+   * Make an educated guess at the [[Platform platform]], not guaranteed to be
+   * correct.
+   */
+  def guess: Option[OfficialPlatform] =
+    if (SystemUtils.IS_OS_LINUX)
+      Some(Platform.Linux)
+    else if (SystemUtils.IS_OS_WINDOWS)
+      Some(Platform.Windows)
+    else if (SystemUtils.IS_OS_MAC_OSX)
+      Some(Platform.OSX)
+    else
+      None
 
 }
 
@@ -57,10 +76,7 @@ sealed abstract class Platform {
 
   private val logger = getLogger
 
-  /**
-   * Path where `libisabelle` stores files downloaded from the Internet, e.g.
-   * by a [[Resolver resolver]] or by [[Setup.install installing]] Isabelle.
-   */
+  /** Path where `libisabelle` stores files downloaded from the Internet. */
   def localStorage: Path
 
   final def setupStorage: Path =
@@ -122,7 +138,7 @@ sealed abstract class Platform {
  * A `[[Platform]]` with known archive location.
  *
  * Official platforms can be installed and bootstrapped automatically via the
- * appropriate methods in [[Setup$ `Setup`]].
+ * appropriate methods in [[info.hupel.isabelle.setup.Setup$ `Setup`]].
  */
 sealed abstract class OfficialPlatform private[isabelle](val name: String) extends Platform {
 
