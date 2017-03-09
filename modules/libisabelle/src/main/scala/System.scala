@@ -151,21 +151,19 @@ final class System private(val env: Environment, config: Configuration) {
   private val logger = getLogger
 
   /**
-   * The [[scala.concurrent.ExecutionContext execution context]] used
-   * internally for bi-directional communication with the prover.
+   * The scheduler used internally for bi-directional communication with the
+   * prover.
    *
-   * Guaranteed to be the same execution context as the
-   * [[info.hupel.isabelle.api.Environment#executionContext execution context]]
-   * of the [[info.hupel.isabelle.api.Environment environment]] used to
+   * Guaranteed to be the same scheduler as the one of the
+   * [[info.hupel.isabelle.api.Environment environment]] used to
    * [[System.create create]] this system.
    *
-   * It is fine to use this execution context for other purposes, for example
-   * to transform the [[scala.concurrent.Future futures]] produced by
-   * [[invoke invoking operations]].
+   * It is fine to use this scheduler for other purposes, for example to
+   * transform the [[scala.concurrent.Future futures]] produced by
+   * [[invoke invoking operations]] (note that `Scheduler` is a subtype of
+   * [[scala.concurrent.ExecutionContext `ExecutionContext`]]).
    *
    * Since it is marked as `implicit`, it can be readily imported and used.
-   *
-   * @see [[dispose]]
    */
   implicit val scheduler: Scheduler = env.scheduler
 
@@ -206,25 +204,14 @@ final class System private(val env: Environment, config: Configuration) {
   /**
    * Instruct the prover to shutdown.
    *
-   * Includes unchecked cancellation of all running operations by virtue of
-   * the system shutting down completely. Pending futures will not be marked as
-   * failed.
+   * Includes orderly cancellation of all running operations. Pending futures
+   * will be marked as failed.
    *
-   * It is recommended to wait for all pending futures to complete, or call
-   * `cancel` on them before shutdown. It is guaranteed that when the returned
-   * [[scala.concurrent.Future future]] succeeds, the prover has been shut
-   * down.
+   * It is guaranteed that when the returned [[scala.concurrent.Future future]]
+   * succeeds, the prover has been shut down propertly.
    *
-   * Calling anything after dispose is undefined. The object should not be used
+   * Calling anything after `dispose` is undefined. The object should not be used
    * afterwards.
-   *
-   * Depending on the
-   * [[info.hupel.isabelle.api.Environment#executionContext implementation details]]
-   * of the [[info.hupel.isabelle.api.Environment environment]] used to
-   * [[System.create create]] this system, it may be unneccessary to call this
-   * method. In any case, it is good practice to call it.
-   *
-   * @see [[executionContext]]
    */
   def dispose: Future[Unit] = {
     env.dispose(session)
