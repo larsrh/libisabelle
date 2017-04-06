@@ -1,6 +1,9 @@
 package info.hupel.isabelle
 
+import scala.concurrent.duration._
 import scala.sys.process._
+
+import monix.execution.cancelables.MultiAssignmentCancelable
 
 import shapeless._
 import shapeless.tag._
@@ -64,12 +67,19 @@ final class GenericEnvironment private(context: Environment.Context) extends Env
     logger.debug(s"Executing '$tool' with arguments '${args.mkString(" ")}' ...")
 
     val env = (variables ++ Map("USER_HOME" -> user.toString)).toList
+    val c = MultiAssignmentCancelable()
 
     try {
-      Process(binary.toString :: tool :: args, None, env: _*).run(console).exitValue()
+      val proc = Process(binary.toString :: tool :: args, None, env: _*).run(console)
+      c := scheduler.scheduleOnce(5.seconds) {
+        logger.info("Opportunistically cleaning components ...")
+        cleanEtcComponents()
+      }
+      proc.exitValue()
     }
     finally {
       cleanEtcComponents()
+      c.cancel()
     }
   }
 
