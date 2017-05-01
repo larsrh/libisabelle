@@ -121,12 +121,7 @@ lazy val docs = project.in(file("modules/docs"))
     doc in Compile := (doc in ScalaUnidoc).value,
     target in unidoc in ScalaUnidoc := crossTarget.value / "api",
     ghpagesNoJekyll := false,
-    git.remoteRepo := {
-      sys.env.get("GH_TOKEN") match {
-        case None => "github.com:larsrh/libisabelle.git"
-        case Some(token) => s"https://$token@github.com/larsrh/libisabelle.git"
-      }
-    },
+    git.remoteRepo := "git@github.com:larsrh/libisabelle.git",
     includeFilter in makeSite := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.yml" | "*.md" | "Gemfile" | "config",
     watchSources ++= (siteSourceDirectory.value ** "*").get,
     watchSources += ((baseDirectory in ThisBuild).value / "README.md"),
