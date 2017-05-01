@@ -141,7 +141,7 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
     buildInfoPackage := "info.hupel.isabelle.api",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.2",
-      "io.monix" %% "monix-execution" % "2.2.2",
+      "io.monix" %% "monix-execution" % "2.2.4",
       "org.log4s" %% "log4s" % "1.3.4"
     )
   )
@@ -156,7 +156,7 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % "0.9.0",
       "org.typelevel" %% "cats-free" % "0.9.0",
-      "com.lihaoyi" %% "scalatags" % "0.6.3",
+      "com.lihaoyi" %% "scalatags" % "0.6.5",
       "org.apache.commons" % "commons-lang3" % "3.5",
       "info.hupel" % "classy" % "0.1.4"
     ),
@@ -181,8 +181,8 @@ lazy val setup = project.in(file("modules/setup"))
   .settings(warningSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "io.get-coursier" %% "coursier" % "1.0.0-M15-4",
-      "io.get-coursier" %% "coursier-cache" % "1.0.0-M15-4",
+      "io.get-coursier" %% "coursier" % "1.0.0-RC1",
+      "io.get-coursier" %% "coursier-cache" % "1.0.0-RC1",
       "org.apache.commons" % "commons-compress" % "1.13",
       "commons-io" % "commons-io" % "2.5"
     )
@@ -220,7 +220,7 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
       "-dontnote",
       "-ignorewarnings"
     ),
-    ProguardKeys.proguardVersion in Proguard := "5.3.2",
+    ProguardKeys.proguardVersion in Proguard := "5.3.3",
     ProguardKeys.outputs in Proguard := Seq(target.value / s"${moduleName.value}-assembly.jar")
   )
 

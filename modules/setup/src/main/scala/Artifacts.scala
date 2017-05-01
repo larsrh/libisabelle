@@ -55,8 +55,8 @@ object Artifacts {
         artifacts = {
             if (!resolution.isDone)
               sys.error("not converged")
-            else if (!resolution.errors.isEmpty)
-              sys.error(s"errors: ${resolution.errors}")
+            else if (!resolution.metadataErrors.isEmpty)
+              sys.error(s"errors: ${resolution.metadataErrors}")
             else if (!resolution.conflicts.isEmpty)
               sys.error(s"conflicts: ${resolution.conflicts}")
             else
