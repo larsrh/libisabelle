@@ -13,5 +13,6 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-ghpages" % "0.5.4")
 addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "0.8.1")
 addSbtPlugin("com.typesafe.sbt" % "sbt-proguard" % "0.2.2")
 addSbtPlugin("org.tpolecat" % "tut-plugin" % "0.4.8")
+addSbtPlugin("com.thoughtworks.sbt-api-mappings" % "sbt-api-mappings" % "1.0.0")
 
 addSbtPlugin("info.hupel" % "sbt-libisabelle" % "0.5.0")
