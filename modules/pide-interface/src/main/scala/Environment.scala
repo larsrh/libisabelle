@@ -164,6 +164,23 @@ abstract class Environment protected(val context: Environment.Context, versionOv
     ()
   }
 
+  protected final def protocolTheory(loaded: Set[String]): Option[String] =
+    if (loaded.contains("Protocol"))
+      None
+    else {
+      // this only works if resources are registered
+      val resourcesHome = isabelleSetting("LIBISABELLE_RESOURCES_HOME")
+      if (resourcesHome.isEmpty)
+        sys.error("protocol not loaded but component not registered")
+
+      logger.info("Protocol theory not contained in image, scheduling to be loaded ...")
+
+      if (loaded.contains("Main"))
+        Some(s"$resourcesHome/libisabelle/Protocol_Main")
+      else
+        Some(s"$resourcesHome/libisabelle/Protocol_Pure")
+    }
+
   override def toString: String =
     s"$version at $home"
 
@@ -177,7 +194,7 @@ abstract class Environment protected(val context: Environment.Context, versionOv
 
   protected[isabelle] type Session
 
-  protected[isabelle] def create(config: Configuration, consumer: (Markup, XML.Body) => Unit): Session
+  protected[isabelle] def create(config: Configuration, consumer: (Markup, XML.Body) => Unit): (Session, Option[String])
   protected[isabelle] def sendOptions(session: Session): Unit
   protected[isabelle] def sendCommand(session: Session, name: String, args: List[String]): Unit
   protected[isabelle] def dispose(session: Session): Unit

@@ -11,11 +11,16 @@ import org.specs2.specification.core.Env
 import info.hupel.isabelle._
 import info.hupel.isabelle.pure._
 
-class LibisabelleSpec(val specs2Env: Env) extends Specification
+class PreloadedLibisabelleSpec(specs2Env: Env) extends LibisabelleSpec(specs2Env, "preloaded")
+class UnloadedLibisabelleSpec(specs2Env: Env) extends LibisabelleSpec(specs2Env, "unloaded") {
+  override def session = "Pure"
+}
+
+abstract class LibisabelleSpec(val specs2Env: Env, flavour: String) extends Specification
   with FullSetup
   with IsabelleMatchers { def is = s2"""
 
-  Basic protocol interaction
+  Basic protocol interaction ($flavour)
 
   An Isabelle session
     can be started             ${system must exist.awaitFor(duration)}

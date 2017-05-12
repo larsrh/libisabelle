@@ -58,12 +58,17 @@ final class Environment private(context: api.Environment.Context) extends api.En
   protected[isabelle] def create(config: api.Configuration, consumer: (api.Markup, api.XML.Body) => Unit) = {
     val content = isabelle.Build.session_content(options, false, mkPaths(config.paths), config.session)
     val resources = new isabelle.Resources(content.loaded_theories, content.known_theories, content.syntax)
-    val session = new isabelle.Session(resources)
+
+    val use = protocolTheory(new isabelle.Thy_Info(resources).Dependencies.empty.loaded_theories) map { thy =>
+      s"""use_thy ${isabelle.ML_Syntax.print_string0(thy)};"""
+    }
 
     def convertXML(tree: isabelle.XML.Tree): api.XML.Tree = tree match {
       case isabelle.XML.Text(content) => api.XML.text(content)
       case isabelle.XML.Elem(markup, body) => api.XML.elem(destMarkup(markup), body.map(convertXML))
     }
+
+    val session = new isabelle.Session(resources)
 
     session.all_messages += isabelle.Session.Consumer[isabelle.Prover.Message]("firehose") {
       case msg: isabelle.Prover.Protocol_Output =>
@@ -78,8 +83,18 @@ final class Environment private(context: api.Environment.Context) extends api.En
     val ml = s"""
       Isabelle_Process.protocol_command "$evalCommand" (List.app (use_text ML_Env.local_context {debug=false, file="eval", line=0, verbose=true}));
     """
+
     session.start("Isabelle" /* name is ignored anyway */, List("-r", "-e", ml, "-q", config.session))
-    session
+
+    // Contrary to Isabelle2016-1, Isabelle2016 doesn't like loading theories
+    // without having options sent first. Postpone evaluating the `use_thy`
+    // expression until after startup. The downside is that we get no feedback
+    // when the theory is done loading, but this should not be a problem:
+    // protocol commands are processed sequentially, so by the time we send the
+    // next command after loading, the theory should be available. Still, the
+    // timeout in `System.create` must be big enough to allow the theory to be
+    // processed.
+    (session, use)
   }
 
   protected[isabelle] def sendCommand(session: Session, name: String, args: List[String]) = {

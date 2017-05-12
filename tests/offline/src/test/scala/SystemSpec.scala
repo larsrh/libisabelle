@@ -11,8 +11,7 @@ class SystemSpec(val specs2Env: Env) extends Specification with DefaultSetup wit
   Isabelle system
 
   An Isabelle system
-    detects startup failures   $failingSystem
-    detects missing protocol   $missingProtocol"""
+    detects startup failures   $failingSystem"""
 
   def create(session: String) =
     isabelleEnv.flatMap(System.create(_, Configuration.simple(session)))
@@ -21,6 +20,5 @@ class SystemSpec(val specs2Env: Env) extends Specification with DefaultSetup wit
     create(session).failed must be_==(System.StartupException(reason): Throwable).awaitFor(duration)
 
   val failingSystem = check("Unbuilt_Session", System.StartupException.Exited)
-  val missingProtocol = check("Pure", System.StartupException.NoPong)
 
 }

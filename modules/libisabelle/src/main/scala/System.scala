@@ -178,6 +178,7 @@ final class System private(val env: Environment, config: Configuration) {
     case ((env.initTag, _), _) =>
       env.sendOptions(session)
       logger.debug("Session started")
+      eval.foreach(rawEval)
       initPromise.success(())
       ()
     case ((env.exitTag, _), _) =>
@@ -199,7 +200,7 @@ final class System private(val env: Environment, config: Configuration) {
   }
 
   logger.debug("Starting session ...")
-  private val session = env.create(config, consumer)
+  private val (session, eval) = env.create(config, consumer)
 
   /**
    * Instruct the prover to shutdown.
