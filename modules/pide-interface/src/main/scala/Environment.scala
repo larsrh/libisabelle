@@ -139,7 +139,7 @@ abstract class Environment protected(val context: Environment.Context, versionOv
   }
   final val etcComponents = etc.resolve("components")
 
-  final def setEtcComponents(): Unit =
+  protected final def setEtcComponents(): Unit =
     if (!context.components.isEmpty) {
       logger.debug(s"Initializing components ...")
 
@@ -158,17 +158,13 @@ abstract class Environment protected(val context: Environment.Context, versionOv
       out.close()
     }
 
-  final def cleanEtcComponents(): Unit = {
+  protected final def cleanEtcComponents(): Unit = {
     Files.deleteIfExists(etcComponents)
     ()
   }
 
-
   override def toString: String =
     s"$version at $home"
-
-  protected[isabelle] def isabelleSetting(name: String): String
-  protected[isabelle] def isabellePath(path: String): String
 
   protected[isabelle] def build(config: Configuration): Int
 
@@ -184,6 +180,9 @@ abstract class Environment protected(val context: Environment.Context, versionOv
   protected[isabelle] def sendOptions(session: Session): Unit
   protected[isabelle] def sendCommand(session: Session, name: String, args: List[String]): Unit
   protected[isabelle] def dispose(session: Session): Unit
+
+  def isabelleSetting(name: String): String
+  def isabellePath(path: String): String
 
   def decode(text: String @@ Environment.Raw): String @@ Environment.Unicode
   def encode(text: String @@ Environment.Unicode): String @@ Environment.Raw

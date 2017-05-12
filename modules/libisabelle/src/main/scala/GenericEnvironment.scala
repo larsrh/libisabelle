@@ -41,9 +41,6 @@ final class GenericEnvironment private(context: Environment.Context) extends Env
 
   protected[isabelle] type Session = Unit
 
-  protected[isabelle] def isabelleSetting(name: String): String = ???
-  protected[isabelle] def isabellePath(path: String): String = path
-
   protected[isabelle] def build(config: Configuration) = {
     val dirs = config.paths.flatMap(p => List("-d", p.toString))
     val cli = "-bv" :: dirs ::: List(config.session)
@@ -54,6 +51,9 @@ final class GenericEnvironment private(context: Environment.Context) extends Env
   protected[isabelle] def sendCommand(session: Session, name: String, args: List[String]) = ???
   protected[isabelle] def sendOptions(session: Session) = ???
   protected[isabelle] def dispose(session: Session) = ???
+
+  def isabelleSetting(name: String): String = ???
+  def isabellePath(path: String): String = path
 
   def decode(text: String @@ Environment.Raw): String @@ Environment.Unicode = ???
   def encode(text: String @@ Environment.Unicode): String @@ Environment.Raw = ???

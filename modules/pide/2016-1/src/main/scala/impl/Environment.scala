@@ -35,12 +35,6 @@ final class Environment private(context: api.Environment.Context) extends api.En
 
   private lazy val options = isabelle.Options.init()
 
-  protected[isabelle] def isabelleSetting(name: String): String =
-    isabelle.Isabelle_System.getenv(name)
-
-  protected[isabelle] def isabellePath(path: String): String =
-    isabelle.File.standard_path(path)
-
   private def mkPaths(paths: List[Path]) =
     paths.map(p => isabelle.Path.explode(isabellePath(p.toAbsolutePath.toString)))
 
@@ -97,6 +91,12 @@ final class Environment private(context: api.Environment.Context) extends api.En
     session.protocol_command("Prover.options", isabelle.YXML.string_of_body(options.encode))
 
   protected[isabelle] def dispose(session: Session) = session.stop()
+
+  def isabelleSetting(name: String): String =
+    isabelle.Isabelle_System.getenv(name)
+
+  def isabellePath(path: String): String =
+    isabelle.File.standard_path(path)
 
   def decode(text: String @@ api.Environment.Raw): String @@ api.Environment.Unicode = tag.apply(isabelle.Symbol.decode(text))
   def encode(text: String @@ api.Environment.Unicode): String @@ api.Environment.Raw = tag.apply(isabelle.Symbol.encode(text))
