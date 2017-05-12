@@ -15,6 +15,7 @@ object Isabelle_Process
     args: List[String] = Nil,
     dirs: List[Path] = Nil,
     modes: List[String] = Nil,
+    pre_eval: List[String] = Nil,
     receiver: Prover.Receiver = Console.println(_),
     store: Sessions.Store = Sessions.store()): Isabelle_Process =
   {
@@ -22,7 +23,7 @@ object Isabelle_Process
     val process =
       try {
         ML_Process(options, logic = logic, args = args, dirs = dirs,
-          modes = modes, store = store, channel = Some(channel))
+          modes = modes, pre_eval = pre_eval, store = store, channel = Some(channel))
       }
       catch { case exn @ ERROR(_) => channel.accepted(); throw exn }
     process.stdin.close

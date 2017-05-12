@@ -81,6 +81,7 @@ final class Environment private(context: api.Environment.Context) extends api.En
         options,
         logic = config.session,
         receiver = receiver,
+        pre_eval = List(s"""Isabelle_Process.protocol_command "$evalCommand" (List.app (ML o Input.string))"""),
         dirs = mkPaths(config.paths)))
     session
   }

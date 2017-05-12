@@ -19,6 +19,7 @@ object ML_Process
     modes: List[String] = Nil,
     raw_ml_system: Boolean = false,
     cwd: JFile = null,
+    pre_eval: List[String] = Nil,
     env: Map[String, String] = Isabelle_System.settings(),
     redirect: Boolean = false,
     cleanup: () => Unit = () => (),
@@ -102,7 +103,7 @@ object ML_Process
     // bash
     val bash_args =
       ml_runtime_options :::
-      (eval_init ::: eval_modes ::: eval_options ::: eval_process).
+      (eval_init ::: eval_modes ::: eval_options ::: pre_eval ::: eval_process).
         map(eval => List("--eval", eval)).flatten ::: args
 
     Bash.process(

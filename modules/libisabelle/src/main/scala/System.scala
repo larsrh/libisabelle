@@ -219,6 +219,9 @@ final class System private(val env: Environment, config: Configuration) {
     exitPromise.future
   }
 
+  def rawEval(ml: String): Unit =
+    env.eval(session, ml)
+
   /**
    * Invoke an [[Operation operation]] on the prover, that is,
    * [[Codec#encode encode]] the input argument, send it to the prover and

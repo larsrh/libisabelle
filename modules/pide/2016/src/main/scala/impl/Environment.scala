@@ -75,8 +75,10 @@ final class Environment private(context: api.Environment.Context) extends api.En
       case msg =>
         logger.trace(msg.toString)
     }
-
-    session.start("Isabelle" /* name is ignored anyway */, List("-r", "-q", config.session))
+    val ml = s"""
+      Isabelle_Process.protocol_command "$evalCommand" (List.app (use_text ML_Env.local_context {debug=false, file="eval", line=0, verbose=true}));
+    """
+    session.start("Isabelle" /* name is ignored anyway */, List("-r", "-e", ml, "-q", config.session))
     session
   }
 

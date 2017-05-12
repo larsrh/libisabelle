@@ -116,6 +116,7 @@ object Environment {
 abstract class Environment protected(val context: Environment.Context, versionOverride: Option[Version] = None) { self =>
 
   protected final val logger = getLogger
+  protected final val evalCommand = "libisabelle_eval"
 
   logger.debug(s"Instantiating environment at ${context.home} (with user storage ${context.user}) ...")
 
@@ -180,6 +181,9 @@ abstract class Environment protected(val context: Environment.Context, versionOv
   protected[isabelle] def sendOptions(session: Session): Unit
   protected[isabelle] def sendCommand(session: Session, name: String, args: List[String]): Unit
   protected[isabelle] def dispose(session: Session): Unit
+
+  protected[isabelle] final def eval(session: Session, ml: String): Unit =
+    sendCommand(session, evalCommand, List(ml))
 
   def isabelleSetting(name: String): String
   def isabellePath(path: String): String
