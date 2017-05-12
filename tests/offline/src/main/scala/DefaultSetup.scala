@@ -20,7 +20,7 @@ import info.hupel.isabelle.setup._
 
 trait BasicSetup {
 
-  LoggingBackend.console("info.hupel" -> Level.Trace)
+  LoggingBackend.console("info.hupel" -> Level.Debug)
 
   lazy val duration = 30.seconds
 

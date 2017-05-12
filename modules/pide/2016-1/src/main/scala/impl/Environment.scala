@@ -33,7 +33,8 @@ final class Environment private(context: api.Environment.Context) extends api.En
 
   protected[isabelle] type Session = isabelle.Session
 
-  private lazy val options = isabelle.Options.init()
+  private lazy val options =
+    isabelle.Options.init().bool.update("ML_statistics", false)
 
   private def mkPaths(paths: List[Path]) =
     paths.map(p => isabelle.Path.explode(isabellePath(p.toAbsolutePath.toString)))
@@ -67,9 +68,12 @@ final class Environment private(context: api.Environment.Context) extends api.En
     session.all_messages += isabelle.Session.Consumer[isabelle.Prover.Message]("firehose") {
       case msg: isabelle.Prover.Protocol_Output =>
         consumer(destMarkup(msg.message.markup), api.XML.bodyFromYXML(msg.text))
+        logger.trace(msg.toString)
       case msg: isabelle.Prover.Output =>
         consumer(destMarkup(msg.message.markup), msg.message.body.map(convertXML))
-      case _ =>
+        logger.trace(msg.toString)
+      case msg =>
+        logger.trace(msg.toString)
     }
 
     session.start(receiver =>
