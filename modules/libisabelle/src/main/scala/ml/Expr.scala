@@ -36,8 +36,10 @@ sealed abstract class Expr[A] {
     } yield res
   }
 
-  def check(sys: System, thyName: String)(implicit A: Codec[A], ec: ExecutionContext): Future[ProverResult[Option[String]]] =
+  def check(sys: System, thyName: String)(implicit A: Codec[A], ec: ExecutionContext): Future[ProverResult[Option[String]]] = {
+    val _ = ec
     sys.invoke(Expr.Check)((Codec[A].mlType, this, thyName))
+  }
 
   def coerce[B]: Expr[B] = Expr.Coerce(this)
 

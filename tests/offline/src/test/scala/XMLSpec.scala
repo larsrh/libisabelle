@@ -1,12 +1,9 @@
 package info.hupel.isabelle.tests
 
-import scala.math.BigInt
-
 import org.specs2.{ScalaCheck, Specification}
 import org.specs2.scalacheck.Parameters
 import org.specs2.specification.core.Env
 
-import org.scalacheck._
 import org.scalacheck.Prop.forAll
 
 import info.hupel.isabelle.api.XML

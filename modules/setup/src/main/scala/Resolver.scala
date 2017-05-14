@@ -80,8 +80,6 @@ object Resolver {
    */
   object Maven extends Resolver {
 
-    private val logger = getLogger
-
     def resolve(platform: Platform, version: Version.Stable)(implicit ec: ExecutionContext) = {
       val dependency = Dependency(
         Module(BuildInfo.organization, s"pide-${version.identifier}_${BuildInfo.scalaBinaryVersion}"),

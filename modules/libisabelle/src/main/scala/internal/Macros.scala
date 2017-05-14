@@ -1,6 +1,5 @@
 package info.hupel.isabelle.internal
 
-import scala.language.experimental.macros
 import scala.reflect.macros.whitebox
 
 import cats.instances.list._

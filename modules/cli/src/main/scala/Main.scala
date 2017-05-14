@@ -5,7 +5,6 @@ import java.nio.file._
 
 import org.apache.commons.io.FileUtils
 
-import scala.collection.JavaConverters._
 import scala.concurrent._
 import scala.concurrent.duration.Duration
 
@@ -20,8 +19,6 @@ import cats.syntax.traverse._
 
 import coursier.{Dependency, Module}
 import coursier.util.Parse
-
-import caseapp._
 
 import info.hupel.isabelle.api._
 import info.hupel.isabelle.setup._

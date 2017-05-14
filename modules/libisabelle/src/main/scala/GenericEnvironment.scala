@@ -5,7 +5,6 @@ import scala.sys.process._
 
 import monix.execution.cancelables.MultiAssignmentCancelable
 
-import shapeless._
 import shapeless.tag._
 
 import info.hupel.isabelle.api._

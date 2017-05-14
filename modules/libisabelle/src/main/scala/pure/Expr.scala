@@ -32,7 +32,7 @@ final case class Expr[T] private[isabelle](val term: Term) {
   def |>[U](that: Expr[T => U]): Expr[U] =
     Expr(App(that.term, this.term))
 
-  private def copy = this
+  private[isabelle] def copy = this
 
   def recheck(ctxt: ml.Expr[Context])(implicit T: Typeable[T]): Program[Expr[T]] =
     Expr.fromTerm(ctxt, term).map(_.get)

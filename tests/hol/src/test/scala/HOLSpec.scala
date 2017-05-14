@@ -87,8 +87,6 @@ class HOLSpec(val specs2Env: Env) extends Specification
   }
 
   val peeking = prop { (n: BigInt, m: BigInt) =>
-    val rScala = n + m
-
     val prog =
       for {
         str <- term"$n + $m"
