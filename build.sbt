@@ -6,7 +6,7 @@ import sbtassembly.AssemblyPlugin.defaultShellScript
 lazy val standardSettings = Seq(
   organization := "info.hupel",
   scalaVersion := "2.11.8",
-  crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.1"),
+  crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.2"),
   javacOptions += "-Xlint:unchecked",
   homepage := Some(url("http://lars.hupel.info/libisabelle/")),
   licenses := Seq(
@@ -112,10 +112,10 @@ lazy val docs = project.in(file("modules/docs"))
   .settings(standardSettings)
   .settings(unidocSettings)
   .settings(macroSettings)
-  .settings(tutSettings)
   .settings(site.settings ++ site.includeScaladoc("api/nightly"))
   .settings(ghpages.settings)
   .settings(loggingSettings)
+  .enablePlugins(TutPlugin)
   .settings(
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(pideInterface, libisabelle, setup),
     doc in Compile := (doc in ScalaUnidoc).value,
@@ -126,7 +126,9 @@ lazy val docs = project.in(file("modules/docs"))
     watchSources ++= (siteSourceDirectory.value ** "*").get,
     watchSources += ((baseDirectory in ThisBuild).value / "README.md"),
     siteMappings += ((baseDirectory in ThisBuild).value / "README.md", "_includes/README.md"),
-    site.addMappingsToSiteDir(tut, "_tut")
+    site.addMappingsToSiteDir(tut, "_tut"),
+    // this seems to be required for scalog
+    libraryDependencies += "com.typesafe" % "config" % "1.3.1"
   )
 
 addCommandAlias("pushSite", "; docs/makeSite ; docs/ghpagesPushSite")
@@ -141,7 +143,7 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
     buildInfoPackage := "info.hupel.isabelle.api",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.2",
-      "io.monix" %% "monix-execution" % "2.2.4",
+      "io.monix" %% "monix-execution" % "2.3.0",
       "org.log4s" %% "log4s" % "1.3.4"
     )
   )
@@ -181,8 +183,8 @@ lazy val setup = project.in(file("modules/setup"))
   .settings(warningSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "io.get-coursier" %% "coursier" % "1.0.0-RC1",
-      "io.get-coursier" %% "coursier-cache" % "1.0.0-RC1",
+      "io.get-coursier" %% "coursier" % "1.0.0-RC3",
+      "io.get-coursier" %% "coursier-cache" % "1.0.0-RC3",
       "org.apache.commons" % "commons-compress" % "1.13",
       "commons-io" % "commons-io" % "2.5"
     )
@@ -203,7 +205,7 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
     libraryDependencies += "org.scala-lang" % "scala-library" % scalaVersion.value % "provided",
     libraryDependencies ++= {
       val dep =
-        ("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.5").exclude("org.scala-lang", "scala-library")
+        ("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.6").exclude("org.scala-lang", "scala-library")
 
       if (scalaVersion.value startsWith "2.10")
         Seq()
@@ -345,7 +347,7 @@ lazy val examples = project.in(file("modules/examples"))
   .settings(warningSettings)
   .settings(
     // logback because Java
-    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.1"
+    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3"
   )
 
 
