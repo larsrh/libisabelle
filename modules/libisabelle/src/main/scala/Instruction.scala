@@ -3,10 +3,12 @@ package info.hupel.isabelle
 import scala.concurrent._
 import scala.math.BigInt
 
+import monix.execution.CancelableFuture
+
 import info.hupel.isabelle.ml.{Expr, Opaque}
 
 sealed trait Instruction[A] {
-  def run(sys: System, thyName: String)(implicit ec: ExecutionContext): Future[ProverResult[A]]
+  def run(sys: System, thyName: String)(implicit ec: ExecutionContext): CancelableFuture[ProverResult[A]]
 }
 
 object Instruction {
@@ -17,7 +19,7 @@ object Instruction {
   }
 
   private[isabelle] case class OpaqueEx[A, Repr](expr: Expr[A], conv: Expr[A => Repr])(implicit A: Opaque[A], Repr: Codec[Repr]) extends Instruction[(BigInt, Repr)] {
-    def run(sys: System, thyName: String)(implicit ec: ExecutionContext): Future[ProverResult[(BigInt, Repr)]] =
+    def run(sys: System, thyName: String)(implicit ec: ExecutionContext): CancelableFuture[ProverResult[(BigInt, Repr)]] =
       expr.opaqueEval(sys, thyName, conv)
   }
 

@@ -6,6 +6,7 @@ import scala.util._
 import monix.execution.CancelableFuture
 import monix.execution.cancelables.MultiAssignmentCancelable
 
+import cats.Monad
 import cats.free.Free
 
 import scalatags.Text
@@ -57,6 +58,16 @@ package object isabelle {
       conn.orderedUpdate(c1, order = 1)
       CancelableFuture(c1, conn)
     }
+  }
+
+  implicit def cancelableFutureMonad(implicit ec: ExecutionContext): Monad[CancelableFuture] = new Monad[CancelableFuture] {
+    def pure[A](x: A) = CancelableFuture.successful(x)
+    def flatMap[A, B](fa: CancelableFuture[A])(f: A => CancelableFuture[B]) = fa.flatMapC(f)
+    def tailRecM[B, C](b: B)(f: B => CancelableFuture[Either[B, C]]) =
+      f(b).flatMapC {
+        case Left(b1) => tailRecM(b1)(f)
+        case Right(c) => pure(c)
+      }
   }
 
 }

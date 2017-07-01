@@ -1,7 +1,9 @@
 package info.hupel.isabelle.ml
 
-import scala.concurrent._
+import scala.concurrent.ExecutionContext
 import scala.math.BigInt
+
+import monix.execution.CancelableFuture
 
 import cats.free.Free
 
@@ -10,10 +12,10 @@ import info.hupel.isabelle.api.XML
 
 sealed abstract class Expr[A] {
 
-  private[isabelle] def eval(sys: System, thyName: String)(implicit A: Codec[A], ec: ExecutionContext): Future[ProverResult[A]] =
+  private[isabelle] def eval(sys: System, thyName: String)(implicit A: Codec[A], ec: ExecutionContext): CancelableFuture[ProverResult[A]] =
     sys.invoke(Expr.Eval)((A.mlType, this, thyName)).map(_.map(A.decodeOrThrow))
 
-  private[isabelle] def opaqueEval[Repr](sys: System, thyName: String, conv: ml.Expr[A => Repr])(implicit A: Opaque[A], Repr: Codec[Repr], ec: ExecutionContext): Future[ProverResult[(BigInt, Repr)]] =
+  private[isabelle] def opaqueEval[Repr](sys: System, thyName: String, conv: ml.Expr[A => Repr])(implicit A: Opaque[A], Repr: Codec[Repr], ec: ExecutionContext): CancelableFuture[ProverResult[(BigInt, Repr)]] =
     sys.invoke(Expr.EvalOpaque)(((A.table, Repr.mlType, conv), this, thyName)).map(_.map { case (id, tree) =>
       (id, Repr.decodeOrThrow(tree))
     })
@@ -36,7 +38,7 @@ sealed abstract class Expr[A] {
     } yield res
   }
 
-  def check(sys: System, thyName: String)(implicit A: Codec[A], ec: ExecutionContext): Future[ProverResult[Option[String]]] = {
+  def check(sys: System, thyName: String)(implicit A: Codec[A], ec: ExecutionContext): CancelableFuture[ProverResult[Option[String]]] = {
     val _ = ec
     sys.invoke(Expr.Check)((Codec[A].mlType, this, thyName))
   }

@@ -5,7 +5,6 @@ import scala.concurrent.duration._
 import scala.util.control.Exception._
 
 import cats.arrow.FunctionK
-import cats.instances.future._
 
 import monix.execution.{Cancelable, CancelableFuture, FutureUtils, Scheduler}
 
@@ -267,8 +266,8 @@ final class System private(val env: Environment, config: Configuration) {
     CancelableFuture(promise.future, cancel)
   }
 
-  def run[A](prog: Program[A], thyName: String): Future[A] = {
-    val interpreter = new FunctionK[Instruction, Future] {
+  def run[A](prog: Program[A], thyName: String): CancelableFuture[A] = {
+    val interpreter = new FunctionK[Instruction, CancelableFuture] {
       def apply[T](instruction: Instruction[T]) =
         instruction.run(System.this, thyName).map(_.unsafeGet)
     }
