@@ -101,9 +101,10 @@ object Main {
     }
 
     Runtime.getRuntime().addShutdownHook(new Thread() {
-      override def run(): Unit =
+      override def run(): Unit = {
         logger.info("Shutting down ...")
         app.cancel()
+      }
     })
     Await.result(app, Duration.Inf)
   }
