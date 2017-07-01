@@ -33,6 +33,9 @@ object Typ {
 sealed abstract class Typ {
   def -->:(that: Typ) = Typ.funT(that, this)
   def --->:(thats: List[Typ]) = thats.foldRight(this)(_ -->: _)
+
+  def print: ml.Expr[Context => String] =
+    ml.Expr.uncheckedLiteral[Typ => Context => String]("(fn t => fn ctxt => YXML.content_of (Syntax.string_of_typ ctxt t))")(this)
 }
 
 final case class Type(name: String, args: List[Typ] = Nil) extends Typ
@@ -103,6 +106,9 @@ sealed abstract class Term {
 
   def print: ml.Expr[Context => String] =
     ml.Expr.uncheckedLiteral[Term => Context => String]("(fn t => fn ctxt => YXML.content_of (Syntax.string_of_term ctxt t))")(this)
+
+  def typeOf: ml.Expr[Typ] =
+    ml.Expr.uncheckedLiteral[Term => Typ]("fastype_of")(this)
 
 }
 
