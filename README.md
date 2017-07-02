@@ -10,7 +10,7 @@ For more information and documentation about the project, visit [its website](ht
 | AppVeyor (Windows CI)     | [![Build status](https://ci.appveyor.com/api/projects/status/uuafgv21ragvoqei/branch/master?svg=true)](https://ci.appveyor.com/project/larsrh/libisabelle/branch/master) |
 | Scaladex                  | [![Latest release](https://index.scala-lang.org/larsrh/libisabelle/libisabelle/latest.svg?color=orange)](https://index.scala-lang.org/larsrh/libisabelle) |
 | Scaladoc (release)        | [![Scaladoc](http://javadoc-badge.appspot.com/info.hupel/libisabelle-docs_2.11.svg?label=scaladoc)](http://javadoc-badge.appspot.com/info.hupel/libisabelle-docs_2.11) |
-| Zenodo (DOI)              | [![DOI](https://zenodo.org/badge/3836/larsrh/libisabelle.svg)](https://zenodo.org/badge/latestdoi/3836/larsrh/libisabelle) |
+| Zenodo (DOI)              | [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.591695.svg)](https://doi.org/10.5281/zenodo.591695) |
 | Gitter (Chat)             | [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/larsrh/libisabelle) |
 
 
