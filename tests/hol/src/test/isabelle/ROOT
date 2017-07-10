@@ -1,0 +1,3 @@
+session "HOL-Protocol-Test" = "HOL-Protocol" +
+  theories
+    Test_Pure_Main

@@ -299,15 +299,17 @@ lazy val pureTest = project.in(file("tests/pure"))
 
 lazy val holTest = project.in(file("tests/hol"))
   .dependsOn(offlineTest)
+  .enablePlugins(LibisabellePlugin)
   .settings(noPublishSettings)
   .settings(standardSettings)
   .settings(warningSettings)
   .settings(
     logBuffered in Test := false,
-    libraryDependencies += "org.specs2" %% "specs2-scalacheck" % specs2Version % "test"
+    libraryDependencies += "org.specs2" %% "specs2-scalacheck" % specs2Version % "test",
+    isabelleSessions in Test := Seq("HOL-Protocol-Test")
   )
 
-addCommandAlias("validateSlow", "; holTest/test")
+addCommandAlias("validateSlow", "; holTest/test ; test:isabelleBuild")
 addCommandAlias("validateQuick", "; offlineTest/test ; pureTest/test")
 
 
