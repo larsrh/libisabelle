@@ -41,7 +41,12 @@ lazy val standardSettings = Seq(
     Option(System.getProperty("build.publish.credentials")) map (new File(_)) getOrElse (Path.userHome / ".ivy2" / ".credentials")
   ),
   autoAPIMappings := true,
-  isabelleVersions := Seq("2016", "2016-1")
+  isabelleVersions := {
+    sys.env.get("ISABELLE_VERSION") match {
+      case None => Seq("2016", "2016-1")
+      case Some(ver) => Seq(ver)
+    }
+  }
 )
 
 lazy val warningSettings = Seq(
