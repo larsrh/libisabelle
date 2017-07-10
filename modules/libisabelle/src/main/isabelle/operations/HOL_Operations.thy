@@ -1,5 +1,5 @@
 theory HOL_Operations
-imports "../protocol/Protocol" Main
+imports Main "../protocol/Protocol"
 begin
 
 operation_setup mk_int = \<open>
