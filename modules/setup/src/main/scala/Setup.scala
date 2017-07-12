@@ -155,7 +155,7 @@ final case class Setup(home: Path, platform: Platform, version: Version) {
   def makeEnvironment(resolver: Resolver, user: Path, components: List[Path])(implicit scheduler: Scheduler): Future[Environment] = {
     val context = Environment.Context(home, user, components)
     version match {
-      case Version.Devel => GenericEnvironment(context, platform) match {
+      case v: Version.Devel => GenericEnvironment(context, v, platform) match {
         case Right(env) => Future.successful(env)
         case Left(err) => Future.failed(new RuntimeException(err.explain))
       }

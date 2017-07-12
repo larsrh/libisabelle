@@ -89,8 +89,8 @@ sealed abstract class Platform {
     localStorage.resolve(s"v${BuildInfo.version}")
 
   final def withIsabelleVersion(path: Path, version: Version): Path = version match {
-    case Version.Stable(identifier) => path.resolve(identifier)
-    case Version.Devel => path.resolve("devel")
+    case Version.Stable(identifier) => path.resolve("stable").resolve(identifier)
+    case Version.Devel(identifier) => path.resolve("devel").resolve(identifier)
   }
 
   final def resourcesStorage(version: Version): Path =

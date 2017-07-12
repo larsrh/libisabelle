@@ -130,12 +130,12 @@ abstract class Environment protected(val context: Environment.Context, versionOv
     "LIBISABELLE_GIT" -> BuildInfo.gitHeadCommit.getOrElse(""),
     "LIBISABELLE_VERSION" -> BuildInfo.version
   ) ++ (version match {
-    case Version.Devel => Map()
+    case Version.Devel(_) => Map()
     case Version.Stable(identifier) => Map("ISABELLE_VERSION" -> identifier)
   })
 
   final val etc = version match {
-    case Version.Devel => user.resolve(".isabelle").resolve("etc")
+    case Version.Devel(_) => user.resolve(".isabelle").resolve("etc")
     case Version.Stable(identifier) => user.resolve(".isabelle").resolve(s"Isabelle$identifier").resolve("etc")
   }
   final val etcComponents = etc.resolve("components")

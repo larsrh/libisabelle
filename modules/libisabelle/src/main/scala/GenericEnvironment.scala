@@ -19,9 +19,9 @@ object GenericEnvironment {
     val explain = "Generic environment does not support unofficial platform"
   }
 
-  def apply(context: Environment.Context, platform: Platform): Either[Error, GenericEnvironment] = platform match {
+  def apply(context: Environment.Context, version: Version, platform: Platform): Either[Error, GenericEnvironment] = platform match {
     case Platform.Linux | Platform.OSX =>
-      Right(new GenericEnvironment(context))
+      Right(new GenericEnvironment(context, version))
     case Platform.Windows =>
       Left(WindowsUnsupported)
     case _ =>
@@ -30,7 +30,7 @@ object GenericEnvironment {
 
 }
 
-final class GenericEnvironment private(context: Environment.Context) extends Environment(context, Some(Version.Devel)) {
+final class GenericEnvironment private(context: Environment.Context, version: Version) extends Environment(context, Some(version)) {
 
   protected[isabelle] val exitTag = ""
   protected[isabelle] val functionTag = ""

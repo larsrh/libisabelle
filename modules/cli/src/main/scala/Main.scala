@@ -33,8 +33,8 @@ object Main {
 
     val afp =
       if (options.afp)
-        options.isabelleVersion match {
-          case Version.Devel =>
+        options.version match {
+          case Version.Devel(_) =>
             Options.usageAndExit("Option conflict: --devel and --afp are mutually exclusive")
           case Version.Stable(identifier) =>
             Set(Dependency(Module(s"${BuildInfo.organization}.afp", s"afp-$identifier"), "1.0.+"))
@@ -70,8 +70,8 @@ object Main {
 
     lazy val setup = options.home match {
       case None =>
-        options.isabelleVersion match {
-          case Version.Devel =>
+        options.version match {
+          case Version.Devel(_) =>
             Options.usageAndExit("Option conflict: --devel requires --home")
           case v: Version.Stable =>
             Setup.default(v) match {
@@ -80,7 +80,7 @@ object Main {
             }
         }
       case Some(home) =>
-        Setup(home, Options.platform, options.isabelleVersion)
+        Setup(home, Options.platform, options.version)
     }
 
     logger.info(s"Using ${options.configuration}")

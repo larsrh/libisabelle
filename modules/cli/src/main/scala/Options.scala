@@ -19,10 +19,7 @@ case class Options(
   @ValueDescription("version")
   @HelpMessage("stable Isabelle version")
   @ExtraName("v")
-  version: Option[Version.Stable] = None,
-
-  @HelpMessage("devel Isabelle version (reduced feature set; --home needs to be specified; conflicts with --version and --afp")
-  devel: Boolean = false,
+  version: Version = Version.Stable("2016-1"),
 
   @ValueDescription("session")
   @HelpMessage("Isabelle session (directory needs to be known; either through --internal, --include, --component or --fetch)")
@@ -72,23 +69,16 @@ case class Options(
   verbose: Boolean = false
 ) {
 
-  lazy val isabelleVersion: Version = (version, devel) match {
-    case (None, false) => Version.Stable("2016-1")
-    case (None, true) => Version.Devel
-    case (Some(v), false) => v
-    case (Some(_), true) => Options.usageAndExit("Option conflict: --version and --devel are mutually exclusive")
-  }
-
   lazy val userPath: Path = (user, freshUser) match {
     case (None, true) => Files.createTempDirectory("libisabelle_user")
-    case (None, false) => Options.platform.userStorage(isabelleVersion)
+    case (None, false) => Options.platform.userStorage(version)
     case (Some(path), false) => path
     case (Some(_), true) => Options.usageAndExit("Option conflict: --user and --fresh-user are mutually exclusive")
   }
 
   lazy val resourcePath: Path = (resources, freshResources) match {
     case (None, true) => Files.createTempDirectory("libisabelle_resources")
-    case (None, false) => Options.platform.resourcesStorage(isabelleVersion)
+    case (None, false) => Options.platform.resourcesStorage(version)
     case (Some(path), false) => path
     case (Some(_), true) => Options.usageAndExit("Option conflict: --resources and --fresh-resources are mutually exclusive")
   }
