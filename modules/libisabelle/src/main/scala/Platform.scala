@@ -79,28 +79,26 @@ sealed abstract class Platform {
   /** Path where `libisabelle` stores files downloaded from the Internet. */
   def localStorage: Path
 
-  final def setupStorage: Path =
-    localStorage.resolve("setups")
+  final def withIsabelleVersion(path: Path, version: Version, resolved: Boolean): Path = version match {
+    case Version.Stable(_) if !resolved => path
+    case Version.Stable(identifier) => path.resolve(s"Isabelle${identifier}")
+    case Version.Devel(identifier) => path.resolve("devel").resolve(identifier) // always resolve devel
+  }
 
-  final def setupStorage(version: Version.Stable): Path =
-    setupStorage.resolve(s"Isabelle${version.identifier}")
+  final def setupStorage(version: Version, resolved: Boolean): Path =
+    withIsabelleVersion(localStorage.resolve("setups"), version, resolved)
 
   final def versionedStorage: Path =
     localStorage.resolve(s"v${BuildInfo.version}")
 
-  final def withIsabelleVersion(path: Path, version: Version): Path = version match {
-    case Version.Stable(identifier) => path.resolve("stable").resolve(identifier)
-    case Version.Devel(identifier) => path.resolve("devel").resolve(identifier)
-  }
-
   final def resourcesStorage(version: Version): Path =
-    withIsabelleVersion(versionedStorage.resolve("resources"), version)
+    withIsabelleVersion(versionedStorage.resolve("resources"), version, true)
 
   final def lockFile: Path =
     localStorage.resolve(".lock")
 
   final def userStorage(version: Version): Path =
-    withIsabelleVersion(localStorage.resolve("user"), version)
+    withIsabelleVersion(localStorage.resolve("user"), version, true)
 
   private def acquireLock(): Option[FileLock] = {
     Files.createDirectories(localStorage)

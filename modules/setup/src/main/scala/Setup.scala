@@ -68,13 +68,14 @@ object Setup {
    * [[Platform platform]].
    */
   def install(platform: OfficialPlatform, version: Version.Stable): Either[SetupImpossible, Setup] = {
-    Files.createDirectories(platform.setupStorage)
+    val path = platform.setupStorage(version, false)
+    Files.createDirectories(path)
     val url = platform.url(version)
-    logger.debug(s"Downloading setup $version from $url to ${platform.setupStorage}")
+    logger.debug(s"Downloading setup $version from $url to $path")
     Tar.download(url) match {
       case Success(stream) =>
         platform.withLock { () =>
-          Tar.extractTo(platform.setupStorage, stream) match {
+          Tar.extractTo(path, stream) match {
             case Success(path) =>
               Files.createFile(successMarker(path))
               stream.close()
@@ -94,7 +95,7 @@ object Setup {
    * [[Platform#setupStorage:* designated path]] of the [[Platform platform]].
    */
   def detect(platform: Platform, version: Version.Stable): Either[NoSetup, Setup] = platform.withLock { () =>
-    val path = platform.setupStorage(version)
+    val path = platform.setupStorage(version, true)
     if (Files.isDirectory(path)) {
       if (Files.isRegularFile(successMarker(path)))
         Right(Setup(path, platform, version))

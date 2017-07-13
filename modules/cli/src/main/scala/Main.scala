@@ -35,7 +35,7 @@ object Main {
       if (options.afp)
         options.version match {
           case Version.Devel(_) =>
-            Options.usageAndExit("Option conflict: --devel and --afp are mutually exclusive")
+            Options.usageAndExit("Option conflict: devel version and --afp are mutually exclusive")
           case Version.Stable(identifier) =>
             Set(Dependency(Module(s"${BuildInfo.organization}.afp", s"afp-$identifier"), "1.0.+"))
         }
@@ -72,7 +72,7 @@ object Main {
       case None =>
         options.version match {
           case Version.Devel(_) =>
-            Options.usageAndExit("Option conflict: --devel requires --home")
+            Options.usageAndExit("Option conflict: devel version requires --home")
           case v: Version.Stable =>
             Setup.default(v) match {
               case Right(setup) => setup

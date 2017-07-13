@@ -17,7 +17,7 @@ import info.hupel.isabelle.api._
 case class Options(
 
   @ValueDescription("version")
-  @HelpMessage("stable Isabelle version")
+  @HelpMessage("Isabelle version ('stable:2016' or 'devel:isabelle-repo' for stable or devel; default prefix: 'stable')")
   @ExtraName("v")
   version: Version = Version.Stable("2016-1"),
 
@@ -66,8 +66,17 @@ case class Options(
   afp: Boolean = false,
 
   @HelpMessage("verbose logging output")
-  verbose: Boolean = false
+  verbose: Boolean = false,
+
+  @HelpMessage("initialize or update devel copy according to version identifier (requires devel version)")
+  update: Boolean = false
 ) {
+
+  version match {
+    case Version.Stable(_) if update =>
+      Options.usageAndExit("Option conflict: --update requires devel version")
+    case _ =>
+  }
 
   lazy val userPath: Path = (user, freshUser) match {
     case (None, true) => Files.createTempDirectory("libisabelle_user")
