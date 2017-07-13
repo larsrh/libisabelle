@@ -11,7 +11,7 @@ import info.hupel.isabelle.setup._
 object JSetup {
 
   def defaultSetup(version: Version.Stable, timeout: Duration): Setup =
-    Setup.default(version) match {
+    Setup.default(version, false) match {
       case Left(reason) => sys.error(reason.explain)
       case Right(setup) => setup
     }

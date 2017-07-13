@@ -85,8 +85,11 @@ sealed abstract class Platform {
     case Version.Devel(identifier) => path.resolve("devel").resolve(identifier) // always resolve devel
   }
 
+  final def setupStorage: Path =
+    localStorage.resolve("setups")
+
   final def setupStorage(version: Version, resolved: Boolean): Path =
-    withIsabelleVersion(localStorage.resolve("setups"), version, resolved)
+    withIsabelleVersion(setupStorage, version, resolved)
 
   final def versionedStorage: Path =
     localStorage.resolve(s"v${BuildInfo.version}")

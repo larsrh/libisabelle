@@ -4,6 +4,7 @@ import java.nio.file.{Files, Path}
 
 import scala.concurrent.Future
 import scala.util._
+import scala.util.control.NonFatal
 
 import org.log4s._
 
@@ -47,6 +48,12 @@ object Setup {
   case class InstallationError(t: Throwable) extends SetupImpossible {
     def explain = s"Download and installation failed: ${t.getMessage}"
   }
+  case class UnknownDevel(s: String) extends NoSetup with SetupImpossible {
+    def explain = s"Unknown devel: $s"
+  }
+  case class DevelError(t: Throwable) extends NoSetup with SetupImpossible {
+    def explain = s"Devel init/update failed: ${t.getMessage}"
+  }
 
   private val logger = getLogger
 
@@ -63,30 +70,49 @@ object Setup {
     path.resolve(".success")
 
   /**
-   * Download an official copy of Isabelle from the Internet and extract it
+   * Download a copy of Isabelle from the Internet and extract it
    * in the [[Platform#setupStorage:* designated path]] according to the
    * [[Platform platform]].
    */
-  def install(platform: OfficialPlatform, version: Version.Stable): Either[SetupImpossible, Setup] = {
+  def install(platform: OfficialPlatform, version: Version): Either[SetupImpossible, Setup] = {
     val path = platform.setupStorage(version, false)
     Files.createDirectories(path)
-    val url = platform.url(version)
-    logger.debug(s"Downloading setup $version from $url to $path")
-    Tar.download(url) match {
-      case Success(stream) =>
-        platform.withLock { () =>
-          Tar.extractTo(path, stream) match {
-            case Success(path) =>
-              Files.createFile(successMarker(path))
-              stream.close()
+
+    version match {
+      case v: Version.Stable =>
+        val url = platform.url(v)
+        logger.debug(s"Downloading setup $v from $url to $path")
+
+        Tar.download(url) match {
+          case Success(stream) =>
+            platform.withLock { () =>
+              Tar.extractTo(path, stream) match {
+                case Success(path) =>
+                  Files.createFile(successMarker(path))
+                  stream.close()
+                  Right(Setup(path, platform, version))
+                case Failure(ex) =>
+                  Left(InstallationError(ex))
+              }
+            }.getOrElse(Left(Busy(platform.lockFile)))
+          case Failure(ex) =>
+            logger.error(ex)(s"Failed to download $url")
+            Left(InstallationError(ex))
+        }
+      case Version.Devel(identifier) =>
+        Devel.knownDevels.get(identifier) match {
+          case Some(devel) =>
+            logger.debug(s"Initializing devel $identifier in $path")
+            try {
+              devel.init(path)
               Right(Setup(path, platform, version))
-            case Failure(ex) =>
-              Left(InstallationError(ex))
-          }
-        }.getOrElse(Left(Busy(platform.lockFile)))
-      case Failure(ex) =>
-        logger.error(ex)(s"Failed to download $url")
-        Left(InstallationError(ex))
+            }
+            catch {
+              case NonFatal(ex) => Left(DevelError(ex))
+            }
+          case None =>
+            Left(UnknownDevel(identifier))
+        }
     }
   }
 
@@ -94,14 +120,32 @@ object Setup {
    * Try to find an existing [[Setup setup]] in the
    * [[Platform#setupStorage:* designated path]] of the [[Platform platform]].
    */
-  def detect(platform: Platform, version: Version.Stable): Either[NoSetup, Setup] = platform.withLock { () =>
+  def detect(platform: Platform, version: Version, updateIfDevel: Boolean): Either[NoSetup, Setup] = platform.withLock { () =>
     val path = platform.setupStorage(version, true)
-    if (Files.isDirectory(path)) {
-      if (Files.isRegularFile(successMarker(path)))
-        Right(Setup(path, platform, version))
-      else
-        Left(Corrupted(path))
-    }
+    if (Files.isDirectory(path))
+      version match {
+        case _: Version.Stable =>
+          if (Files.isRegularFile(successMarker(path)))
+            Right(Setup(path, platform, version))
+          else
+            Left(Corrupted(path))
+        case _: Version.Devel if !updateIfDevel =>
+          Right(Setup(path, platform, version))
+        case Version.Devel(identifier) =>
+          Devel.knownDevels.get(identifier) match {
+            case Some(devel) =>
+              logger.debug(s"Updating devel $identifier in $path")
+              try {
+                devel.update(path)
+                Right(Setup(path, platform, version))
+              }
+              catch {
+                case NonFatal(ex) => Left(DevelError(ex))
+              }
+            case None =>
+              Left(UnknownDevel(identifier))
+          }
+      }
     else
       Left(Absent)
   }.getOrElse(Left(Busy(platform.lockFile)))
@@ -111,16 +155,15 @@ object Setup {
    * [[detect detect existing setup]],
    * [[install install if not existing]].
    */
-  def default(version: Version.Stable): Either[SetupImpossible, Setup] =
+  def default(version: Version, updateIfDevel: Boolean): Either[SetupImpossible, Setup] =
     Platform.guess match {
       case None =>
         Left(UnknownPlatform)
       case Some(platform) =>
-        detect(platform, version) match {
-          case Right(install) =>     Right(install)
-          case Left(Absent) =>       install(platform, version)
-          case Left(Busy(p)) =>      Left(Busy(p))
-          case Left(Corrupted(p)) => Left(Corrupted(p))
+        detect(platform, version, updateIfDevel) match {
+          case Right(install) =>           Right(install)
+          case Left(Absent) =>             install(platform, version)
+          case Left(e: SetupImpossible) => Left(e)
         }
     }
 

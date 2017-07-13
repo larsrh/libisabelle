@@ -12,7 +12,7 @@ import monix.execution.Scheduler.Implicits.global
 
 import info.hupel.isabelle._, info.hupel.isabelle.api._, info.hupel.isabelle.setup._
 
-val setup = Setup.default(Version.Stable("2016")).right.get
+val setup = Setup.default(Version.Stable("2016"), false).right.get
 val resources = Resources.dumpIsabelleResources().right.get
 val config = Configuration.simple("Protocol")
 

@@ -41,7 +41,7 @@ trait BasicSetup {
     ).map(Version.Stable.apply).get
 
   lazy val platform: Platform = Platform.guess.get
-  lazy val setup: Setup = Setup.detect(platform, version).right.get
+  lazy val setup: Setup = Setup.detect(platform, version, false).right.get
 
 }
 

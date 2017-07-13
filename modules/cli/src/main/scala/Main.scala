@@ -28,6 +28,8 @@ object Main {
   private lazy val logger = getLogger
 
   def main(args: Array[String]): Unit = Options.parse(args.toList) { (options, rest) =>
+    options.check()
+
     val parentClassLoader =
       if (options.internal) getClass.getClassLoader else null
 
@@ -70,14 +72,9 @@ object Main {
 
     lazy val setup = options.home match {
       case None =>
-        options.version match {
-          case Version.Devel(_) =>
-            Options.usageAndExit("Option conflict: devel version requires --home")
-          case v: Version.Stable =>
-            Setup.default(v) match {
-              case Right(setup) => setup
-              case Left(reason) => sys.error(reason.explain)
-            }
+        Setup.default(options.version, options.update) match {
+          case Right(setup) => setup
+          case Left(reason) => sys.error(reason.explain)
         }
       case Some(home) =>
         Setup(home, Options.platform, options.version)

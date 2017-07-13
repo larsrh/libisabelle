@@ -37,7 +37,7 @@ case class Options(
   component: List[Path],
 
   @ValueDescription("path")
-  @HelpMessage("Isabelle home directory (not checked against version; if unspecified, Isabelle will be downloaded if necessary)")
+  @HelpMessage("Isabelle home directory (not checked against version; if unspecified, Isabelle will be downloaded if necessary; conflicts with --update)")
   home: Option[Path],
 
   @ValueDescription("path")
@@ -68,14 +68,22 @@ case class Options(
   @HelpMessage("verbose logging output")
   verbose: Boolean = false,
 
-  @HelpMessage("initialize or update devel copy according to version identifier (requires devel version)")
+  @HelpMessage("initialize or update devel copy according to version identifier (requires devel version; conflicts with --home)")
   update: Boolean = false
 ) {
 
-  version match {
-    case Version.Stable(_) if update =>
-      Options.usageAndExit("Option conflict: --update requires devel version")
-    case _ =>
+  def check(): Unit = {
+    if (update) {
+      version match {
+        case Version.Stable(_) => Options.usageAndExit("Option conflict: --update requires devel version")
+        case _ =>
+      }
+
+      home match {
+        case Some(_) => Options.usageAndExit("Option conflict: --update only works if no --home is specified")
+        case _ =>
+      }
+    }
   }
 
   lazy val userPath: Path = (user, freshUser) match {
@@ -124,7 +132,7 @@ object Options {
 
   def parse[T](args: List[String])(f: (Options, List[String]) => T): T = CaseApp.parseWithHelp[Options](args) match {
     case Right((options, help, usage, rest)) =>
-      LoggingBackend.console("info.hupel" -> {
+      LoggingBackend.console("" -> {
         if (options.verbose)
           Level.Debug
         else

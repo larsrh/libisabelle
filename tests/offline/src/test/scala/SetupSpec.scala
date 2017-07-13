@@ -20,14 +20,14 @@ class SetupSpec(val specs2Env: Env) extends Specification with DefaultSetup { de
     val dir = Files.createTempDirectory("libisabelle_test")
     val platform = Platform.genericPlatform(dir)
     Files.createDirectories(platform.setupStorage)
-    Setup.detect(platform, version) must beLeft(Setup.Absent)
+    Setup.detect(platform, version, false) must beLeft(Setup.Absent)
   }
 
   def corrupted = {
     val dir = Files.createTempDirectory("libisabelle_test")
     val platform = Platform.genericPlatform(dir)
-    Files.createDirectories(platform.setupStorage(version))
-    Setup.detect(platform, version) must beLeft.like {
+    Files.createDirectories(platform.setupStorage(version, true))
+    Setup.detect(platform, version, false) must beLeft.like {
       case Setup.Corrupted(_) => true
     }
   }

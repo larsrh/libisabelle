@@ -191,6 +191,7 @@ lazy val setup = project.in(file("modules/setup"))
       "io.get-coursier" %% "coursier" % "1.0.0-RC3",
       "io.get-coursier" %% "coursier-cache" % "1.0.0-RC3",
       "org.apache.commons" % "commons-compress" % "1.13",
+      "org.eclipse.jgit" % "org.eclipse.jgit" % "4.8.0.201706111038-r",
       "commons-io" % "commons-io" % "2.5"
     )
   )
@@ -379,7 +380,7 @@ lazy val workbench = project.in(file("modules/workbench"))
       import scala.concurrent.Await
       import monix.execution.Scheduler.Implicits.global
 
-      val setup = Setup.default(Version.Stable("2016-1")).right.get
+      val setup = Setup.default(Version.Stable("2016-1"), false).right.get
       val resources = Resources.dumpIsabelleResources().right.get
       val config = Configuration.simple("HOL-Protocol")
       val env = Await.result(setup.makeEnvironment(resources), Duration.Inf)
