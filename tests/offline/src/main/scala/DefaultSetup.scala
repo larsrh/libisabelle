@@ -38,7 +38,11 @@ trait BasicSetup {
   lazy val version: Version.Stable =
     Option(java.lang.System.getenv("ISABELLE_VERSION")).orElse(
       specs2Env.arguments.commandLine.value("isabelle.version")
-    ).map(Version.Stable.apply).get
+    ).map(Version.parse) match {
+      case None | Some(Left(_)) => sys.error("no or invalid test version specified")
+      case Some(Right(v: Version.Stable)) => v
+      case _ => sys.error("unsupported test version")
+    }
 
   lazy val platform: Platform = Platform.guess.get
   lazy val setup: Setup = Setup.detect(platform, version, false).right.get

@@ -1,8 +1,9 @@
 language: java
 env:
   matrix:
-    - ISABELLE_VERSION=2016 SCALA_VERSION=2.11.8 PROFILE=quick
-    - ISABELLE_VERSION=2016-1 SCALA_VERSION=2.11.8 PROFILE=quick
+    - ISABELLE_VERSION=stable:2016 SCALA_VERSION=2.11.8 PROFILE=quick
+    - ISABELLE_VERSION=stable:2016-1 SCALA_VERSION=2.11.8 PROFILE=quick
+    - ISABELLE_VERSION=devel:isabelle-mirror SCALA_VERSION=2.11.8 PROFILE=devel
 os:
   - osx
 script:
@@ -25,28 +26,28 @@ deploy:
       secure: YesgpQ6CanVwyHpp852CEHPOt78hdUSZMvPUDE5x1uAWY4U55qIOAFC9kCEqIkAAvUcq7GSuGGmHzDhlhXQic9nEj/YWkLkTypfE7kUicIqcsjhuwn9OF7n4Tu6zQJv2qMtSl2RlGyNEP2UhtBJHb+ukQA33+p06mBhKHJKZ06I=
 matrix:
   include:
-    - env: ISABELLE_VERSION=2016 SCALA_VERSION=2.10.6 PROFILE=quick
+    - env: ISABELLE_VERSION=stable:2016 SCALA_VERSION=2.10.6 PROFILE=quick
       os: linux
       jdk: oraclejdk8
       addons:
         apt:
           packages:
             - lib32stdc++6
-    - env: ISABELLE_VERSION=2016 SCALA_VERSION=2.11.8 PROFILE=slow DEPLOY=1
+    - env: ISABELLE_VERSION=stable:2016 SCALA_VERSION=2.11.8 PROFILE=slow DEPLOY=1
       os: linux
       jdk: oraclejdk8
       addons:
         apt:
           packages:
             - lib32stdc++6
-    - env: ISABELLE_VERSION=2016-1 SCALA_VERSION=2.11.8 PROFILE=slow
+    - env: ISABELLE_VERSION=stable:2016-1 SCALA_VERSION=2.12.2 PROFILE=slow
       os: linux
       jdk: oraclejdk8
       addons:
         apt:
           packages:
             - lib32stdc++6
-    - env: ISABELLE_VERSION=2016-1 SCALA_VERSION=2.12.2 PROFILE=slow
+    - env: ISABELLE_VERSION=devel:isabelle-mirror SCALA_VERSION=2.12.2 PROFILE=devel
       os: linux
       jdk: oraclejdk8
       addons:
@@ -61,3 +62,4 @@ cache:
 before_cache:
   - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
   - find $HOME/.sbt -name "*.lock" -delete
+  - rm -rf $HOME/.local/share/libisabelle/devel

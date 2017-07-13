@@ -3,6 +3,9 @@ import SiteKeys._
 import UnidocKeys._
 import sbtassembly.AssemblyPlugin.defaultShellScript
 
+// FIXME duplicated code
+val Version = "(stable:|devel:|)([a-zA-Z0-9-_]+)".r
+
 lazy val standardSettings = Seq(
   organization := "info.hupel",
   scalaVersion := "2.11.8",
@@ -43,8 +46,8 @@ lazy val standardSettings = Seq(
   autoAPIMappings := true,
   isabelleVersions := {
     sys.env.get("ISABELLE_VERSION") match {
-      case None => Seq("2016", "2016-1")
-      case Some(ver) => Seq(ver)
+      case Version("stable:" | "", id) => Seq(id)
+      case _ => Seq("2016", "2016-1")
     }
   }
 )
