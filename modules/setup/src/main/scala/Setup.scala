@@ -187,8 +187,8 @@ final case class Setup(home: Path, platform: Platform, version: Version) {
    * Prepares a fresh [[info.hupel.isabelle.api.Environment]] using the
    * [[Resolver.Default default resolver]].
    */
-  def makeEnvironment(resources: Resources)(implicit scheduler: Scheduler): Future[Environment] =
-    makeEnvironment(Resolver.Default, platform.userStorage(version), List(resources.component))
+  def makeEnvironment(resources: Resources, options: List[OptionKey.Update])(implicit scheduler: Scheduler): Future[Environment] =
+    makeEnvironment(Resolver.Default, platform.userStorage(version), List(resources.component), options)
 
   /**
    * Prepares a fresh [[info.hupel.isabelle.api.Environment]].
@@ -196,8 +196,8 @@ final case class Setup(home: Path, platform: Platform, version: Version) {
    * If the [[Resolver resolver]] found an appropriate classpath, this method
    * also checks for matching [[info.hupel.isabelle.api.BuildInfo build info]].
    */
-  def makeEnvironment(resolver: Resolver, user: Path, components: List[Path])(implicit scheduler: Scheduler): Future[Environment] = {
-    val context = Environment.Context(home, user, components)
+  def makeEnvironment(resolver: Resolver, user: Path, components: List[Path], options: List[OptionKey.Update])(implicit scheduler: Scheduler): Future[Environment] = {
+    val context = Environment.Context(home, user, components, options)
     version match {
       case v: Version.Devel => GenericEnvironment(context, v, platform) match {
         case Right(env) => Future.successful(env)

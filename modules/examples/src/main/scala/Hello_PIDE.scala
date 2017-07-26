@@ -17,7 +17,7 @@ object Hello_PIDE extends App {
 
   val transaction =
     for {
-      env <- setup.makeEnvironment(resources)
+      env <- setup.makeEnvironment(resources, Nil)
       sys <- System.create(env, config)
       response <- sys.invoke(Operation.Hello)("world")
       _ = println(response.unsafeGet)

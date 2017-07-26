@@ -44,7 +44,11 @@ object Environment {
     val constructor = env.getDeclaredConstructor(classOf[Environment.Context])
     constructor.setAccessible(true)
 
-    constructor.newInstance(context)
+    import context.scheduler
+
+    constructor.newInstance(context.copy(options =
+      OptionKey.Bool("ML_statistics").set(false) :: context.options
+    ))
   }
 
 
@@ -65,7 +69,7 @@ object Environment {
   sealed trait Unicode
 
   /** Bundles all requirements to instantiate an [[Environment environment]]. */
-  case class Context(home: Path, user: Path, components: List[Path])(implicit val scheduler: Scheduler) {
+  case class Context(home: Path, user: Path, components: List[Path], options: List[OptionKey.Update])(implicit val scheduler: Scheduler) {
     def executorService = scheduler.toExecutorService
   }
 

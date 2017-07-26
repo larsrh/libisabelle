@@ -81,9 +81,12 @@ object Main {
     }
 
     logger.info(s"Using ${options.configuration}")
+    val updates = List(
+      OptionKey.Integer("threads").set(Runtime.getRuntime.availableProcessors)
+    )
     lazy val bundle = for {
       cs <- CancelableFuture(components, Cancelable.empty)
-      env <- setup.makeEnvironment(Resolver.Default, options.userPath, cs)
+      env <- setup.makeEnvironment(Resolver.Default, options.userPath, cs, updates)
     } yield Bundle(env, setup, options.configuration)
 
     val app = rest match {

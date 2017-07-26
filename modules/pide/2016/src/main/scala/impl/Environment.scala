@@ -34,7 +34,9 @@ final class Environment private(context: api.Environment.Context) extends api.En
   protected[isabelle] type Session = isabelle.Session
 
   private lazy val options =
-    isabelle.Options.init().bool.update("ML_statistics", false)
+    context.options.foldLeft(isabelle.Options.init()) { (options, update) =>
+      options + (update.key, update.value)
+    }
 
   private def mkPaths(paths: List[Path]) =
     paths.map(p => isabelle.Path.explode(isabellePath(p.toAbsolutePath.toString)))

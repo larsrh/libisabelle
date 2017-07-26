@@ -32,6 +32,9 @@ object GenericEnvironment {
 
 final class GenericEnvironment private(context: Environment.Context, version: Version) extends Environment(context, Some(version)) {
 
+  if (context.options.nonEmpty)
+    logger.warn("Ignoring options")
+
   protected[isabelle] val exitTag = ""
   protected[isabelle] val functionTag = ""
   protected[isabelle] val initTag = ""

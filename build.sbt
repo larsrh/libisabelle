@@ -386,7 +386,7 @@ lazy val workbench = project.in(file("modules/workbench"))
       val setup = Setup.default(Version.Stable("2016-1"), false).right.get
       val resources = Resources.dumpIsabelleResources().right.get
       val config = Configuration.simple("HOL-Protocol")
-      val env = Await.result(setup.makeEnvironment(resources), Duration.Inf)
+      val env = Await.result(setup.makeEnvironment(resources, Nil), Duration.Inf)
       System.build(env, config)
       val system = Await.result(System.create(env, config), Duration.Inf)
 

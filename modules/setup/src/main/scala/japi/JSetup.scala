@@ -20,7 +20,7 @@ object JSetup {
     defaultSetup(version, Duration.Inf)
 
   def makeEnvironment(setup: Setup, resources: JResources, timeout: Duration): Environment =
-    Await.result(setup.makeEnvironment(resources.getResources()), timeout)
+    Await.result(setup.makeEnvironment(resources.getResources(), Nil), timeout)
 
   def makeEnvironment(setup: Setup, resources: JResources): Environment =
     makeEnvironment(setup, resources, Duration.Inf)
