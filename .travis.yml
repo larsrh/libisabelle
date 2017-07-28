@@ -3,7 +3,6 @@ env:
   matrix:
     - ISABELLE_VERSION=stable:2016 SCALA_VERSION=2.11.8 PROFILE=quick
     - ISABELLE_VERSION=stable:2016-1 SCALA_VERSION=2.11.8 PROFILE=quick
-    - ISABELLE_VERSION=devel:isabelle-mirror SCALA_VERSION=2.11.8 PROFILE=devel
 os:
   - osx
 script:
