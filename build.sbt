@@ -1,6 +1,3 @@
-import GhPagesKeys._
-import SiteKeys._
-import UnidocKeys._
 import sbtassembly.AssemblyPlugin.defaultShellScript
 
 // FIXME duplicated code
@@ -8,8 +5,8 @@ val Version = "(stable:|devel:|)([a-zA-Z0-9-_]+)".r
 
 lazy val standardSettings = Seq(
   organization := "info.hupel",
-  scalaVersion := "2.11.8",
-  crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.2"),
+  scalaVersion := "2.12.3",
+  crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.3"),
   javacOptions += "-Xlint:unchecked",
   homepage := Some(url("http://lars.hupel.info/libisabelle/")),
   licenses := Seq(
@@ -114,29 +111,32 @@ lazy val root = project.in(file("."))
     workbench
   )
 
+lazy val tutDirectory = settingKey[String]("tut directory")
+
 lazy val docs = project.in(file("modules/docs"))
   .dependsOn(setup, pidePackage)
   .settings(moduleName := "libisabelle-docs")
   .settings(standardSettings)
-  .settings(unidocSettings)
   .settings(macroSettings)
-  .settings(site.settings ++ site.includeScaladoc("api/nightly"))
-  .settings(ghpages.settings)
   .settings(loggingSettings)
-  .enablePlugins(TutPlugin)
+  .enablePlugins(TutPlugin, ScalaUnidocPlugin, SiteScaladocPlugin, GhpagesPlugin)
   .settings(
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(pideInterface, libisabelle, setup),
     doc in Compile := (doc in ScalaUnidoc).value,
     target in unidoc in ScalaUnidoc := crossTarget.value / "api",
+    siteSubdirName in SiteScaladoc := "api/nightly",
     ghpagesNoJekyll := false,
     git.remoteRepo := "git@github.com:larsrh/libisabelle.git",
     includeFilter in makeSite := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.yml" | "*.md" | "Gemfile" | "config",
     watchSources ++= (siteSourceDirectory.value ** "*").get,
     watchSources += ((baseDirectory in ThisBuild).value / "README.md"),
     siteMappings += ((baseDirectory in ThisBuild).value / "README.md", "_includes/README.md"),
-    site.addMappingsToSiteDir(tut, "_tut"),
+    tutDirectory := "_tut",
     // this seems to be required for scalog
     libraryDependencies += "com.typesafe" % "config" % "1.3.1"
+  )
+  .settings(
+    addMappingsToSiteDir(tut, tutDirectory)
   )
 
 addCommandAlias("pushSite", "; docs/makeSite ; docs/ghpagesPushSite")
@@ -152,7 +152,7 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.2",
       "io.monix" %% "monix-execution" % "2.3.0",
-      "org.log4s" %% "log4s" % "1.3.4"
+      "org.log4s" %% "log4s" % "1.3.6"
     )
   )
 
@@ -167,7 +167,7 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
       "org.typelevel" %% "cats-core" % "0.9.0",
       "org.typelevel" %% "cats-free" % "0.9.0",
       "com.lihaoyi" %% "scalatags" % "0.6.5",
-      "org.apache.commons" % "commons-lang3" % "3.5",
+      "org.apache.commons" % "commons-lang3" % "3.6",
       "info.hupel" % "classy" % "0.1.4"
     ),
     libraryDependencies += {
@@ -191,9 +191,9 @@ lazy val setup = project.in(file("modules/setup"))
   .settings(warningSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "io.get-coursier" %% "coursier" % "1.0.0-RC3",
-      "io.get-coursier" %% "coursier-cache" % "1.0.0-RC3",
-      "org.apache.commons" % "commons-compress" % "1.13",
+      "io.get-coursier" %% "coursier" % "1.0.0-RC8",
+      "io.get-coursier" %% "coursier-cache" % "1.0.0-RC8",
+      "org.apache.commons" % "commons-compress" % "1.14",
       "org.eclipse.jgit" % "org.eclipse.jgit" % "4.8.0.201706111038-r",
       "commons-io" % "commons-io" % "2.5"
     )
@@ -274,7 +274,7 @@ lazy val tests = project.in(file("tests"))
   .settings(noPublishSettings)
   .aggregate(offlineTest, pureTest, holTest)
 
-val specs2Version = "3.8.9"
+val specs2Version = "3.9.4"
 
 lazy val offlineTest = project.in(file("tests/offline"))
   .dependsOn(setup, pidePackage)
