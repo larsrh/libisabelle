@@ -1,5 +1,3 @@
-import sbtassembly.AssemblyPlugin.defaultShellScript
-
 // FIXME duplicated code
 val Version = "(stable:|devel:|)([a-zA-Z0-9-_]+)".r
 
@@ -330,7 +328,9 @@ lazy val cli = project.in(file("modules/cli"))
     libraryDependencies += "com.github.alexarchambault" %% "case-app" % "1.1.3",
     mainClass in Compile := Some("info.hupel.isabelle.cli.Main"),
     assemblyJarName in assembly := s"isabellectl-assembly-${version.value}",
-    assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript))
+    assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(
+      Seq("#!/usr/bin/env sh", """exec java -jar "$0" "$@"""" + "\n")
+    ))
   )
   .enablePlugins(LibisabellePlugin)
 
