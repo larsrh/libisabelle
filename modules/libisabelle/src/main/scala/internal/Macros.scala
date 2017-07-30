@@ -8,8 +8,6 @@ import cats.syntax.traverse._
 import info.hupel.isabelle._
 import info.hupel.isabelle.pure._
 
-import macrocompat.bundle
-
 object Macros {
 
   def fuse(terms: List[Program[Term]], parts: List[String]): Program[String] = {
@@ -26,7 +24,6 @@ object Macros {
 
 }
 
-@bundle
 class Macros(val c: whitebox.Context { type PrefixType <: ExprStringContext.term.type }) {
 
   import c.universe.{Expr => _, _}

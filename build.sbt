@@ -4,7 +4,7 @@ val Version = "(stable:|devel:|)([a-zA-Z0-9-_]+)".r
 lazy val standardSettings = Seq(
   organization := "info.hupel",
   scalaVersion := "2.12.3",
-  crossScalaVersions := Seq("2.10.6", "2.11.10", "2.12.3"),
+  crossScalaVersions := Seq("2.11.10", "2.12.3"),
   javacOptions += "-Xlint:unchecked",
   homepage := Some(url("http://lars.hupel.info/libisabelle/")),
   licenses := Seq(
@@ -71,7 +71,6 @@ lazy val noPublishSettings = Seq(
 
 lazy val macroSettings = Seq(
   libraryDependencies ++= Seq(
-    "org.typelevel" %% "macro-compat" % "1.1.1",
     scalaOrganization.value % "scala-compiler" % scalaVersion.value % "provided",
     scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided",
     compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.patch)
