@@ -1,8 +1,8 @@
 language: java
 env:
   matrix:
-    - ISABELLE_VERSION=stable:2016 SCALA_VERSION=2.11.10 PROFILE=quick
-    - ISABELLE_VERSION=stable:2016-1 SCALA_VERSION=2.11.10 PROFILE=quick
+    - ISABELLE_VERSION=stable:2016 SCALA_VERSION=2.11.11 PROFILE=quick
+    - ISABELLE_VERSION=stable:2016-1 SCALA_VERSION=2.11.11 PROFILE=quick
 os:
   - osx
 script:
@@ -32,7 +32,7 @@ matrix:
         apt:
           packages:
             - lib32stdc++6
-    - env: ISABELLE_VERSION=stable:2016 SCALA_VERSION=2.11.10 PROFILE=slow
+    - env: ISABELLE_VERSION=stable:2016 SCALA_VERSION=2.11.11 PROFILE=slow
       os: linux
       jdk: oraclejdk8
       addons:
