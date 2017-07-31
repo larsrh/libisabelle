@@ -225,7 +225,8 @@ lazy val pideExtraSettings = Seq(
   libraryDependencies ++= Seq(
     "org.tukaani" % "xz" % "1.6",
     "com.jcraft" % "jsch" % "0.1.54",
-    "com.jcraft" % "jzlib" % "1.1.3"
+    "com.jcraft" % "jzlib" % "1.1.3",
+    ("org.scala-lang" % "scala-compiler" % scalaVersion.value).exclude("org.scala-lang", "scala-library")
   )
 )
 
