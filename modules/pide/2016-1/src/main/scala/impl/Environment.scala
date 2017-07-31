@@ -37,7 +37,6 @@ final class Environment private(context: api.Environment.Context) extends api.En
     context.options.foldLeft(isabelle.Options.init()) { (options, update) =>
       options + (update.key, update.value)
     }
-    isabelle.Options.init().bool.update("ML_statistics", false)
 
   private def mkPaths(paths: List[Path]) =
     paths.map(p => isabelle.Path.explode(isabellePath(p.toAbsolutePath.toString)))
