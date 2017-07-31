@@ -165,16 +165,9 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
       "org.typelevel" %% "cats-free" % "0.9.0",
       "com.lihaoyi" %% "scalatags" % "0.6.5",
       "org.apache.commons" % "commons-lang3" % "3.6",
-      "info.hupel" % "classy" % "0.1.4"
+      "info.hupel" % "classy" % "0.1.4",
+      "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
     ),
-    libraryDependencies += {
-      val version =
-        if (scalaVersion.value.startsWith("2.10"))
-          "0.5.0"
-        else
-          "0.8.0"
-      "org.scala-lang.modules" %% "scala-java8-compat" % version
-    },
     isabelleSessions in Compile := Seq(
       "Protocol",
       "HOL-Protocol"
@@ -208,16 +201,10 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
     buildInfoKeys := apiBuildInfoKeys,
     buildInfoPackage := "info.hupel.isabelle.impl",
     autoScalaLibrary := false,
-    libraryDependencies += "org.scala-lang" % "scala-library" % scalaVersion.value % "provided",
-    libraryDependencies ++= {
-      val dep =
-        ("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.6").exclude("org.scala-lang", "scala-library")
-
-      if (scalaVersion.value startsWith "2.10")
-        Seq()
-      else
-        Seq(dep)
-    },
+    libraryDependencies ++= Seq(
+      "org.scala-lang" % "scala-library" % scalaVersion.value % "provided",
+      ("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.6").exclude("org.scala-lang", "scala-library")
+    ),
     assemblyJarName := s"${moduleName.value}-assembly.jar"
   )
 
