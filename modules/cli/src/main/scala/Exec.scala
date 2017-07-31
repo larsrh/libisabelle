@@ -10,6 +10,8 @@ object Exec extends Command {
         logger.info(s"Starting Isabelle tool $tool with arguments ${args.mkString(" ")} ...")
         val rc = bundle.env.exec(tool, args)
         logger.info(s"Exited with status $rc")
+        if (rc > 0)
+          sys.exit(rc)
       }
     case Nil =>
       sys.error("missing parameters for 'exec'")
