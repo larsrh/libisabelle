@@ -218,18 +218,7 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
       else
         Seq(dep)
     },
-    proguardSettings,
-    ProguardKeys.options in Proguard ++= Seq(
-      "-keep public class info.hupel.isabelle.impl.Environment { public protected private *; }",
-      "-keep public class info.hupel.isabelle.impl.BuildInfo { public *; }",
-      "-dontoptimize",
-      "-dontobfuscate",
-      "-dontwarn",
-      "-dontnote",
-      "-ignorewarnings"
-    ),
-    ProguardKeys.proguardVersion in Proguard := "5.3.3",
-    ProguardKeys.outputs in Proguard := Seq(target.value / s"${moduleName.value}-assembly.jar")
+    assemblyJarName := s"${moduleName.value}-assembly.jar"
   )
 
 lazy val pideExtraSettings = Seq(
@@ -244,7 +233,7 @@ lazy val pide2016 = pide("2016")
 lazy val pide2016_1 = pide("2016-1").settings(pideExtraSettings)
 
 def assemblyGenerator(p: Project) = Def.task {
-  val Seq(source) = (ProguardKeys.proguard in Proguard in p).value
+  val source = (assembly in p).value
   val target = resourceManaged.value / source.getName
   val log = streams.value.log
   log.info(s"Copying assembly $source to $target ...")
