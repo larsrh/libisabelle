@@ -47,6 +47,7 @@ object Platform {
   def genericPlatform(localStorage0: Path): Platform =
     new Platform {
       val localStorage = localStorage0.toAbsolutePath
+      def withLocalStorage(path: Path) = genericPlatform(path)
     }
 
   /**
@@ -78,6 +79,8 @@ sealed abstract class Platform {
 
   /** Path where `libisabelle` stores files downloaded from the Internet. */
   def localStorage: Path
+
+  def withLocalStorage(path: Path): Platform
 
   final def withIsabelleVersion(path: Path, version: Version, resolved: Boolean): Path = version match {
     case Version.Stable(_) if !resolved => path
@@ -153,5 +156,10 @@ sealed abstract class OfficialPlatform private[isabelle](val name: String) exten
    */
   def url(version: Version.Stable): URL =
     new URL(s"${baseURL(version)}_$name.tar.gz")
+
+  final def withLocalStorage(path: Path): OfficialPlatform =
+    new OfficialPlatform(name) {
+      val localStorage = path
+    }
 
 }
