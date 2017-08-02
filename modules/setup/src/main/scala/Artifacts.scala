@@ -16,6 +16,8 @@ object Artifacts {
   private val logger = getLogger
 
   def fetch(platform: Platform, dependencies: Set[Dependency])(implicit ec: ExecutionContext): Future[List[Path]] = {
+    logger.debug("Fetching artifacts")
+
     val coursierStorage = platform.versionedStorage.resolve("coursier")
 
     val repositories = Seq(
@@ -49,7 +51,7 @@ object Artifacts {
     def fetchArtifact(artifact: Artifact, cachePolicy: CachePolicy) =
       Cache.file(artifact, cache = coursierStorage.toFile, logger = Some(downloadLogger), cachePolicy = cachePolicy)
 
-    platform.withAsyncLock { () =>
+    val result = platform.withAsyncLock { () =>
       for {
         resolution <- Resolution(dependencies).process.run(fetch).toScalaFuture
         artifacts = {
@@ -71,6 +73,8 @@ object Artifacts {
       yield
         res.map(_.fold(err => sys.error(err.toString), _.toPath))
     }
+    result.foreach(_ => logger.debug("Finished fetching artifacts"))
+    result
   }
 
 }

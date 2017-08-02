@@ -26,13 +26,18 @@ trait Resolver { self =>
     def resolve(platform: Platform, version: Version.Stable)(implicit ec: ExecutionContext) =
       // recoverWith instead of fallbackTo because the latter is eager
       // we don't want to run the second future unless necessary
-      self.resolve(platform, version).recoverWith { case _ => that.resolve(platform, version) }
+      self.resolve(platform, version).recoverWith { case _ =>
+        Resolver.logger.warn("Resolution failed, trying fallback")
+        that.resolve(platform, version)
+      }
   }
 
 }
 
 /** [[Resolver resolver]] instances. */
 object Resolver {
+
+  private val logger = getLogger
 
   /**
    * Default resolver: look in the [[Classpath classpath]] first, then resolve
@@ -55,6 +60,7 @@ object Resolver {
     private val logger = getLogger
 
     def resolve(platform: Platform, version: Version.Stable)(implicit ec: ExecutionContext) = {
+      logger.debug("Trying to resolve PIDE jar from classpath")
       val classLoader = getClass.getClassLoader
       val fileName = s"pide-${version.identifier}-assembly.jar"
       Option(classLoader.getResourceAsStream(fileName)) match {
@@ -81,6 +87,7 @@ object Resolver {
   object Maven extends Resolver {
 
     def resolve(platform: Platform, version: Version.Stable)(implicit ec: ExecutionContext) = {
+      logger.debug("Trying to resolve PIDE jar from Maven Central")
       val dependency = Dependency(
         Module(BuildInfo.organization, s"pide-${version.identifier}_${BuildInfo.scalaBinaryVersion}"),
         BuildInfo.version
