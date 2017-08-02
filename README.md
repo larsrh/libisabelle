@@ -16,13 +16,13 @@ For more information and documentation about the project, visit [its website](ht
 
 ## Including libisabelle into your project
 
-`libisabelle` is cross-built for Scala 2.10.x, 2.11.x, and 2.12.x.
+`libisabelle` is cross-built for Scala 2.11.x, and 2.12.x.
 Drop the following lines into your `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "info.hupel" %% "libisabelle" % "0.8.0",
-  "info.hupel" %% "libisabelle-setup" % "0.8.0"
+  "info.hupel" %% "libisabelle" % "0.9.0",
+  "info.hupel" %% "libisabelle-setup" % "0.9.0"
 )
 ```
 
@@ -30,7 +30,7 @@ With this configuration, the automatic Isabelle setup will fetch additional JAR 
 If you don't want this, additionally include the following dependency:
 
 ```scala
-  "info.hupel" %% "pide-package" % "0.8.0"
+  "info.hupel" %% "pide-package" % "0.9.0"
 ```
 
 This adds PIDE implementations for all supported Isabelle versions to your classpath.
@@ -38,7 +38,7 @@ This adds PIDE implementations for all supported Isabelle versions to your class
 
 ## Using the plugin
 
-There is an [SBT plugin](https://github.com/larsrh/sbt-libisabelle/) for working with Isabelle sources available.
+There is an [sbt plugin](https://github.com/larsrh/sbt-libisabelle/) for working with Isabelle sources available.
 Refer to its README for more information.
 You should use the plugin if your build contains Isabelle source files.
 
