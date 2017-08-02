@@ -68,7 +68,10 @@ case class Options(
   @HelpMessage("verbose logging output")
   verbose: Boolean = false,
 
-  @HelpMessage("initialize or update devel copy according to version identifier (requires devel version; conflicts with --home)")
+  @HelpMessage("do not download anything, use only local cache (conflicts with --update)")
+  offline: Boolean = false,
+
+  @HelpMessage("initialize or update devel copy according to version identifier (requires devel version; conflicts with --home and --offline)")
   update: Boolean = false
 ) {
 
@@ -83,6 +86,9 @@ case class Options(
         case Some(_) => Options.usageAndExit("Option conflict: --update only works if no --home is specified")
         case _ =>
       }
+
+      if (offline)
+        Options.usageAndExit("Option conflict: --update only works if no --offline is specified")
     }
   }
 

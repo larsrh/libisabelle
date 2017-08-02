@@ -27,7 +27,7 @@ object Setup {
    * Common trait for a reason why a [[Setup setup]] could not be
    * [[detect detected]].
    */
-  sealed trait NoSetup
+  sealed trait NoSetup { def explain: String }
 
   /**
    * Common trait for a reason why a [[Setup setup]] could not be
@@ -35,7 +35,9 @@ object Setup {
    */
   sealed trait SetupImpossible { def explain: String }
 
-  case object Absent extends NoSetup
+  case object Absent extends NoSetup {
+    def explain = "Setup is absent"
+  }
   case class Corrupted(path: Path) extends NoSetup with SetupImpossible {
     def explain = s"Possibly corrupted setup detected at $path; try deleting that folder and running again"
   }

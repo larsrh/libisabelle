@@ -15,8 +15,8 @@ object Artifacts {
 
   private val logger = getLogger
 
-  def fetch(platform: Platform, dependencies: Set[Dependency])(implicit ec: ExecutionContext): Future[List[Path]] = {
-    logger.debug("Fetching artifacts")
+  def fetch(platform: Platform, dependencies: Set[Dependency], offline: Boolean)(implicit ec: ExecutionContext): Future[List[Path]] = {
+    logger.debug(s"Fetching artifacts in ${if (offline) "offline" else "online"} mode")
 
     val coursierStorage = platform.versionedStorage.resolve("coursier")
 
@@ -27,8 +27,14 @@ object Artifacts {
     )
 
     val downloadLogger = new coursier.Cache.Logger {
-      override def downloadingArtifact(url: String, file: File) =
-        logger.debug(s"Downloading artifact from $url ...")
+      override def foundLocally(url: String, file: File) =
+        logger.debug(s"Using local cache of $url")
+      override def downloadingArtifact(url: String, file: File) = {
+        if (offline)
+          sys.error(s"Attempting to download from $url, but running in offline mode. Aborting.")
+        else
+          logger.debug(s"Downloading artifact from $url ...")
+      }
       override def downloadedArtifact(url: String, success: Boolean) = {
         val file = url.split('/').last
         if (success)
@@ -41,15 +47,32 @@ object Artifacts {
     def cache(policy: CachePolicy) =
       Cache.fetch(cache = coursierStorage.toFile, logger = Some(downloadLogger), cachePolicy = policy)
 
-    val fetch = Fetch.from(
-      repositories,
-      cache(CachePolicy.LocalUpdateChanging),
-      cache(CachePolicy.LocalOnly),
-      cache(CachePolicy.FetchMissing)
-    )
+    val fetch =
+      if (offline)
+        Fetch.from(
+          repositories,
+          cache(CachePolicy.LocalOnly)
+        )
+      else
+        Fetch.from(
+          repositories,
+          cache(CachePolicy.LocalUpdateChanging),
+          cache(CachePolicy.LocalOnly),
+          cache(CachePolicy.FetchMissing)
+        )
 
-    def fetchArtifact(artifact: Artifact, cachePolicy: CachePolicy) =
-      Cache.file(artifact, cache = coursierStorage.toFile, logger = Some(downloadLogger), cachePolicy = cachePolicy)
+    def fetchArtifact(artifact: Artifact) = {
+      def file(cachePolicy: CachePolicy) =
+        Cache.file(artifact, cache = coursierStorage.toFile, logger = Some(downloadLogger), cachePolicy = cachePolicy)
+
+      val task =
+        if (offline)
+          file(CachePolicy.LocalOnly)
+        else
+          file(CachePolicy.LocalOnly) orElse file(CachePolicy.FetchMissing)
+
+      task.run.toScalaFuture
+    }
 
     val result = platform.withAsyncLock { () =>
       for {
@@ -64,11 +87,7 @@ object Artifacts {
             else
               resolution.artifacts.toSet
           }
-        res <- Future.traverse(artifacts.toList)(artifact =>
-          (fetchArtifact(artifact, CachePolicy.LocalOnly)
-             orElse fetchArtifact(artifact, CachePolicy.FetchMissing))
-            .run.toScalaFuture
-        )
+        res <- Future.traverse(artifacts.toList)(fetchArtifact)
       }
       yield
         res.map(_.fold(err => sys.error(err.toString), _.toPath))

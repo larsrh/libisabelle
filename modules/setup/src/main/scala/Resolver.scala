@@ -44,7 +44,7 @@ object Resolver {
    * via [[Maven]].
    */
   def Default =
-    Classpath orElse Maven
+    Classpath orElse new Maven(false)
 
 
   /**
@@ -84,7 +84,7 @@ object Resolver {
    * Uses `coursier` under the hood to resolve artifacts from Maven and Ivy
    * repositories.
    */
-  object Maven extends Resolver {
+  class Maven(offline: Boolean) extends Resolver {
 
     def resolve(platform: Platform, version: Version.Stable)(implicit ec: ExecutionContext) = {
       logger.debug("Trying to resolve PIDE jar from Maven Central")
@@ -92,7 +92,7 @@ object Resolver {
         Module(BuildInfo.organization, s"pide-${version.identifier}_${BuildInfo.scalaBinaryVersion}"),
         BuildInfo.version
       )
-      Artifacts.fetch(platform, Set(dependency))
+      Artifacts.fetch(platform, Set(dependency), offline)
     }
 
   }
