@@ -60,7 +60,8 @@ lazy val warningSettings = Seq(
     "-Ywarn-value-discard",
     "-Xfatal-warnings"
   ),
-  scalacOptions in (Compile, doc) ~= (_.filterNot(_ == "-Xfatal-warnings"))
+  scalacOptions in (Compile, doc) ~= (_.filterNot(_ == "-Xfatal-warnings")),
+  scalacOptions in (Compile, console) := Seq()
 )
 
 lazy val noPublishSettings = Seq(
@@ -120,6 +121,12 @@ lazy val docs = project.in(file("modules/docs"))
   .settings(
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(pideInterface, libisabelle, setup),
     doc in Compile := (doc in ScalaUnidoc).value,
+    scalacOptions in (ScalaUnidoc, unidoc) ++= Seq(
+      "-doc-title", "libisabelle",
+      "-doc-version", version.value,
+      "-doc-source-url", s"https://github.com/larsrh/libisabelle/blob/${"git rev-parse HEAD" !!}€{FILE_PATH}.scala",
+      "-sourcepath", (baseDirectory in ThisBuild).value.getAbsolutePath
+    ),
     target in unidoc in ScalaUnidoc := crossTarget.value / "api",
     siteSubdirName in SiteScaladoc := "api/nightly",
     ghpagesNoJekyll := false,
