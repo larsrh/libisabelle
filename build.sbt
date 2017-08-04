@@ -1,3 +1,5 @@
+import scala.sys.process._
+
 // FIXME duplicated code
 val Version = "(stable:|devel:|)([a-zA-Z0-9-_]+)".r
 
@@ -66,8 +68,8 @@ lazy val warningSettings = Seq(
 )
 
 lazy val noPublishSettings = Seq(
-  publish := (),
-  publishLocal := (),
+  publish := (()),
+  publishLocal := (()),
   publishArtifact := false
 )
 
@@ -133,8 +135,6 @@ lazy val docs = project.in(file("modules/docs"))
     ghpagesNoJekyll := false,
     git.remoteRepo := "git@github.com:larsrh/libisabelle.git",
     includeFilter in makeSite := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.yml" | "*.md" | "Gemfile" | "config",
-    watchSources ++= (siteSourceDirectory.value ** "*").get,
-    watchSources += ((baseDirectory in ThisBuild).value / "README.md"),
     siteMappings += ((baseDirectory in ThisBuild).value / "README.md", "_includes/README.md"),
     tutDirectory := "_tut",
     // this seems to be required for scalog
@@ -399,6 +399,8 @@ import ReleaseTransformations._
 releaseVcsSign := true
 releaseCrossBuild := true
 
+releasePublishArtifactsAction := PgpKeys.publishSigned.value
+
 releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,
   inquireVersions,
@@ -406,10 +408,10 @@ releaseProcess := Seq[ReleaseStep](
   setReleaseVersion,
   commitReleaseVersion,
   tagRelease,
-  ReleaseStep(action = Command.process("publishSigned", _), enableCrossBuild = true),
+  publishArtifacts,
   setNextVersion,
   commitNextVersion,
-  ReleaseStep(action = Command.process("sonatypeRelease", _))
+  releaseStepCommand("sonatypeRelease")
 )
 
 
