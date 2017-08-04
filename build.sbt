@@ -54,6 +54,7 @@ lazy val warningSettings = Seq(
     "-encoding", "UTF-8",
     "-unchecked",
     "-Xlint",
+    "-Ypartial-unification",
     "-Yno-adapted-args",
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
@@ -74,7 +75,7 @@ lazy val macroSettings = Seq(
   libraryDependencies ++= Seq(
     scalaOrganization.value % "scala-compiler" % scalaVersion.value % "provided",
     scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided",
-    compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.patch)
+    compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.patch)
   )
 )
 
@@ -155,7 +156,7 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
     buildInfoPackage := "info.hupel.isabelle.api",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.2",
-      "io.monix" %% "monix-execution" % "2.3.0",
+      "io.monix" %% "monix-execution" % "3.0.0-22bf9c6",
       "org.log4s" %% "log4s" % "1.3.6"
     )
   )
@@ -168,8 +169,8 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
   .settings(macroSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "0.9.0",
-      "org.typelevel" %% "cats-free" % "0.9.0",
+      "org.typelevel" %% "cats-core" % "1.0.0-MF",
+      "org.typelevel" %% "cats-free" % "1.0.0-MF",
       "com.lihaoyi" %% "scalatags" % "0.6.5",
       "org.apache.commons" % "commons-lang3" % "3.6",
       "info.hupel" % "classy" % "0.1.4",

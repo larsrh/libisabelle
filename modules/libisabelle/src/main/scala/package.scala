@@ -4,7 +4,6 @@ import scala.concurrent._
 import scala.util._
 
 import monix.execution.CancelableFuture
-import monix.execution.cancelables.MultiAssignmentCancelable
 
 import cats.Monad
 import cats.free.Free
@@ -46,25 +45,11 @@ package object isabelle {
 
   }
 
-  final implicit class CancelableFutureOps[A](future: CancelableFuture[A]) {
-    def flatMapC[B](cont: A => CancelableFuture[B])(implicit ec: ExecutionContext): CancelableFuture[B] = {
-      val conn = MultiAssignmentCancelable()
-      val c1 = future.flatMap { a =>
-        val c2 = cont(a)
-        conn.orderedUpdate(c2, order = 2)
-        c2
-      }
-
-      conn.orderedUpdate(c1, order = 1)
-      CancelableFuture(c1, conn)
-    }
-  }
-
   implicit def cancelableFutureMonad(implicit ec: ExecutionContext): Monad[CancelableFuture] = new Monad[CancelableFuture] {
     def pure[A](x: A) = CancelableFuture.successful(x)
-    def flatMap[A, B](fa: CancelableFuture[A])(f: A => CancelableFuture[B]) = fa.flatMapC(f)
+    def flatMap[A, B](fa: CancelableFuture[A])(f: A => CancelableFuture[B]) = fa.flatMap(f)
     def tailRecM[B, C](b: B)(f: B => CancelableFuture[Either[B, C]]) =
-      f(b).flatMapC {
+      f(b).flatMap {
         case Left(b1) => tailRecM(b1)(f)
         case Right(c) => pure(c)
       }

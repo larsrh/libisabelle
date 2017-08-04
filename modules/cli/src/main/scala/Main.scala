@@ -45,7 +45,7 @@ object Main {
       else
         Set()
 
-    val classpath = options.fetch.traverseU(Parse.moduleVersion(_, BuildInfo.scalaBinaryVersion)) match {
+    val classpath = options.fetch.traverse(Parse.moduleVersion(_, BuildInfo.scalaBinaryVersion)) match {
       case Right(Nil) if !options.afp => Future.successful { Nil }
       case Right(modules) => Artifacts.fetch(Options.platform, modules.map { case (mod, v) => Dependency(mod, v) }.toSet ++ afp, options.offline)
       case Left(error) => sys.error(s"could not parse dependency: $error")
@@ -102,7 +102,7 @@ object Main {
           case None =>
             Options.usageAndExit(s"no such command `$cmd`")
           case Some(cmd) =>
-            bundle.flatMapC(cmd.cancelableRun(_, rest))
+            bundle.flatMap(cmd.cancelableRun(_, rest))
         }
       case _ => bundle.map(_ => ())
     }
