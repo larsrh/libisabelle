@@ -400,8 +400,6 @@ import ReleaseTransformations._
 releaseVcsSign := true
 releaseCrossBuild := true
 
-releasePublishArtifactsAction := PgpKeys.publishSigned.value
-
 releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,
   inquireVersions,
@@ -409,7 +407,7 @@ releaseProcess := Seq[ReleaseStep](
   setReleaseVersion,
   commitReleaseVersion,
   tagRelease,
-  publishArtifacts,
+  releaseStepCommand("publishSigned"),
   setNextVersion,
   commitNextVersion,
   releaseStepCommand("sonatypeRelease")
