@@ -185,6 +185,8 @@ object Setup {
  */
 final case class Setup(home: Path, platform: Platform, version: Version) {
 
+  private val logger = getLogger
+
   /**
    * Prepares a fresh [[info.hupel.isabelle.api.Environment]] using the
    * [[Resolver.Default default resolver]].
@@ -200,12 +202,18 @@ final case class Setup(home: Path, platform: Platform, version: Version) {
    */
   def makeEnvironment(resolver: Resolver, user: Path, components: List[Path], options: List[OptionKey.Update])(implicit scheduler: Scheduler): Future[Environment] = {
     val context = Environment.Context(home, user, components, options)
+    def makeGenericEnvironment = GenericEnvironment(context, version, platform) match {
+      case Right(env) => Future.successful(env)
+      case Left(err) => Future.failed(new RuntimeException(err.explain))
+    }
+
     version match {
-      case v: Version.Devel => GenericEnvironment(context, v, platform) match {
-        case Right(env) => Future.successful(env)
-        case Left(err) => Future.failed(new RuntimeException(err.explain))
-      }
-      case v: Version.Stable => resolver.resolve(platform, v).map(Environment.instantiate(version, _, context))
+      case v: Version.Devel => makeGenericEnvironment
+      case v: Version.Stable =>
+        resolver.resolve(platform, v).map(Environment.instantiate(version, _, context)).recoverWith { case ex =>
+          logger.warn(ex)("Environment could not be instantiated, falling back to generic environment")
+          makeGenericEnvironment
+        }
     }
   }
 

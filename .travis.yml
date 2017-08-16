@@ -25,6 +25,13 @@ deploy:
       secure: YesgpQ6CanVwyHpp852CEHPOt78hdUSZMvPUDE5x1uAWY4U55qIOAFC9kCEqIkAAvUcq7GSuGGmHzDhlhXQic9nEj/YWkLkTypfE7kUicIqcsjhuwn9OF7n4Tu6zQJv2qMtSl2RlGyNEP2UhtBJHb+ukQA33+p06mBhKHJKZ06I=
 matrix:
   include:
+    - env: ISABELLE_VERSION=stable:2015 SCALA_VERSION=2.11.11 PROFILE=generic
+      os: linux
+      jdk: oraclejdk8
+      addons:
+        apt:
+          packages:
+            - lib32stdc++6
     - env: ISABELLE_VERSION=stable:2016 SCALA_VERSION=2.11.11 PROFILE=slow
       os: linux
       jdk: oraclejdk8
