@@ -38,11 +38,6 @@ lazy val standardSettings = Seq(
         <url>http://lars.hupel.info</url>
       </developer>
     </developers>
-    <scm>
-      <connection>scm:git:github.com/larsrh/libisabelle.git</connection>
-      <developerConnection>scm:git:git@github.com:larsrh/libisabelle.git</developerConnection>
-      <url>https://github.com/larsrh/libisabelle</url>
-    </scm>
   ),
   credentials += Credentials(
     Option(System.getProperty("build.publish.credentials")) map (new File(_)) getOrElse (Path.userHome / ".ivy2" / ".credentials")
