@@ -100,7 +100,7 @@ lazy val root = project.in(file("."))
     pideInterface, libisabelle, setup,
     tests, docs, examples,
     cli,
-    pide2016, pide2016_1,
+    pide2016, pide2016_1, pide2017_RC0,
     pidePackage,
     workbench
   )
@@ -166,7 +166,7 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
       "org.typelevel" %% "cats-free" % "1.0.0-MF",
       "com.lihaoyi" %% "scalatags" % "0.6.5",
       "org.apache.commons" % "commons-lang3" % "3.6",
-      "info.hupel" % "classy" % "0.1.4",
+      "info.hupel" % "classy" % "0.1.5",
       "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
     ),
     isabelleSessions in Compile := Seq(
@@ -220,6 +220,10 @@ lazy val pideExtraSettings = Seq(
 
 lazy val pide2016 = pide("2016")
 lazy val pide2016_1 = pide("2016-1").settings(pideExtraSettings)
+lazy val pide2017_RC0 = pide("2017-RC0").settings(pideExtraSettings)
+  .settings(
+    libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.20.0"
+  )
 
 def assemblyGenerator(p: Project) = Def.task {
   val source = (assembly in p).value
@@ -237,7 +241,8 @@ lazy val pidePackage = project.in(file("modules/pide-package"))
   .settings(
     resourceGenerators in Compile ++= Seq(
       assemblyGenerator(pide2016).taskValue,
-      assemblyGenerator(pide2016_1).taskValue
+      assemblyGenerator(pide2016_1).taskValue,
+      assemblyGenerator(pide2017_RC0).taskValue
     )
   )
 

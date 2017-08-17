@@ -26,8 +26,8 @@ object Platform {
       Prop[File]("user.home").value.toPath.resolve(".local/share/libisabelle").toAbsolutePath
   }
 
-  /** Universal Windows platform for both 32- and 64-bit machines. */
-  case object Windows extends OfficialPlatform("windows") {
+  /** Windows platform for both 64-bit machines. */
+  case object Windows extends OfficialPlatform("windows64") {
     def localStorage =
       Paths.get(sys.env("LOCALAPPDATA")).resolve("libisabelle").toAbsolutePath
   }

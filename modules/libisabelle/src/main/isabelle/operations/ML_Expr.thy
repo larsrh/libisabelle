@@ -10,7 +10,7 @@ operation_setup eval_expr = \<open>
    to_lib = Codec.tree,
    action = fn (typ, prog, thy_name) =>
     let
-      val thy = Thy_Info.get_theory thy_name
+      val thy = get_theory thy_name
       val ctxt = Proof_Context.init_global thy
     in
       ML_Expr.eval ctxt prog typ
@@ -21,7 +21,7 @@ operation_setup eval_opaque_expr = \<open>
    to_lib = Codec.tuple Codec.int Codec.tree,
    action = fn ((table, repr_typ, conv), prog, thy_name) =>
     let
-      val thy = Thy_Info.get_theory thy_name
+      val thy = get_theory thy_name
       val ctxt = Proof_Context.init_global thy
     in
       ML_Expr.eval_opaque ctxt prog {table = table, repr_typ = repr_typ, conv = conv}
@@ -32,7 +32,7 @@ operation_setup check_expr = \<open>
    to_lib = Codec.option Codec.string,
    action = fn (typ, prog, thy_name) =>
     let
-      val thy = Thy_Info.get_theory thy_name
+      val thy = get_theory thy_name
       val ctxt = Proof_Context.init_global thy
     in
       ML_Expr.check ctxt prog typ

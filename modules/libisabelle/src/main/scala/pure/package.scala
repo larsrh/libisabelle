@@ -18,7 +18,7 @@ package object pure {
 
   object Theory {
     val get: ml.Expr[String => Theory] =
-      ml.Expr.uncheckedLiteral("Thy_Info.get_theory")
+      ml.Expr.uncheckedLiteral("get_theory")
 
     implicit val thyOpaque: ml.Opaque[Theory] = ml.Opaque.make("Refs.Thy")
   }

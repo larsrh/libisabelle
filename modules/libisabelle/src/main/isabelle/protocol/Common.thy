@@ -7,6 +7,7 @@ ML_cond ("2016") \<open>
   val parse_int = Markup.parse_int
   val print_bool = Markup.print_bool
   val parse_bool = Markup.parse_bool
+  val get_theory = Thy_Info.get_theory
 \<close>
 
 ML_cond ("2016-1") \<open>
@@ -14,6 +15,19 @@ ML_cond ("2016-1") \<open>
   val parse_int = Value.parse_int
   val print_bool = Value.print_bool
   val parse_bool = Value.parse_bool
+  val get_theory = Thy_Info.get_theory
+\<close>
+
+ML_cond ("2017-RC0") \<open>
+  val print_int = Value.print_int
+  val parse_int = Value.parse_int
+  val print_bool = Value.print_bool
+  val parse_bool = Value.parse_bool
+  fun get_theory name =
+    let
+      val all = Thy_Info.get_names ()
+      val qualified = find_first (fn name' => name = Long_Name.base_name name') all
+    in Thy_Info.get_theory (the qualified) end
 \<close>
 
 ML\<open>
