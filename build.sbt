@@ -1,15 +1,5 @@
 import scala.sys.process._
 
-// FIXME duplicated code
-val Version = "(stable:|devel:|)([a-zA-Z0-9-_]+)".r
-
-isabelleVersions in ThisBuild := {
-  sys.env.get("ISABELLE_VERSION") match {
-    case Some(Version("stable:" | "", id)) => Seq(id)
-    case _ => Seq("2016", "2016-1")
-  }
-}
-
 lazy val standardSettings = Seq(
   organization := "info.hupel",
   scalaVersion := "2.12.3",
@@ -42,6 +32,13 @@ lazy val standardSettings = Seq(
   credentials += Credentials(
     Option(System.getProperty("build.publish.credentials")) map (new File(_)) getOrElse (Path.userHome / ".ivy2" / ".credentials")
   ),
+  isabelleVersions := {
+    isabelleVersions.?.value match {
+      case Some(Seq()) => List(Version.Stable("2016"), Version.Stable("2016-1"), Version.Stable("2017-RC0"))
+      case Some(ver) => ver
+      case None => Nil
+    }
+  },
   autoAPIMappings := true
 )
 

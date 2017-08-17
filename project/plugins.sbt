@@ -13,4 +13,4 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "1.3.0")
 addSbtPlugin("org.tpolecat" % "tut-plugin" % "0.6.0")
 addSbtPlugin("com.thoughtworks.sbt-api-mappings" % "sbt-api-mappings" % "2.0.0")
 
-addSbtPlugin("info.hupel" % "sbt-libisabelle" % "0.5.1")
+addSbtPlugin("info.hupel" % "sbt-libisabelle" % "0.6.0")
