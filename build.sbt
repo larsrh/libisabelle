@@ -149,7 +149,7 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
     buildInfoPackage := "info.hupel.isabelle.api",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.2",
-      "io.monix" %% "monix-execution" % "3.0.0-22bf9c6",
+      "io.monix" %% "monix-execution" % "3.0.0-b20be32",
       "org.log4s" %% "log4s" % "1.3.6"
     )
   )
@@ -182,8 +182,8 @@ lazy val setup = project.in(file("modules/setup"))
   .settings(warningSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "io.get-coursier" %% "coursier" % "1.0.0-RC8",
-      "io.get-coursier" %% "coursier-cache" % "1.0.0-RC8",
+      "io.get-coursier" %% "coursier" % "1.0.0-RC10",
+      "io.get-coursier" %% "coursier-cache" % "1.0.0-RC10",
       "org.apache.commons" % "commons-compress" % "1.14",
       "org.eclipse.jgit" % "org.eclipse.jgit" % "4.8.0.201706111038-r",
       "commons-io" % "commons-io" % "2.5"
