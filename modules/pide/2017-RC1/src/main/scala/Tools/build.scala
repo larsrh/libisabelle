@@ -377,7 +377,7 @@ object Build
     val deps =
       Sessions.deps(selected_sessions, progress = progress, inlined_files = true,
         verbose = verbose, list_files = list_files, check_keywords = check_keywords,
-        global_theories = full_sessions.global_theories)
+        global_theories = full_sessions.global_theories).check_errors
 
     def sources_stamp(name: String): List[String] =
       (selected_sessions(name).meta_digest :: deps.sources(name)).map(_.toString).sorted
@@ -416,8 +416,10 @@ object Build
 
     // scheduler loop
     case class Result(
-      current: Boolean, heap_stamp: Option[String],
-      process: Option[Process_Result], info: Sessions.Info)
+      current: Boolean,
+      heap_stamp: Option[String],
+      process: Option[Process_Result],
+      info: Sessions.Info)
     {
       def ok: Boolean =
         process match {
@@ -523,11 +525,11 @@ object Build
                       using(SQLite.open_database(database))(store.read_build(_, name)) match {
                         case Some(build) =>
                           val current =
+                            build.return_code == 0 &&
                             build.sources == sources_stamp(name) &&
                             build.input_heaps == ancestor_heaps &&
                             build.output_heap == heap_stamp &&
-                            !(do_output && heap_stamp.isEmpty) &&
-                            build.return_code == 0
+                            !(do_output && heap_stamp.isEmpty)
                           (current, heap_stamp)
                         case None => (false, None)
                       }

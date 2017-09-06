@@ -18,7 +18,7 @@ ML_cond ("2016-1") \<open>
   val get_theory = Thy_Info.get_theory
 \<close>
 
-ML_cond ("2017-RC0") \<open>
+ML_cond ("2017-RC1") \<open>
   val print_int = Value.print_int
   val parse_int = Value.parse_int
   val print_bool = Value.print_bool

@@ -14,7 +14,7 @@ ML_cond ("2016-1") \<open>
   val use_thys = Thy_Info.use_thys o map (rpair Position.none)
 \<close>
 
-ML_cond ("2017-RC0") \<open>
+ML_cond ("2017-RC1") \<open>
   val use_thys = List.app Thy_Info.use_thy
 \<close>
 
