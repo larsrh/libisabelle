@@ -182,8 +182,8 @@ lazy val setup = project.in(file("modules/setup"))
   .settings(warningSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "io.get-coursier" %% "coursier" % "1.0.0-RC10",
-      "io.get-coursier" %% "coursier-cache" % "1.0.0-RC10",
+      "io.get-coursier" %% "coursier" % "1.0.0-RC11",
+      "io.get-coursier" %% "coursier-cache" % "1.0.0-RC11",
       "org.apache.commons" % "commons-compress" % "1.14",
       "org.eclipse.jgit" % "org.eclipse.jgit" % "4.8.0.201706111038-r",
       "commons-io" % "commons-io" % "2.5"
