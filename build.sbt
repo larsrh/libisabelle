@@ -81,7 +81,7 @@ lazy val loggingSettings = Seq(
     // scalac requires this pseudo-transitive dependency of scalog to be present,
     // even though we don't use its functionality here
     // this seems to be an issue for Scala <= 2.11.x
-    "com.typesafe" % "config" % "1.3.1" % "provided"
+    "com.typesafe" % "config" % "1.3.2" % "provided"
   )
 )
 
@@ -131,7 +131,7 @@ lazy val docs = project.in(file("modules/docs"))
     siteMappings += ((baseDirectory in ThisBuild).value / "README.md", "_includes/README.md"),
     tutDirectory := "_tut",
     // this seems to be required for scalog
-    libraryDependencies += "com.typesafe" % "config" % "1.3.1"
+    libraryDependencies += "com.typesafe" % "config" % "1.3.2"
   )
   .settings(
     addMappingsToSiteDir(tut, tutDirectory)
@@ -149,8 +149,8 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
     buildInfoPackage := "info.hupel.isabelle.api",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.2",
-      "io.monix" %% "monix-execution" % "3.0.0-b20be32",
-      "org.log4s" %% "log4s" % "1.3.6"
+      "io.monix" %% "monix-execution" % "3.0.0-M1",
+      "org.log4s" %% "log4s" % "1.4.0"
     )
   )
 
@@ -164,7 +164,7 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % "1.0.0-MF",
       "org.typelevel" %% "cats-free" % "1.0.0-MF",
-      "com.lihaoyi" %% "scalatags" % "0.6.5",
+      "com.lihaoyi" %% "scalatags" % "0.6.7",
       "org.apache.commons" % "commons-lang3" % "3.6",
       "info.hupel" % "classy" % "0.1.7",
       "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
@@ -182,10 +182,10 @@ lazy val setup = project.in(file("modules/setup"))
   .settings(warningSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "io.get-coursier" %% "coursier" % "1.0.0-RC11",
-      "io.get-coursier" %% "coursier-cache" % "1.0.0-RC11",
+      "io.get-coursier" %% "coursier" % "1.0.0-RC12",
+      "io.get-coursier" %% "coursier-cache" % "1.0.0-RC12",
       "org.apache.commons" % "commons-compress" % "1.14",
-      "org.eclipse.jgit" % "org.eclipse.jgit" % "4.8.0.201706111038-r",
+      "org.eclipse.jgit" % "org.eclipse.jgit" % "4.9.0.201710071750-r",
       "commons-io" % "commons-io" % "2.5"
     )
   )
@@ -222,7 +222,7 @@ lazy val pide2016 = pide("2016")
 lazy val pide2016_1 = pide("2016-1").settings(pideExtraSettings)
 lazy val pide2017 = pide("2017").settings(pideExtraSettings)
   .settings(
-    libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.20.0"
+    libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.20.1"
   )
 
 def assemblyGenerator(p: Project) = Def.task {
@@ -254,7 +254,7 @@ lazy val tests = project.in(file("tests"))
   .settings(noPublishSettings)
   .aggregate(offlineTest, pureTest, holTest)
 
-val specs2Version = "3.9.4"
+val specs2Version = "4.0.1"
 
 lazy val offlineTest = project.in(file("tests/offline"))
   .dependsOn(setup, pidePackage)
