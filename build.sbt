@@ -34,7 +34,7 @@ lazy val standardSettings = Seq(
   ),
   isabelleVersions := {
     isabelleVersions.?.value match {
-      case Some(Seq()) => List(Version.Stable("2016"), Version.Stable("2016-1"), Version.Stable("2017-RC1"))
+      case Some(Seq()) => List(Version.Stable("2016"), Version.Stable("2016-1"), Version.Stable("2017"))
       case Some(ver) => ver
       case None => Nil
     }
@@ -100,7 +100,7 @@ lazy val root = project.in(file("."))
     pideInterface, libisabelle, setup,
     tests, docs, examples,
     cli,
-    pide2016, pide2016_1, pide2017_RC1,
+    pide2016, pide2016_1, pide2017,
     pidePackage,
     workbench
   )
@@ -166,7 +166,7 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
       "org.typelevel" %% "cats-free" % "1.0.0-MF",
       "com.lihaoyi" %% "scalatags" % "0.6.5",
       "org.apache.commons" % "commons-lang3" % "3.6",
-      "info.hupel" % "classy" % "0.1.6",
+      "info.hupel" % "classy" % "0.1.7",
       "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
     ),
     isabelleSessions in Compile := Seq(
@@ -220,7 +220,7 @@ lazy val pideExtraSettings = Seq(
 
 lazy val pide2016 = pide("2016")
 lazy val pide2016_1 = pide("2016-1").settings(pideExtraSettings)
-lazy val pide2017_RC1 = pide("2017-RC1").settings(pideExtraSettings)
+lazy val pide2017 = pide("2017").settings(pideExtraSettings)
   .settings(
     libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.20.0"
   )
@@ -242,7 +242,7 @@ lazy val pidePackage = project.in(file("modules/pide-package"))
     resourceGenerators in Compile ++= Seq(
       assemblyGenerator(pide2016).taskValue,
       assemblyGenerator(pide2016_1).taskValue,
-      assemblyGenerator(pide2017_RC1).taskValue
+      assemblyGenerator(pide2017).taskValue
     )
   )
 

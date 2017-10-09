@@ -81,6 +81,11 @@ object Sessions
         theories_local = for ((a, b) <- theories_local) yield (a, b.map(File.platform_path(_))),
         files = for ((a, b) <- files) yield (a, b.map(c => c.map(File.platform_path(_)))))
 
+    def standard_path: Known =
+      copy(theories = for ((a, b) <- theories) yield (a, b.map(File.standard_path(_))),
+        theories_local = for ((a, b) <- theories_local) yield (a, b.map(File.standard_path(_))),
+        files = for ((a, b) <- files) yield (a, b.map(c => c.map(File.standard_path(_)))))
+
     def get_file(file: JFile, bootstrap: Boolean = false): Option[Document.Node.Name] =
     {
       val res = files.getOrElse(File.canonical(file), Nil).headOption
@@ -114,6 +119,7 @@ object Sessions
     def get_imports: Base = imports getOrElse Base.bootstrap(global_theories)
 
     def platform_path: Base = copy(known = known.platform_path)
+    def standard_path: Base = copy(known = known.standard_path)
 
     def loaded_theory(name: Document.Node.Name): Boolean =
       loaded_theories.isDefinedAt(name.theory)
@@ -251,6 +257,11 @@ object Sessions
                     ((g /: (a :: bs))(_.default_node(_, Nil)) /: bs)(_.add_edge(_, a)) })
             }
 
+            val sources =
+              for (p <- all_files if p.is_file) yield (p, SHA1.digest(p.file))
+            val sources_errors =
+              for (p <- all_files if !p.is_file) yield "No such file: " + p
+
             val base =
               Base(
                 pos = info.pos,
@@ -260,9 +271,9 @@ object Sessions
                 known = Known.make(info.dir, List(imports_base), thy_deps.deps.map(_.name)),
                 keywords = thy_deps.keywords,
                 syntax = syntax,
-                sources = all_files.map(p => (p, SHA1.digest(p.file))),
+                sources = sources,
                 session_graph = session_graph,
-                errors = thy_deps.errors)
+                errors = thy_deps.errors ::: sources_errors)
 
             session_bases + (info.name -> base)
           }
