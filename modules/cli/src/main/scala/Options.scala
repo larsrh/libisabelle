@@ -19,7 +19,7 @@ case class Options(
   @ValueDescription("version")
   @HelpMessage("Isabelle version ('stable:2016' or 'devel:isabelle-repo' for stable or devel; default prefix: 'stable')")
   @ExtraName("v")
-  version: Version = Version.Stable("2016-1"),
+  version: Version = Version.Stable("2017"),
 
   @ValueDescription("session")
   @HelpMessage("Isabelle session (directory needs to be known; either through --internal, --include, --component or --fetch)")
