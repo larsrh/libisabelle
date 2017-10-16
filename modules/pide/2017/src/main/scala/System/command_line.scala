@@ -21,14 +21,14 @@ object Command_Line
     def unapplySeq(list: List[String]): Option[List[List[String]]] = Some(chunks(list))
   }
 
-  var debug = false
+  var debug = true
 
   def tool(body: => Int): Nothing =
   {
     val rc =
       try { body }
       catch {
-        case exn: Throwable =>
+        case exn: Exception =>
           if (debug) exn.printStackTrace
           Output.error_message(Exn.message(exn))
           Exn.return_code(exn, 2)

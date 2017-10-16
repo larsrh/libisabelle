@@ -21,4 +21,9 @@ package object isabelle
   def proper[A](x: A): Option[A] = Library.proper(x)
   val proper_string = Library.proper_string _
   def proper_list[A](list: List[A]): Option[List[A]] = Library.proper_list(list)
+
+  object sys {
+    def exit(rc: Int) = throw info.hupel.isabelle.api.ExitTrap(rc)
+    def env = _root_.scala.sys.env
+  }
 }

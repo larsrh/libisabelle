@@ -21,7 +21,7 @@ object Command_Line
     def unapplySeq(list: List[String]): Option[List[List[String]]] = Some(chunks(list))
   }
 
-  var debug = false
+  var debug = true
 
   def tool(body: => Int): Nothing =
   {
