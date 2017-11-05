@@ -2,14 +2,14 @@
 
 A Scala library which talks to Isabelle.
 It currently works with Isabelle2016, 2016-1 and 2017.
-For more information and documentation about the project, visit [its website](http://lars.hupel.info/libisabelle/).
+For more information and documentation about the project, visit [its website](https://lars.hupel.info/libisabelle/).
 
 | Service                   | Status |
 | ------------------------- | ------ |
 | Travis (Linux/Mac CI)     | [![Build Status](https://travis-ci.org/larsrh/libisabelle.svg?branch=master)](https://travis-ci.org/larsrh/libisabelle) |
 | AppVeyor (Windows CI)     | [![Build status](https://ci.appveyor.com/api/projects/status/uuafgv21ragvoqei/branch/master?svg=true)](https://ci.appveyor.com/project/larsrh/libisabelle/branch/master) |
 | Scaladex                  | [![Latest release](https://index.scala-lang.org/larsrh/libisabelle/libisabelle/latest.svg?color=orange)](https://index.scala-lang.org/larsrh/libisabelle) |
-| Scaladoc (release)        | [![Scaladoc](http://javadoc-badge.appspot.com/info.hupel/libisabelle-docs_2.12.svg?label=scaladoc)](http://javadoc-badge.appspot.com/info.hupel/libisabelle-docs_2.12) |
+| Scaladoc (release)        | [![Scaladoc](https://javadoc-badge.appspot.com/info.hupel/libisabelle-docs_2.12.svg?label=scaladoc)](https://javadoc-badge.appspot.com/info.hupel/libisabelle-docs_2.12) |
 | Zenodo (DOI)              | [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.591695.svg)](https://doi.org/10.5281/zenodo.591695) |
 | Gitter (Chat)             | [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/larsrh/libisabelle) |
 
@@ -75,5 +75,5 @@ isabellectl exec getenv ISABELLE_HOME
 
 This project supports the [Typelevel][typelevel] [code of conduct][codeofconduct] and wants all of its channels (at the moment: GitHub and Gitter) to be welcoming environments for everyone.
 
-[typelevel]: http://typelevel.org/
-[codeofconduct]: http://typelevel.org/conduct.html
+[typelevel]: https://typelevel.org/
+[codeofconduct]: https://typelevel.org/conduct.html
