@@ -124,7 +124,7 @@ lazy val docs = project.in(file("modules/docs"))
       "-sourcepath", (baseDirectory in ThisBuild).value.getAbsolutePath
     ),
     target in unidoc in ScalaUnidoc := crossTarget.value / "api",
-    siteSubdirName in SiteScaladoc := "api/nightly",
+    siteSubdirName in SiteScaladoc := "api/nightly/",
     ghpagesNoJekyll := false,
     git.remoteRepo := "git@github.com:larsrh/libisabelle.git",
     includeFilter in makeSite := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.yml" | "*.md" | "Gemfile" | "config",
