@@ -11,6 +11,6 @@ addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.1.0-M1")
 addSbtPlugin("com.typesafe.sbt" % "sbt-ghpages" % "0.6.2")
 addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "1.3.0")
 addSbtPlugin("org.tpolecat" % "tut-plugin" % "0.6.2")
-addSbtPlugin("com.thoughtworks.sbt-api-mappings" % "sbt-api-mappings" % "2.0.0")
+addSbtPlugin("info.hupel" % "sbt-api-mappings" % "3.0.1")
 
 addSbtPlugin("info.hupel" % "sbt-libisabelle" % "0.6.1")

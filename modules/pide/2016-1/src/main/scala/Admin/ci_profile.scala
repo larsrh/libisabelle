@@ -85,10 +85,16 @@ abstract class CI_Profile extends Isabelle_Tool.Body
 
   override final def apply(args: List[String]): Unit =
   {
+    import scala.collection.JavaConverters._
+
     print_section("CONFIGURATION")
     println(Build_Log.Settings.show())
-    val props = load_properties()
-    System.getProperties().putAll(props)
+
+    // workaround for https://github.com/scala/bug/issues/10418
+    val props = System.getProperties()
+    load_properties().asScala.foreach { case (k, v) =>
+      props.put(k, v)
+    }
 
     val options =
       with_documents(Options.init())

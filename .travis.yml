@@ -53,6 +53,13 @@ matrix:
         apt:
           packages:
             - lib32stdc++6
+    - env: ISABELLE_VERSION=stable:2017 SCALA_VERSION=2.12.4 PROFILE=slow
+      os: linux
+      jdk: oraclejdk9
+      addons:
+        apt:
+          packages:
+            - lib32stdc++6
     - env: ISABELLE_VERSION=devel:isabelle-mirror SCALA_VERSION=2.12.4 PROFILE=devel
       os: linux
       jdk: oraclejdk8
