@@ -2,8 +2,8 @@ import scala.sys.process._
 
 lazy val standardSettings = Seq(
   organization := "info.hupel",
-  scalaVersion := "2.12.3",
-  crossScalaVersions := Seq("2.11.11", "2.12.3"),
+  scalaVersion := "2.12.4",
+  crossScalaVersions := Seq("2.11.12", "2.12.4"),
   javacOptions += "-Xlint:unchecked",
   homepage := Some(url("http://lars.hupel.info/libisabelle/")),
   licenses := Seq(
@@ -149,7 +149,7 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
     buildInfoPackage := "info.hupel.isabelle.api",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.2",
-      "io.monix" %% "monix-execution" % "3.0.0-M1",
+      "io.monix" %% "monix-execution" % "3.0.0-M2",
       "org.log4s" %% "log4s" % "1.4.0"
     )
   )
@@ -162,10 +162,10 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
   .settings(macroSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "1.0.0-MF",
-      "org.typelevel" %% "cats-free" % "1.0.0-MF",
+      "org.typelevel" %% "cats-core" % "1.0.0-RC1",
+      "org.typelevel" %% "cats-free" % "1.0.0-RC1",
       "com.lihaoyi" %% "scalatags" % "0.6.7",
-      "org.apache.commons" % "commons-lang3" % "3.6",
+      "org.apache.commons" % "commons-lang3" % "3.7",
       "info.hupel" % "classy" % "0.1.7",
       "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
     ),
@@ -184,7 +184,7 @@ lazy val setup = project.in(file("modules/setup"))
     libraryDependencies ++= Seq(
       "io.get-coursier" %% "coursier" % "1.0.0-RC12",
       "io.get-coursier" %% "coursier-cache" % "1.0.0-RC12",
-      "org.apache.commons" % "commons-compress" % "1.14",
+      "org.apache.commons" % "commons-compress" % "1.15",
       "org.eclipse.jgit" % "org.eclipse.jgit" % "4.9.0.201710071750-r",
       "commons-io" % "commons-io" % "2.5"
     )
