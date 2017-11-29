@@ -1,5 +1,8 @@
 import scala.sys.process._
 
+lazy val defaultIsabelleVersions = settingKey[Seq[Version]]("Default Isabelle versions")
+defaultIsabelleVersions in ThisBuild := Seq()
+
 lazy val standardSettings = Seq(
   organization := "info.hupel",
   scalaVersion := "2.12.4",
@@ -34,7 +37,7 @@ lazy val standardSettings = Seq(
   ),
   isabelleVersions := {
     isabelleVersions.?.value match {
-      case Some(Seq()) => List(Version.Stable("2016"), Version.Stable("2016-1"), Version.Stable("2017"))
+      case Some(Seq()) => (defaultIsabelleVersions in ThisBuild).value
       case Some(ver) => ver
       case None => Nil
     }
@@ -100,7 +103,7 @@ lazy val root = project.in(file("."))
     pideInterface, libisabelle, setup,
     tests, docs, examples,
     cli,
-    pide2016, pide2016_1, pide2017,
+    pideAggregate,
     pidePackage,
     workbench
   )
@@ -193,6 +196,8 @@ lazy val setup = project.in(file("modules/setup"))
 
 // PIDE implementations
 
+lazy val pideVersion = settingKey[Version]("PIDE version")
+
 def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$version"))
   .dependsOn(pideInterface % "provided")
   .settings(moduleName := s"pide-$version")
@@ -200,6 +205,7 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
   .enablePlugins(GitVersioning, BuildInfoPlugin)
   .settings(
     buildInfoKeys := apiBuildInfoKeys,
+    pideVersion := Version.Stable(version),
     buildInfoPackage := "info.hupel.isabelle.impl",
     autoScalaLibrary := false,
     libraryDependencies ++= Seq(
@@ -225,6 +231,20 @@ lazy val pide2017 = pide("2017").settings(pideExtraSettings)
     libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.20.1"
   )
 
+lazy val pides = Seq(
+  pide2016,
+  pide2016_1,
+  pide2017
+)
+
+inThisBuild(pides.map { p =>
+  defaultIsabelleVersions += (pideVersion in p).value
+})
+
+lazy val pideAggregate = project.in(file("modules/pide-aggregate"))
+  .settings(noPublishSettings)
+  .aggregate(pides.map(p => p: ProjectReference): _*)
+
 def assemblyGenerator(p: Project) = Def.task {
   val source = (assembly in p).value
   val target = resourceManaged.value / source.getName
@@ -239,11 +259,9 @@ lazy val pidePackage = project.in(file("modules/pide-package"))
   .settings(moduleName := "pide-package")
   .settings(standardSettings)
   .settings(
-    resourceGenerators in Compile ++= Seq(
-      assemblyGenerator(pide2016).taskValue,
-      assemblyGenerator(pide2016_1).taskValue,
-      assemblyGenerator(pide2017).taskValue
-    )
+    pides.map { p =>
+      resourceGenerators in Compile += assemblyGenerator(p).taskValue
+    }
   )
 
 
