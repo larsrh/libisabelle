@@ -358,8 +358,15 @@ lazy val examples = project.in(file("modules/examples"))
   .settings(warningSettings)
   .settings(
     // logback because Java
-    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3"
+    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3",
+    jsr223Scripts in Compile += Script(
+      "info.hupel.isabelle.examples.python",
+      "Hello_PIDE",
+      Language.Python,
+      Script.Static((baseDirectory in ThisBuild).value / "tools" / "hello_pide.py")
+    )
   )
+  .enablePlugins(JSR223Plugin)
 
 
 // Workbench
