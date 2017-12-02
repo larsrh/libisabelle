@@ -363,10 +363,10 @@ lazy val examples = project.in(file("modules/examples"))
       "info.hupel.isabelle.examples.python",
       "Hello_PIDE",
       Language.Python,
-      Script.Static((baseDirectory in ThisBuild).value / "tools" / "hello_pide.py")
+      Script.Literal("import hello_pide")
     )
   )
-  .enablePlugins(JSR223Plugin)
+  .enablePlugins(JSR223Plugin, JythonPlugin)
 
 
 // Workbench
