@@ -243,6 +243,7 @@ inThisBuild(pides.map { p =>
 
 lazy val pideAggregate = project.in(file("modules/pide-aggregate"))
   .settings(noPublishSettings)
+  .settings(standardSettings)
   .aggregate(pides.map(p => p: ProjectReference): _*)
 
 def assemblyGenerator(p: Project) = Def.task {
