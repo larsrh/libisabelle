@@ -185,11 +185,11 @@ lazy val setup = project.in(file("modules/setup"))
   .settings(warningSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "io.get-coursier" %% "coursier" % "1.0.0-RC12",
-      "io.get-coursier" %% "coursier-cache" % "1.0.0-RC12",
+      "io.get-coursier" %% "coursier" % "1.0.0",
+      "io.get-coursier" %% "coursier-cache" % "1.0.0",
       "org.apache.commons" % "commons-compress" % "1.15",
-      "org.eclipse.jgit" % "org.eclipse.jgit" % "4.9.0.201710071750-r",
-      "commons-io" % "commons-io" % "2.5"
+      "org.eclipse.jgit" % "org.eclipse.jgit" % "4.9.1.201712030800-r",
+      "commons-io" % "commons-io" % "2.6"
     )
   )
 
@@ -228,7 +228,7 @@ lazy val pide2016 = pide("2016")
 lazy val pide2016_1 = pide("2016-1").settings(pideExtraSettings)
 lazy val pide2017 = pide("2017").settings(pideExtraSettings)
   .settings(
-    libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.20.1"
+    libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.21.0.1"
   )
 
 lazy val pides = Seq(
@@ -273,7 +273,7 @@ lazy val tests = project.in(file("tests"))
   .settings(noPublishSettings)
   .aggregate(offlineTest, pureTest, holTest)
 
-val specs2Version = "4.0.1"
+val specs2Version = "4.0.2"
 
 lazy val offlineTest = project.in(file("tests/offline"))
   .dependsOn(setup, pidePackage)
