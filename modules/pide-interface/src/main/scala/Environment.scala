@@ -117,7 +117,10 @@ object Environment {
  * loader. This is the primary reason why this class exists in the first place,
  * to enable seamless abstraction over multiple PIDEs.
  */
-abstract class Environment protected(val context: Environment.Context, versionOverride: Option[Version] = None) { self =>
+abstract class Environment protected(val context: Environment.Context, versionOverride: Option[Version] = None, checkClassLoader: Boolean = true) { self =>
+
+  if (checkClassLoader && getClass.getClassLoader == classOf[Environment].getClassLoader)
+    sys.error("Environment not loaded in an isolated class loader, this is unsupported")
 
   protected final val logger = getLogger
   protected final val evalCommand = "libisabelle_eval"

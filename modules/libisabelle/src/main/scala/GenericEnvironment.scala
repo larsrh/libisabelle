@@ -30,7 +30,7 @@ object GenericEnvironment {
 
 }
 
-final class GenericEnvironment private(context: Environment.Context, version: Version) extends Environment(context, Some(version)) {
+final class GenericEnvironment private(context: Environment.Context, version: Version) extends Environment(context, Some(version), false) {
 
   if (context.options.nonEmpty)
     logger.warn("Ignoring options")
