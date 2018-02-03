@@ -12,6 +12,7 @@ case "$PROFILE" in
     ./sbt "++$SCALA_VERSION" script
     ./isabellectl --version "$ISABELLE_VERSION" --verbose exec components -- -I
     ./isabellectl --version "$ISABELLE_VERSION" --verbose exec components -- -a
+    ./isabellectl --version "$ISABELLE_VERSION" --verbose exec jedit -- -bf
     ./isabellectl --version "$ISABELLE_VERSION" --session Pure --verbose build
     ;;
   generic)
