@@ -211,6 +211,7 @@ final case class Model(env: Environment, regions: Map[Path, Regions] = Map.empty
 
 object Reports {
   def empty: Reports = Reports(Vector.empty)
+  def fromTrees(trees: List[XML.Tree]) = trees.foldLeft(empty)(_ + _)
 }
 
 final case class Reports(items: Vector[XML.Tree]) {
