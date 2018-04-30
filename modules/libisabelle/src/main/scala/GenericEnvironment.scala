@@ -3,7 +3,7 @@ package info.hupel.isabelle
 import scala.concurrent.duration._
 import scala.sys.process._
 
-import monix.execution.cancelables.MultiAssignmentCancelable
+import monix.execution.cancelables.OrderedCancelable
 
 import shapeless.tag._
 
@@ -69,7 +69,7 @@ final class GenericEnvironment private(context: Environment.Context, version: Ve
     logger.debug(s"Executing '$tool' with arguments '${args.mkString(" ")}' ...")
 
     val env = (variables ++ Map("USER_HOME" -> user.toString)).toList
-    val c = MultiAssignmentCancelable()
+    val c = OrderedCancelable()
 
     try {
       val proc = Process(binary.toString :: tool :: args, None, env: _*).run(console)

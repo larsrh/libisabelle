@@ -84,7 +84,7 @@ lazy val loggingSettings = Seq(
     // scalac requires this pseudo-transitive dependency of scalog to be present,
     // even though we don't use its functionality here
     // this seems to be an issue for Scala <= 2.11.x
-    "com.typesafe" % "config" % "1.3.2" % "provided"
+    "com.typesafe" % "config" % "1.3.3" % "provided"
   )
 )
 
@@ -134,7 +134,7 @@ lazy val docs = project.in(file("modules/docs"))
     siteMappings += ((baseDirectory in ThisBuild).value / "README.md", "_includes/README.md"),
     tutDirectory := "_tut",
     // this seems to be required for scalog
-    libraryDependencies += "com.typesafe" % "config" % "1.3.2"
+    libraryDependencies += "com.typesafe" % "config" % "1.3.3"
   )
   .settings(
     addMappingsToSiteDir(tut, tutDirectory)
@@ -151,9 +151,9 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
     buildInfoKeys := apiBuildInfoKeys,
     buildInfoPackage := "info.hupel.isabelle.api",
     libraryDependencies ++= Seq(
-      "com.chuusai" %% "shapeless" % "2.3.2",
-      "io.monix" %% "monix-execution" % "3.0.0-M2",
-      "org.log4s" %% "log4s" % "1.4.0"
+      "com.chuusai" %% "shapeless" % "2.3.3",
+      "io.monix" %% "monix-execution" % "3.0.0-RC1",
+      "org.log4s" %% "log4s" % "1.6.1"
     )
   )
 
@@ -165,8 +165,8 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
   .settings(macroSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "1.0.0-RC1",
-      "org.typelevel" %% "cats-free" % "1.0.0-RC1",
+      "org.typelevel" %% "cats-core" % "1.0.1",
+      "org.typelevel" %% "cats-free" % "1.0.1",
       "com.lihaoyi" %% "scalatags" % "0.6.7",
       "org.apache.commons" % "commons-lang3" % "3.7",
       "info.hupel" % "classy" % "0.1.7",
@@ -185,10 +185,10 @@ lazy val setup = project.in(file("modules/setup"))
   .settings(warningSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "io.get-coursier" %% "coursier" % "1.0.0",
-      "io.get-coursier" %% "coursier-cache" % "1.0.0",
-      "org.apache.commons" % "commons-compress" % "1.15",
-      "org.eclipse.jgit" % "org.eclipse.jgit" % "4.9.1.201712030800-r",
+      "io.get-coursier" %% "coursier" % "1.0.3",
+      "io.get-coursier" %% "coursier-cache" % "1.0.3",
+      "org.apache.commons" % "commons-compress" % "1.16.1",
+      "org.eclipse.jgit" % "org.eclipse.jgit" % "4.11.0.201803080745-r",
       "commons-io" % "commons-io" % "2.6"
     )
   )
@@ -210,14 +210,14 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
     autoScalaLibrary := false,
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-library" % scalaVersion.value % "provided",
-      ("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.6").exclude("org.scala-lang", "scala-library")
+      ("org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.0").exclude("org.scala-lang", "scala-library")
     ),
     assemblyJarName := s"${moduleName.value}-assembly.jar"
   )
 
 lazy val pideExtraSettings = Seq(
   libraryDependencies ++= Seq(
-    "org.tukaani" % "xz" % "1.6",
+    "org.tukaani" % "xz" % "1.8",
     "com.jcraft" % "jsch" % "0.1.54",
     "com.jcraft" % "jzlib" % "1.1.3",
     ("org.scala-lang" % "scala-compiler" % scalaVersion.value).exclude("org.scala-lang", "scala-library")
@@ -273,7 +273,7 @@ lazy val tests = project.in(file("tests"))
   .settings(noPublishSettings)
   .aggregate(offlineTest, pureTest, holTest)
 
-val specs2Version = "4.0.2"
+val specs2Version = "4.1.0"
 
 lazy val offlineTest = project.in(file("tests/offline"))
   .dependsOn(setup, pidePackage)
