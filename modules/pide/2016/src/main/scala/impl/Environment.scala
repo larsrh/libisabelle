@@ -13,14 +13,18 @@ import shapeless.tag._
 final class Environment private(context: api.Environment.Context) extends api.Environment(context) {
 
   isabelle.Standard_Thread.pool = context.executorService
-  isabelle.Isabelle_System.init(
-    isabelle_root = home.toString,
-    cygwin_root = home.resolve("contrib/cygwin").toString,
-    user = user.toString,
-    init_env = variables,
-    hook = setEtcComponents _
-  )
-  cleanEtcComponents()
+  try {
+    isabelle.Isabelle_System.init(
+      isabelle_root = home.toString,
+      cygwin_root = home.resolve("contrib/cygwin").toString,
+      user = user.toString,
+      init_env = variables,
+      hook = setEtcComponents _
+    )
+  }
+  finally {
+    cleanEtcComponents()
+  }
 
   private def destMarkup(markup: isabelle.Markup) =
     (markup.name, markup.properties)
