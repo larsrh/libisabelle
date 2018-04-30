@@ -71,6 +71,13 @@ object Environment {
   /** Bundles all requirements to instantiate an [[Environment environment]]. */
   case class Context(home: Path, user: Path, components: List[Path], options: List[OptionKey.Update])(implicit val scheduler: Scheduler) {
     def executorService = scheduler.toExecutorService
+
+    // FIXME move to different location?
+    def etc(version: Version) = version match {
+      case Version.Devel(_) => user.resolve(".isabelle").resolve("etc")
+      case Version.Stable(identifier) => user.resolve(".isabelle").resolve(s"Isabelle$identifier").resolve("etc")
+    }
+    def etcComponents(version: Version) = etc(version).resolve("components")
   }
 
 }
@@ -141,11 +148,8 @@ abstract class Environment protected(val context: Environment.Context, versionOv
     case Version.Stable(identifier) => Map("ISABELLE_VERSION" -> identifier)
   })
 
-  final val etc = version match {
-    case Version.Devel(_) => user.resolve(".isabelle").resolve("etc")
-    case Version.Stable(identifier) => user.resolve(".isabelle").resolve(s"Isabelle$identifier").resolve("etc")
-  }
-  final val etcComponents = etc.resolve("components")
+  final val etc = context.etc(version)
+  final val etcComponents = context.etcComponents(version)
 
   protected final def setEtcComponents(): Unit =
     if (!context.components.isEmpty) {
