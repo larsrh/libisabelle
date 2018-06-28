@@ -227,7 +227,8 @@ lazy val pide2017 = pide("2017")
 lazy val pide2018_RC0 = pide("2018-RC0")
 
 lazy val pides = Seq(
-  pide2017
+  pide2017,
+  pide2018_RC0
 )
 
 inThisBuild(pides.map { p =>

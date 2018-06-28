@@ -25,7 +25,7 @@ class EnvironmentSpec(val specs2Env: Env) extends Specification with BasicSetup 
   val settingsPrefix = classpath.map { paths =>
     val env = Environment.instantiate(version, paths, context)
     val prefix = env.isabellePath(user.toAbsolutePath.toString)
-    List("ISABELLE_BROWSER_INFO", "ISABELLE_OUTPUT", "ISABELLE_HOME_USER").forall { setting =>
+    List("ISABELLE_BROWSER_INFO", "ISABELLE_HOME_USER").forall { setting =>
       env.isabelleSetting(setting).startsWith(prefix)
     }
   }
