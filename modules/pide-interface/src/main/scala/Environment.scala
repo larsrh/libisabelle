@@ -187,9 +187,9 @@ abstract class Environment protected(val context: Environment.Context, versionOv
       logger.info("Protocol theory not contained in image, scheduling to be loaded ...")
 
       if (loaded.contains("Main"))
-        Some(s"$resourcesHome/libisabelle/Protocol_Main")
+        Some(s"HOL-Protocol.Protocol_Main")
       else
-        Some(s"$resourcesHome/libisabelle/Protocol_Pure")
+        Some(s"Protocol.Protocol_Pure")
     }
 
   override def toString: String =

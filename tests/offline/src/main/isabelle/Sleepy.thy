@@ -1,5 +1,5 @@
 theory Sleepy
-imports Protocol
+imports Protocol.Protocol
 begin
 
 operation_setup sleepy = \<open>

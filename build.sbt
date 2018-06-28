@@ -172,7 +172,7 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
       "org.typelevel" %% "cats-free" % "1.0.1",
       "com.lihaoyi" %% "scalatags" % "0.6.7",
       "org.apache.commons" % "commons-lang3" % "3.7",
-      "info.hupel" % "classy" % "0.1.7",
+      "info.hupel" % "classy" % "0.2.0",
       "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
     ),
     isabelleSessions in Compile := Seq(

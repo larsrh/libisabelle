@@ -62,7 +62,7 @@ final class Environment private(context: api.Environment.Context) extends api.En
     ).rc
 
   protected[isabelle] def create(config: api.Configuration, consumer: (api.Markup, api.XML.Body) => Unit) = {
-    val base = isabelle.Sessions.session_base(options, config.session, mkPaths(config.paths))
+    val base = isabelle.Sessions.session_base(options, config.session, mkPaths(config.paths), true)
     val resources = new isabelle.Resources(base)
 
     val use = protocolTheory(new isabelle.Thy_Info(resources).Dependencies.empty.loaded_theories.keySet) map { thy =>

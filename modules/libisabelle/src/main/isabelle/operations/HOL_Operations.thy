@@ -1,5 +1,5 @@
 theory HOL_Operations
-imports Main "../protocol/Protocol"
+imports Main Protocol.Protocol
 begin
 
 operation_setup mk_int = \<open>
@@ -20,9 +20,5 @@ operation_setup dest_int = \<open>
 
 operation_setup (auto) mk_list = \<open>uncurry HOLogic.mk_list\<close>
 operation_setup (auto) dest_list = \<open>try HOLogic.dest_list\<close>
-
-ML_cond ("2016") \<open>
-  structure Value_Command = Value
-\<close>
 
 end

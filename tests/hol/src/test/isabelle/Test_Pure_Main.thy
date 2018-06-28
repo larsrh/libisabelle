@@ -1,5 +1,5 @@
 theory Test_Pure_Main
-imports Protocol_Main
+imports "HOL-Protocol.Protocol_Main"
 begin
 
 text \<open>\<open>https://github.com/larsrh/libisabelle/issues/61\<close>\<close>

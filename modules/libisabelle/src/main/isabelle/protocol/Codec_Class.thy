@@ -1,5 +1,5 @@
 theory Codec_Class
-imports Common "../../classy/Classy"
+imports Common "Classy.Classy"
 begin
 
 ML.class codec = \<open>'a codec\<close>
