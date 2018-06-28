@@ -213,30 +213,20 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
     autoScalaLibrary := false,
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-library" % scalaVersion.value % "provided",
-      ("org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.0").exclude("org.scala-lang", "scala-library")
+      ("org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.0").exclude("org.scala-lang", "scala-library"),
+      "org.tukaani" % "xz" % "1.8",
+      "com.jcraft" % "jsch" % "0.1.54",
+      "com.jcraft" % "jzlib" % "1.1.3",
+      ("org.scala-lang" % "scala-compiler" % scalaVersion.value).exclude("org.scala-lang", "scala-library"),
+      "org.xerial" % "sqlite-jdbc" % "3.21.0.1"
     ),
     assemblyJarName := s"${moduleName.value}-assembly.jar"
   )
 
-lazy val pideExtraSettings = Seq(
-  libraryDependencies ++= Seq(
-    "org.tukaani" % "xz" % "1.8",
-    "com.jcraft" % "jsch" % "0.1.54",
-    "com.jcraft" % "jzlib" % "1.1.3",
-    ("org.scala-lang" % "scala-compiler" % scalaVersion.value).exclude("org.scala-lang", "scala-library")
-  )
-)
-
-lazy val pide2016 = pide("2016")
-lazy val pide2016_1 = pide("2016-1").settings(pideExtraSettings)
-lazy val pide2017 = pide("2017").settings(pideExtraSettings)
-  .settings(
-    libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.21.0.1"
-  )
+lazy val pide2017 = pide("2017")
+lazy val pide2018_RC0 = pide("2018-RC0")
 
 lazy val pides = Seq(
-  pide2016,
-  pide2016_1,
   pide2017
 )
 

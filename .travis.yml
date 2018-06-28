@@ -1,8 +1,4 @@
 language: java
-env:
-  matrix:
-    - ISABELLE_VERSION=stable:2016 SCALA_VERSION=2.11.12 PROFILE=quick
-    - ISABELLE_VERSION=stable:2016-1 SCALA_VERSION=2.11.12 PROFILE=quick
 os:
   - osx
 script:
@@ -25,21 +21,14 @@ deploy:
       secure: "eTZ3R7NVfCqqolU+DG4TR5CJBp0YT/k1dSjRwLMrGyypZvlzsE3Ur3VMLWYH39pypHA9ayDCKNJlqM3kQzXxCC3kGRgk7u7cqM5HwgT/l54Jzz7S731SPmSdIaGDbycAzz6bauYvu1v2jDrsSuS6bo8mfzH4HLSz86qfK8bpZdk="
 matrix:
   include:
-    - env: ISABELLE_VERSION=stable:2015 SCALA_VERSION=2.11.12 PROFILE=generic
+    - env: ISABELLE_VERSION=stable:2016 SCALA_VERSION=2.11.12 PROFILE=generic
       os: linux
       jdk: oraclejdk8
       addons:
         apt:
           packages:
             - lib32stdc++6
-    - env: ISABELLE_VERSION=stable:2016 SCALA_VERSION=2.11.12 PROFILE=slow
-      os: linux
-      jdk: oraclejdk8
-      addons:
-        apt:
-          packages:
-            - lib32stdc++6
-    - env: ISABELLE_VERSION=stable:2016-1 SCALA_VERSION=2.12.4 PROFILE=slow DEPLOY=1
+    - env: ISABELLE_VERSION=stable:2016-1 SCALA_VERSION=2.11.12 PROFILE=generic
       os: linux
       jdk: oraclejdk8
       addons:
