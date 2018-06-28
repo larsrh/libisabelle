@@ -23,6 +23,7 @@ trait BasicSetup {
   LoggingBackend.console("info.hupel" -> Level.Debug)
 
   lazy val duration = 30.seconds
+  private lazy val logger = getLogger
 
   val specs2Env: Env
   implicit val ee = specs2Env.executionEnv
@@ -39,7 +40,12 @@ trait BasicSetup {
     Option(java.lang.System.getenv("ISABELLE_VERSION")).orElse(
       specs2Env.arguments.commandLine.value("isabelle.version")
     ).map(Version.parse) match {
-      case None | Some(Left(_)) => sys.error("no or invalid test version specified")
+      case None if BuildInfo.defaultIsabelleVersions.isEmpty => sys.error("no test version specified")
+      case None =>
+        val v = Version.Stable(BuildInfo.defaultIsabelleVersions.last)
+        logger.warn(s"No test version specified, falling back to $v")
+        v
+      case Some(Left(_)) => sys.error("invalid test version specified")
       case Some(Right(v: Version.Stable)) => v
       case _ => sys.error("unsupported test version")
     }
