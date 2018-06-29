@@ -106,6 +106,7 @@ lazy val root = project.in(file("."))
     pideInterface, libisabelle, setup,
     tests, docs, examples,
     cli,
+    pideDependencies,
     pideAggregate,
     pidePackage,
     workbench
@@ -201,8 +202,24 @@ lazy val setup = project.in(file("modules/setup"))
 
 lazy val pideVersion = settingKey[Version]("PIDE version")
 
+lazy val pideDependencies = project.in(file("modules/pide-dependencies"))
+  .dependsOn(pideInterface)
+  .settings(moduleName := "pide-dependencies")
+  .settings(standardSettings)
+  .enablePlugins(GitVersioning)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1",
+      "org.tukaani" % "xz" % "1.8",
+      "com.jcraft" % "jsch" % "0.1.54",
+      "com.jcraft" % "jzlib" % "1.1.3",
+      "org.scala-lang" % "scala-compiler" % scalaVersion.value,
+      "org.xerial" % "sqlite-jdbc" % "3.23.1"
+    )
+  )
+
 def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$version"))
-  .dependsOn(pideInterface % "provided")
+  .dependsOn(pideDependencies % "provided")
   .settings(moduleName := s"pide-$version")
   .settings(standardSettings)
   .enablePlugins(GitVersioning, BuildInfoPlugin)
@@ -211,15 +228,6 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
     pideVersion := Version.Stable(version),
     buildInfoPackage := "info.hupel.isabelle.impl",
     autoScalaLibrary := false,
-    libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-library" % scalaVersion.value % "provided",
-      ("org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1").exclude("org.scala-lang", "scala-library"),
-      "org.tukaani" % "xz" % "1.8",
-      "com.jcraft" % "jsch" % "0.1.54",
-      "com.jcraft" % "jzlib" % "1.1.3",
-      ("org.scala-lang" % "scala-compiler" % scalaVersion.value).exclude("org.scala-lang", "scala-library"),
-      "org.xerial" % "sqlite-jdbc" % "3.23.1"
-    ),
     assemblyJarName := s"${moduleName.value}-assembly.jar"
   )
 
@@ -250,7 +258,7 @@ def assemblyGenerator(p: Project) = Def.task {
 }
 
 lazy val pidePackage = project.in(file("modules/pide-package"))
-  .dependsOn(pideInterface)
+  .dependsOn(pideDependencies)
   .settings(moduleName := "pide-package")
   .settings(standardSettings)
   .settings(
