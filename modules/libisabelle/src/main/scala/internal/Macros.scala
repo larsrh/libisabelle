@@ -24,7 +24,7 @@ object Macros {
 
 }
 
-class Macros(val c: whitebox.Context { type PrefixType <: ExprStringContext.term.type }) {
+class Macros(val c: whitebox.Context) {
 
   import c.universe.{Expr => _, _}
 
