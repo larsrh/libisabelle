@@ -62,7 +62,7 @@ You should use the plugin if your build contains Isabelle source files.
 
 `libisabelle` features a CLI called `isabellectl`.
 Currently, it only allows some basic features like downloading, building and launching Isabelle.
-You can download the latest nightly CLI executable from [Bintray](https://dl.bintray.com/larsrh/libisabelle/nightly/isabellectl).
+You can download a CLI executable from [GitHub](https://github.com/larsrh/libisabelle/raw/master/bin/isabellectl).
 
 
 ### Downloading & checking your installation
