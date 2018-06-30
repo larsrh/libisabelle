@@ -34,6 +34,4 @@ esac
 
 if [ "$DEPLOY" = "1" ]; then
   ./sbt "++$SCALA_VERSION" tut
-  ./sbt "cli/assembly"
-  cp modules/cli/target/scala-2.12/isabellectl-assembly-* isabellectl-bin
 fi

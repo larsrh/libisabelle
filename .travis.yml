@@ -14,15 +14,6 @@ deploy:
     on:
       branch: master
       condition: $DEPLOY = 1
-  - provider: bintray
-    file: .ci/bintray
-    user: larsrh
-    skip_cleanup: true
-    on:
-      branch: master
-      condition: $DEPLOY = 1
-    key:
-      secure: "eTZ3R7NVfCqqolU+DG4TR5CJBp0YT/k1dSjRwLMrGyypZvlzsE3Ur3VMLWYH39pypHA9ayDCKNJlqM3kQzXxCC3kGRgk7u7cqM5HwgT/l54Jzz7S731SPmSdIaGDbycAzz6bauYvu1v2jDrsSuS6bo8mfzH4HLSz86qfK8bpZdk="
 matrix:
   include:
     - env: ISABELLE_VERSION=stable:2016 SCALA_VERSION=2.11.12 PROFILE=generic
@@ -46,7 +37,7 @@ matrix:
         apt:
           packages:
             - lib32stdc++6
-    - env: ISABELLE_VERSION=stable:2017 SCALA_VERSION=2.12.6 PROFILE=slow
+    - env: ISABELLE_VERSION=stable:2017 SCALA_VERSION=2.12.6 PROFILE=slow DEPLOY=1
       os: linux
       jdk: oraclejdk9
       addons:
