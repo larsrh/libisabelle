@@ -106,7 +106,6 @@ lazy val root = project.in(file("."))
     pideInterface, libisabelle, setup,
     tests, docs, examples,
     cli,
-    pideDependencies,
     pideAggregate,
     pidePackage,
     workbench
@@ -157,7 +156,15 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.3",
       "io.monix" %% "monix-execution" % "3.0.0-RC1",
-      "org.log4s" %% "log4s" % "1.6.1"
+      "org.log4s" %% "log4s" % "1.6.1",
+      // the dependencies below are not strictly necessary for pide-interface,
+      // but all non-generic PIDE implementations require them
+      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1",
+      "org.tukaani" % "xz" % "1.8",
+      "com.jcraft" % "jsch" % "0.1.54",
+      "com.jcraft" % "jzlib" % "1.1.3",
+      "org.scala-lang" % "scala-compiler" % scalaVersion.value,
+      "org.xerial" % "sqlite-jdbc" % "3.23.1"
     )
   )
 
@@ -202,24 +209,8 @@ lazy val setup = project.in(file("modules/setup"))
 
 lazy val pideVersion = settingKey[Version]("PIDE version")
 
-lazy val pideDependencies = project.in(file("modules/pide-dependencies"))
-  .dependsOn(pideInterface)
-  .settings(moduleName := "pide-dependencies")
-  .settings(standardSettings)
-  .enablePlugins(GitVersioning)
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1",
-      "org.tukaani" % "xz" % "1.8",
-      "com.jcraft" % "jsch" % "0.1.54",
-      "com.jcraft" % "jzlib" % "1.1.3",
-      "org.scala-lang" % "scala-compiler" % scalaVersion.value,
-      "org.xerial" % "sqlite-jdbc" % "3.23.1"
-    )
-  )
-
 def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$version"))
-  .dependsOn(pideDependencies % "provided")
+  .dependsOn(pideInterface % "provided")
   .settings(moduleName := s"pide-$version")
   .settings(standardSettings)
   .enablePlugins(GitVersioning, BuildInfoPlugin)
@@ -258,7 +249,7 @@ def assemblyGenerator(p: Project) = Def.task {
 }
 
 lazy val pidePackage = project.in(file("modules/pide-package"))
-  .dependsOn(pideDependencies)
+  .dependsOn(pideInterface)
   .settings(moduleName := "pide-package")
   .settings(standardSettings)
   .settings(
