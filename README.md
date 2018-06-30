@@ -1,7 +1,7 @@
 # libisabelle
 
 A Scala library which talks to Isabelle.
-It currently works with Isabelle2016, 2016-1 and 2017.
+It currently works with most recent Isabelle versions (there are two tiers of support).
 For more information and documentation about the project, visit [its website](https://lars.hupel.info/libisabelle/).
 
 | Service                   | Status |
@@ -21,8 +21,8 @@ Drop the following lines into your `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "info.hupel" %% "libisabelle" % "0.9.2",
-  "info.hupel" %% "libisabelle-setup" % "0.9.2"
+  "info.hupel" %% "libisabelle" % version,
+  "info.hupel" %% "libisabelle-setup" % version
 )
 ```
 
@@ -30,10 +30,25 @@ With this configuration, the automatic Isabelle setup will fetch additional JAR 
 If you don't want this, additionally include the following dependency:
 
 ```scala
-  "info.hupel" %% "pide-package" % "0.9.2"
+  "info.hupel" %% "pide-package" % version
 ```
 
 This adds PIDE implementations for all supported Isabelle versions to your classpath.
+
+
+## Support tiers
+
+There is a "full" and a "generic" tier.
+Isabelle versions that are supported generically are only supported on Linux and macOS and do not offer full features, i.e. starting a system.
+It only requires a `bin/isabelle` executable to be present.
+
+Usually, more versions get added to the full tier.
+Sometimes, breaking changes in Isabelle require that full support needs to be dropped.
+
+| libisabelle version | full support versions   |
+| ------------------- | ----------------------- |
+| 0.9.2 – 0.9.3       | 2016, 2016-1, 2017      |
+| 1.0.0 (upcoming)    | 2017, 2018 (upcoming)   |
 
 
 ## Using the plugin
