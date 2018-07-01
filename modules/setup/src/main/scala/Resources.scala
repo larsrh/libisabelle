@@ -6,6 +6,10 @@ import java.nio.file._
 import scala.collection.JavaConverters._
 import scala.io.Source
 
+import cats.instances.either._
+import cats.instances.list._
+import cats.syntax.traverse._
+
 import org.log4s._
 
 import info.hupel.isabelle.api.Configuration
@@ -16,6 +20,7 @@ object Resources {
   sealed abstract class Error(val explain: String)
   case object Absent extends Error("No resources found in classpath")
   case class DuplicatedFiles(files: List[String]) extends Error(s"Duplicated resources in classpath: ${files.mkString(", ")}")
+  case class MissingFiles(files: List[String]) extends Error(s"Missing files in classpath: ${files.mkString(", ")}")
 
   private val logger = getLogger
 
@@ -91,29 +96,40 @@ object Resources {
         Left(DuplicatedFiles(duplicates))
       }
       else {
-        for (file <- files) {
+        val result = files.traverse { file =>
           val target = path resolve file
           Files.createDirectories(target.getParent)
           val in = classLoader.getResourceAsStream(s".libisabelle/$file")
-          Files.copy(in, target)
-          in.close()
+          if (in == null) {
+            Left(List(file))
+          }
+          else {
+            Files.copy(in, target)
+            in.close()
+            Right(())
+          }
         }
 
-        val components = filterFor("etc/settings")
-        components.foreach(subdir => logger.debug(s"Found component at $path/$subdir"))
-        val target = path resolve "etc"
-        Files.createDirectories(target)
-        writeList(target resolve "components", components)
+        result match {
+          case Left(files) =>
+            Left(MissingFiles(files))
+          case Right(_) =>
+            val components = filterFor("etc/settings")
+            components.foreach(subdir => logger.debug(s"Found component at $path/$subdir"))
+            val target = path resolve "etc"
+            Files.createDirectories(target)
+            writeList(target resolve "components", components)
 
-        val roots = filterFor("ROOT", "ROOTS")
-        roots.foreach(subdir => logger.debug(s"Found session root at $path/$subdir"))
-        writeList(path resolve "ROOTS", roots diff components)
+            val roots = filterFor("ROOT", "ROOTS")
+            roots.foreach(subdir => logger.debug(s"Found session root at $path/$subdir"))
+            writeList(path resolve "ROOTS", roots diff components)
 
-        val out = Files.newBufferedWriter(target resolve "settings", Charset.forName("UTF-8"), StandardOpenOption.CREATE_NEW)
-        out.write("""LIBISABELLE_RESOURCES_HOME="$COMPONENT"""")
-        out.close()
+            val out = Files.newBufferedWriter(target resolve "settings", Charset.forName("UTF-8"), StandardOpenOption.CREATE_NEW)
+            out.write("""LIBISABELLE_RESOURCES_HOME="$COMPONENT"""")
+            out.close()
 
-        Right(Resources(path, roots.map(path.resolve)))
+            Right(Resources(path, roots.map(path.resolve)))
+        }
       }
     }
     else {
