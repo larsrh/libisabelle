@@ -13,4 +13,4 @@ addSbtPlugin("org.tpolecat" % "tut-plugin" % "0.6.4")
 addSbtPlugin("info.hupel" % "sbt-api-mappings" % "3.0.1")
 addSbtPlugin("info.hupel" % "sbt-jython" % "0.1.1")
 
-addSbtPlugin("info.hupel" % "sbt-libisabelle" % "0.6.1")
+addSbtPlugin("info.hupel" % "sbt-libisabelle" % "0.7.0-RC1")
