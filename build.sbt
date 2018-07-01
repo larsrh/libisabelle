@@ -127,7 +127,8 @@ lazy val docs = project.in(file("modules/docs"))
       "-doc-title", "libisabelle",
       "-doc-version", version.value,
       "-doc-source-url", s"https://github.com/larsrh/libisabelle/blob/${"git rev-parse HEAD" !!}€{FILE_PATH}.scala",
-      "-sourcepath", (baseDirectory in ThisBuild).value.getAbsolutePath
+      "-sourcepath", (baseDirectory in ThisBuild).value.getAbsolutePath,
+      "-Ypartial-unification"
     ),
     target in unidoc in ScalaUnidoc := crossTarget.value / "api",
     siteSubdirName in SiteScaladoc := "api/nightly",
