@@ -224,6 +224,7 @@ def pide(version: String) = Project(s"pide$version", file(s"modules/pide/$versio
 
 lazy val pide2017 = pide("2017")
 lazy val pide2018_RC0 = pide("2018-RC0")
+lazy val pide2018_RC1 = pide("2018-RC1")
 
 lazy val pides = Seq(
   pide2017,
