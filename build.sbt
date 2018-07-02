@@ -93,7 +93,7 @@ lazy val apiBuildInfoKeys = Seq[BuildInfoKey](
   scalaVersion,
   scalaBinaryVersion,
   organization,
-  git.gitHeadCommit,
+  "gitHeadCommit" -> Some("25606f6e38afccaa33682b49b505716e1fc862f8"),
   BuildInfoKey.map(defaultIsabelleVersions) { case (k, v) =>
     (k, v collect { case Version.Stable(identifier) => identifier })
   }
