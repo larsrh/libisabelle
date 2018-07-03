@@ -1,5 +1,5 @@
 theory Common
-imports "Multi_Isabelle.Multi_Isabelle"
+imports Pure
 begin
 
 ML\<open>

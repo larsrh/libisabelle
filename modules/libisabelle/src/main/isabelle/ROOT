@@ -1,6 +1,4 @@
 session Protocol = Classy +
-  sessions
-    Multi_Isabelle
   theories
     "protocol/Protocol"
     "protocol/Codec_Test"
@@ -8,7 +6,6 @@ session Protocol = Classy +
 
 session "HOL-Protocol" = "HOL-Classy" +
   sessions
-    Multi_Isabelle
     Protocol
   theories
     Protocol.Protocol
