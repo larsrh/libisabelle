@@ -107,7 +107,8 @@ sealed abstract class Platform {
     withIsabelleVersion(localStorage.resolve("user"), version, true)
 
   private def acquireLock(): Option[FileLock] = {
-    Files.createDirectories(localStorage)
+    if (!Files.isDirectory(localStorage)) // https://github.com/larsrh/libisabelle/issues/71
+      Files.createDirectories(localStorage)
     FileChannel.open(lockFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE).tryLock() match {
       case null =>
         logger.warn("lock could not be acquired")
