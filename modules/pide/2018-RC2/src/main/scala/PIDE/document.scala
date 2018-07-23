@@ -539,6 +539,7 @@ object Document
     def markup_to_XML(range: Text.Range, elements: Markup.Elements): XML.Body
     def messages: List[(XML.Tree, Position.T)]
     def exports: List[Export.Entry]
+    def exports_map: Map[String, Export.Entry]
 
     def find_command(id: Document_ID.Generic): Option[(Node, Command)]
     def find_command_position(id: Document_ID.Generic, offset: Symbol.Offset)
@@ -668,6 +669,16 @@ object Document
     /*intermediate state between remove_versions/removed_versions*/
     removing_versions: Boolean = false)
   {
+    override def toString: String =
+      "State(versions = " + versions.size +
+      ", blobs = " + blobs.size +
+      ", commands = " + commands.size +
+      ", execs = " + execs.size +
+      ", assignments = " + assignments.size +
+      ", commands_redirection = " + commands_redirection.size +
+      ", history = " + history.undo_list.size +
+      ", removing_versions = " + removing_versions + ")"
+
     private def fail[A]: A = throw new State.Fail(this)
 
     def define_version(version: Version, assignment: State.Assignment): State =
@@ -1030,7 +1041,7 @@ object Document
         def markup_to_XML(range: Text.Range, elements: Markup.Elements): XML.Body =
           state.markup_to_XML(version, node_name, range, elements)
 
-        def messages: List[(XML.Tree, Position.T)] =
+        lazy val messages: List[(XML.Tree, Position.T)] =
           (for {
             (command, start) <-
               Document.Node.Commands.starts_pos(
@@ -1039,12 +1050,15 @@ object Document
             (_, tree) <- state.command_results(version, command).iterator
            } yield (tree, pos)).toList
 
-        def exports: List[Export.Entry] =
+        lazy val exports: List[Export.Entry] =
           Command.Exports.merge(
             for {
               command <- node.commands.iterator
               st <- state.command_states(version, command).iterator
             } yield st.exports).iterator.map(_._2).toList
+
+        lazy val exports_map: Map[String, Export.Entry] =
+          (for (entry <- exports.iterator) yield (entry.name, entry)).toMap
 
 
         /* find command */

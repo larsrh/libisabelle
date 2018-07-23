@@ -56,7 +56,7 @@ object Dump
         { case args =>
             for (entry <- args.snapshot.exports if entry.name == "document.tex")
               args.write(Path.explode(entry.name), entry.uncompressed())
-        }, options = List("editor_presentation")),
+        }, options = List("editor_presentation", "export_document")),
       Aspect("theory", "foundational theory content",
         { case args =>
             for {
@@ -78,6 +78,10 @@ object Dump
 
   val default_output_dir = Path.explode("dump")
 
+  def make_options(options: Options, aspects: List[Aspect]): Options =
+    (options.int.update("completion_limit", 0).bool.update("ML_statistics", false) /: aspects)(
+      { case (opts, aspect) => (opts /: aspect.options)(_ + _) })
+
   def dump(options: Options, logic: String,
     aspects: List[Aspect] = Nil,
     progress: Progress = No_Progress,
@@ -89,12 +93,10 @@ object Dump
     system_mode: Boolean = false,
     selection: Sessions.Selection = Sessions.Selection.empty): Process_Result =
   {
-    if (Build.build_logic(options, logic, progress = progress, dirs = dirs,
-      system_mode = system_mode) != 0) error(logic + " FAILED")
+    if (Build.build_logic(options, logic, build_heap = true, progress = progress,
+      dirs = dirs, system_mode = system_mode) != 0) error(logic + " FAILED")
 
-    val dump_options =
-      (options.int.update("completion_limit", 0).bool.update("ML_statistics", false) /: aspects)(
-        { case (opts, aspect) => (opts /: aspect.options)(_ + _) })
+    val dump_options = make_options(options, aspects)
 
 
     /* dependencies */
@@ -130,7 +132,15 @@ object Dump
       aspects.foreach(_.operation(aspect_args))
     }
 
-    session_result
+    if (theories_result.ok) session_result
+    else {
+      for {
+        (name, status) <- theories_result.nodes if !status.ok
+        (tree, pos) <- theories_result.snapshot(name).messages if Protocol.is_error(tree)
+      } progress.echo_error_message(XML.content(Pretty.formatted(List(tree))))
+
+      session_result.copy(rc = session_result.rc max 1)
+    }
   }
 
 

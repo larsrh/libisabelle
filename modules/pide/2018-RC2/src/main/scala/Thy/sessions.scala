@@ -459,9 +459,13 @@ object Sessions
 
     val selected_sessions1 =
     {
-      val sel_sessions1 = session1 :: include_sessions
+      val sel_sessions1 = session1 :: session :: include_sessions
       val select_sessions1 =
-        if (session_focus) full_sessions1.imports_descendants(sel_sessions1) else sel_sessions1
+        if (session_focus) {
+          full_sessions1.check_sessions(sel_sessions1)
+          full_sessions1.imports_descendants(sel_sessions1)
+        }
+        else sel_sessions1
       full_sessions1.selection(Selection(sessions = select_sessions1))
     }
 
@@ -679,13 +683,16 @@ object Sessions
               }
           })
 
-    def selection(sel: Selection): Structure =
+    def check_sessions(names: List[String])
     {
-      val bad_sessions =
-        SortedSet((sel.base_sessions ::: sel.exclude_sessions ::: sel.sessions).
-          filterNot(defined(_)): _*).toList
+      val bad_sessions = SortedSet(names.filterNot(defined(_)): _*).toList
       if (bad_sessions.nonEmpty)
         error("Undefined session(s): " + commas_quote(bad_sessions))
+    }
+
+    def selection(sel: Selection): Structure =
+    {
+      check_sessions(sel.base_sessions ::: sel.exclude_sessions ::: sel.sessions)
 
       val excluded = sel.excluded(build_graph).toSet
 
@@ -1012,8 +1019,8 @@ object Sessions
 
     /* directories */
 
-    val system_output_dir: Path = Path.explode("~~/heaps/$ML_IDENTIFIER")
-    val user_output_dir: Path = Path.explode("$ISABELLE_HOME_USER/heaps/$ML_IDENTIFIER")
+    val system_output_dir: Path = Path.explode("$ISABELLE_HEAPS_SYSTEM/$ML_IDENTIFIER")
+    val user_output_dir: Path = Path.explode("$ISABELLE_HEAPS/$ML_IDENTIFIER")
 
     val output_dir: Path =
       if (system_mode) system_output_dir else user_output_dir
@@ -1023,7 +1030,7 @@ object Sessions
       else List(user_output_dir, system_output_dir)
 
     val browser_info: Path =
-      if (system_mode) Path.explode("~~/browser_info")
+      if (system_mode) Path.explode("$ISABELLE_BROWSER_INFO_SYSTEM")
       else Path.explode("$ISABELLE_BROWSER_INFO")
 
 
