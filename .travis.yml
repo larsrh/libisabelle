@@ -1,10 +1,4 @@
 language: java
-env:
-  matrix:
-    - ISABELLE_VERSION=stable:2017 SCALA_VERSION=2.11.12 PROFILE=quick
-    - ISABELLE_VERSION=stable:2018-RC2 SCALA_VERSION=2.11.12 PROFILE=quick
-os:
-  - osx
 script:
   - ./.ci/travis.sh
 deploy:
@@ -16,6 +10,12 @@ deploy:
       condition: $DEPLOY = 1
 matrix:
   include:
+    - env: ISABELLE_VERSION=stable:2017 SCALA_VERSION=2.11.12 PROFILE=quick
+      os: osx
+      osx_image: xcode8.3
+    - env: ISABELLE_VERSION=stable:2018-RC2 SCALA_VERSION=2.11.12 PROFILE=quick
+      os: osx
+      osx_image: xcode8.3
     - env: ISABELLE_VERSION=stable:2016 SCALA_VERSION=2.11.12 PROFILE=generic
       os: linux
       jdk: oraclejdk8
