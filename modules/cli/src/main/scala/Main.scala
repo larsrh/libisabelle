@@ -40,7 +40,7 @@ object Main {
           case Version.Devel(_) =>
             Options.usageAndExit("Option conflict: devel version and --afp are mutually exclusive")
           case Version.Stable(identifier) =>
-            Set(Dependency(Module(s"${BuildInfo.organization}.afp", s"afp-$identifier"), "1.1.+"))
+            Set(Dependency(Module(s"${BuildInfo.organization}.afp", s"afp-$identifier"), "2.0.+"))
         }
       else
         Set()
