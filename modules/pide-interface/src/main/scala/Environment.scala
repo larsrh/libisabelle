@@ -176,7 +176,7 @@ abstract class Environment protected(val context: Environment.Context, versionOv
   }
 
   protected final def protocolTheory(loaded: Set[String]): Option[String] =
-    if (loaded.contains("Protocol"))
+    if (loaded.contains("Protocol.Protocol"))
       None
     else {
       // this only works if resources are registered
