@@ -15,6 +15,8 @@ signature CODEC = sig
   val decode: 'a codec -> XML.tree -> 'a result
   val the_decode: 'a codec -> XML.tree -> 'a
 
+  val add_exception_printer: ((exn -> string) -> exn -> string option) -> unit
+
   val basic: {encode: 'a -> XML.tree, decode: XML.tree -> 'a result} -> 'a codec
 
   val variant: ('a -> (int * XML.tree)) -> (int -> (XML.tree -> 'a result) option) -> string -> 'a codec
@@ -172,8 +174,23 @@ val content_of =
 (* slightly fishy codec, doesn't preserve exception type *)
 exception GENERIC of string
 
-fun string_of_exn (ERROR msg) = "ERROR " ^ content_of msg
-  | string_of_exn exn = content_of (@{make_string} exn)
+fun ERROR_printer (ERROR msg) = SOME ("ERROR " ^ content_of msg)
+  | ERROR_printer _ = NONE
+
+val exception_printers = Synchronized.var "exceptions_printers" [ERROR_printer]
+
+(* Installs a printer for exceptions. 
+  "printer p exn" is supposed to output a string describing exn (with no markup), or NONE.
+  Here p is a printer that can be used to convert exceptions to strings (for recursive printing).
+  The last added printer that does not return NONE is used for printing an exception.
+ *)
+fun add_exception_printer printer = Synchronized.change exception_printers (fn printers => (printer string_of_exn)::printers)
+
+and string_of_exn exn = 
+  let
+    fun print (printer::printers) = (case printer exn of NONE => print printers | SOME msg => msg)
+      | print [] = content_of (@{make_string} exn)
+  in print (Synchronized.value exception_printers) end
 
 val exn = tagged "exn" (text string_of_exn (SOME o GENERIC))
 
