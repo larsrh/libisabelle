@@ -1,5 +1,7 @@
 package info.hupel.isabelle
 
+import scala.util.control.NoStackTrace
+
 import info.hupel.isabelle.api.XML
 
 /**
@@ -11,7 +13,7 @@ import info.hupel.isabelle.api.XML
  *
  * @see [[info.hupel.isabelle.System#invoke]]
  */
-trait ProverResult[+T] {
+sealed trait ProverResult[+T] {
   def unsafeGet: T = this match {
     case ProverResult.Success(t) => t
     case ProverResult.Failure(exn) => throw exn
@@ -27,8 +29,38 @@ trait ProverResult[+T] {
 }
 
 object ProverResult {
+
   final case class Success[+T](t: T) extends ProverResult[T]
-  final case class Failure(exn: Exception) extends ProverResult[Nothing]
+  final case class Failure(exn: Exn) extends ProverResult[Nothing]
+
+  /**
+   * Slightly fishy exception to represent any kind of exception from the
+   * prover.
+   *
+   * There is no stack traces available, because instance are only created when
+   * the prover throws an exception.
+   */
+  final case class Exn private(operation: String, msg: String, input: Any) extends RuntimeException(msg) with NoStackTrace {
+    def fullMessage =
+      s"Prover error in operation $operation: $msg\nOffending input: $input"
+  }
+
+  private def exnCodec(operation: String, input: Any): Codec[Exn] = Codec.text[Exn](
+    _.getMessage,
+    str => Some(Exn(operation, str, input)),
+    "exn"
+  ).tagged("exn")
+
+  private[isabelle] def resultCodec[O](codec: Codec[O], operation: String, input: Any): Codec[ProverResult[O]] = new Codec.Variant[ProverResult[O]]("Exn.result") {
+    val mlType = "Exn.result"
+    def enc(a: ProverResult[O]) = sys.error("impossible")
+    def dec(idx: Int) = idx match {
+      case 0 => Some(codec.decode(_).right.map(Success.apply))
+      case 1 => Some(exnCodec(operation, input).decode(_).right.map(Failure.apply))
+      case _ => None
+    }
+  }
+
 }
 
 /**
