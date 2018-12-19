@@ -51,7 +51,17 @@ abstract class LibisabelleSpec(val specs2Env: Env, flavour: String) extends Spec
 
   // Loading auxiliary files
 
-  val loaded = system.flatMap(_.invoke(Operation.UseThys)(List(resources.findTheory(Paths.get("tests/Sleepy.thy")).get)))
+  def load(name: String) = {
+    val thy = resources.findTheory(Paths.get(s"tests/$name.thy")).get
+    for {
+      s <- system
+      e <- isabelleEnv
+      res <- s.invoke(Operation.UseThys)(List(e.isabellePath(thy)))
+    }
+    yield res
+  }
+
+  val loaded = load("Sleepy")
 
   val Sleepy = Operation.implicitly[BigInt, Unit]("sleepy")
 
