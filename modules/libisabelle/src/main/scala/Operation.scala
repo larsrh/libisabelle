@@ -48,8 +48,7 @@ object Operation {
         done = { tree =>
           ProverResult.resultCodec[Unit](Codec[Unit], name, args).decode(tree) match {
             case Left((err, body)) => Observer.Failure(DecodingException(err, body))
-            case Right(ProverResult.Success(())) => Observer.Success(ProverResult.Success(finish(a)))
-            case Right(fail @ ProverResult.Failure(_)) => Observer.Success(fail)
+            case Right(res) => Observer.Success(res.map { case () => finish(a) })
           }
         }
       )

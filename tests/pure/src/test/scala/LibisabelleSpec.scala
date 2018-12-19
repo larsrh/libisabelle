@@ -27,9 +27,10 @@ abstract class LibisabelleSpec(val specs2Env: Env, flavour: String) extends Spec
     supports term parsing      ${parseCheck must beSuccess(Option.empty[String]).awaitFor(duration)}
     can parse terms            ${parsed must beSome.awaitFor(duration)}
     can't parse wrong terms    ${parseFailed must beNone.awaitFor(duration)}
-    handles missing operations ${missingOperation must beFailure.awaitFor(duration)}
+    handles missing operations ${missingOperation must beFailure(contain("unknown command")).awaitFor(duration)}
     can load theories          ${loaded must beSuccess(()).awaitFor(duration)}
-    handles operation errors   ${operationError must beFailure.awaitFor(duration)}
+    handles operation errors   ${operationError must beFailure(contain("Invalid time")).awaitFor(duration)}
+    handles load errors        ${loadedFailing must beFailure(contain("Failed to finish proof")).awaitFor(duration)}
     can cancel requests        ${cancelled.failed must beAnInstanceOf[CancellationException].awaitFor(duration)}"""
 
 
@@ -62,6 +63,7 @@ abstract class LibisabelleSpec(val specs2Env: Env, flavour: String) extends Spec
   }
 
   val loaded = load("Sleepy")
+  val loadedFailing = load("Failing")
 
   val Sleepy = Operation.implicitly[BigInt, Unit]("sleepy")
 

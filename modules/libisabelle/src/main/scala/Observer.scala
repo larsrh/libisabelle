@@ -16,7 +16,7 @@ import info.hupel.isabelle.api.XML
 sealed trait ProverResult[+T] {
   def unsafeGet: T = this match {
     case ProverResult.Success(t) => t
-    case ProverResult.Failure(exn) => throw exn
+    case fail: ProverResult.Failure => throw fail
   }
   def toOption: Option[T] = this match {
     case ProverResult.Success(t) => Some(t)
@@ -31,23 +31,15 @@ sealed trait ProverResult[+T] {
 object ProverResult {
 
   final case class Success[+T](t: T) extends ProverResult[T]
-  final case class Failure(exn: Exn) extends ProverResult[Nothing]
 
-  /**
-   * Slightly fishy exception to represent any kind of exception from the
-   * prover.
-   *
-   * There is no stack traces available, because instance are only created when
-   * the prover throws an exception.
-   */
-  final case class Exn private(operation: String, msg: String, input: Any) extends RuntimeException(msg) with NoStackTrace {
+  final case class Failure private(operation: String, msg: String, input: Any) extends RuntimeException with ProverResult[Nothing] with NoStackTrace {
     def fullMessage =
       s"Prover error in operation $operation: $msg\nOffending input: $input"
   }
 
-  private def exnCodec(operation: String, input: Any): Codec[Exn] = Codec.text[Exn](
+  private def failureCodec(operation: String, input: Any): Codec[Failure] = Codec.text[Failure](
     _.getMessage,
-    str => Some(Exn(operation, str, input)),
+    str => Some(Failure(operation, str, input)),
     "exn"
   ).tagged("exn")
 
@@ -56,7 +48,7 @@ object ProverResult {
     def enc(a: ProverResult[O]) = sys.error("impossible")
     def dec(idx: Int) = idx match {
       case 0 => Some(codec.decode(_).right.map(Success.apply))
-      case 1 => Some(exnCodec(operation, input).decode(_).right.map(Failure.apply))
+      case 1 => Some(failureCodec(operation, input).decode(_))
       case _ => None
     }
   }

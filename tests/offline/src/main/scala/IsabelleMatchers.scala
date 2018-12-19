@@ -12,11 +12,11 @@ trait IsabelleMatchers { self: Matchers =>
       case _ => None
     }, check)
 
-  def beFailure[A]: Matcher[ProverResult[A]] =
-    new OptionLikeMatcher[ProverResult, A, Exception]("ProverResult.Failure", {
-      case ProverResult.Failure(exn) => Some(exn)
+  def beFailure[A](check: ValueCheck[String]): Matcher[ProverResult[A]] =
+    new OptionLikeCheckedMatcher[ProverResult, A, String]("ProverResult.Failure", {
+      case ProverResult.Failure(_, msg, _) => Some(msg)
       case _ => None
-    })
+    }, check)
 
   def exist[A]: Matcher[A] = ((a: A) => a != null, "doesn't exist")
 
