@@ -32,7 +32,7 @@ final class JSystem private(system: System, timeout: Duration) {
   def invoke[I, O](operation: Operation[I, O], arg: I): O =
     await(system.invoke(operation)(arg)) match {
       case ProverResult.Success(o) => o
-      case ProverResult.Failure(exn) => throw exn
+      case exn: ProverResult.Failure => throw exn
     }
 
 }

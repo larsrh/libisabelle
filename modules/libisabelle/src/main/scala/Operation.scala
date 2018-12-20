@@ -1,23 +1,9 @@
 package info.hupel.isabelle
 
-import scala.util.control.NoStackTrace
-
 import info.hupel.isabelle.api.XML
 
 /** Combinators for creating [[Operation operations]] and basic operations. */
 object Operation {
-
-  /**
-   * Slightly fishy exception to represent any kind of exception from the
-   * prover.
-   *
-   * There is no stack traces available, because instance are only created when
-   * the prover throws an exception.
-   */
-  final case class ProverException private[isabelle](operation: String, msg: String, input: Any) extends RuntimeException(msg) with NoStackTrace {
-    def fullMessage =
-      s"Prover error in operation $operation: $msg\nOffending input: $input"
-  }
 
   /** Create a [[simple]] observer using implicit [[Codec codecs]]. */
   def implicitly[I : Codec, O : Codec](name: String): Operation[I, O] =
@@ -28,35 +14,17 @@ object Operation {
    * final result and immediately attempts to decode it with a given
    * [[Codec codec]].
    */
-  def simple[I, O](name: String, toProver: Codec[I], fromProver: Codec[O]): Operation[I, O] = {
-    def exn(input: I) = Codec.text[Exception](
-      _.getMessage,
-      str => Some(ProverException(name, str, input)),
-      "exn"
-    ).tagged("exn")
-
-    def proverResult(input: I) = new Codec.Variant[ProverResult[O]]("Exn.result") {
-      val mlType = "Exn.result"
-      def enc(a: ProverResult[O]) = sys.error("impossible")
-      def dec(idx: Int) = idx match {
-        case 0 => Some(fromProver.decode(_).right.map(ProverResult.Success.apply))
-        case 1 => Some(exn(input).decode(_).right.map(ProverResult.Failure.apply))
-        case _ => None
-      }
-    }
-
-    new Operation[I, O](name) {
-      def prepare(i: I): (XML.Tree, Observer[O]) = {
-        val tree = toProver.encode(i)
-        val observer = Observer.ignoreStep[O] { tree =>
-          proverResult(i).decode(tree) match {
-            case Left((err, body)) => Observer.Failure(DecodingException(err, body))
-            case Right(o) => Observer.Success(o)
-          }
+  def simple[I, O](name: String, toProver: Codec[I], fromProver: Codec[O]): Operation[I, O] = new Operation[I, O](name) {
+    def prepare(i: I): (XML.Tree, Observer[O]) = {
+      val tree = toProver.encode(i)
+      val observer = Observer.ignoreStep[O] { tree =>
+        ProverResult.resultCodec(fromProver, name, i).decode(tree) match {
+          case Left((err, body)) => Observer.Failure(DecodingException(err, body))
+          case Right(o) => Observer.Success(o)
         }
-
-        (tree, observer)
       }
+
+      (tree, observer)
     }
   }
 
@@ -77,7 +45,12 @@ object Operation {
       val tree = Codec[List[String]].encode(args)
       def observer(a: A): Observer[B] = Observer.More(
         step = msg => observer(markup(a, msg)),
-        done = _ => Observer.Success(ProverResult.Success(finish(a)))
+        done = { tree =>
+          ProverResult.resultCodec[Unit](Codec[Unit], name, args).decode(tree) match {
+            case Left((err, body)) => Observer.Failure(DecodingException(err, body))
+            case Right(res) => Observer.Success(res.map { case () => finish(a) })
+          }
+        }
       )
 
       (tree, observer(init))

@@ -27,9 +27,10 @@ abstract class LibisabelleSpec(val specs2Env: Env, flavour: String) extends Spec
     supports term parsing      ${parseCheck must beSuccess(Option.empty[String]).awaitFor(duration)}
     can parse terms            ${parsed must beSome.awaitFor(duration)}
     can't parse wrong terms    ${parseFailed must beNone.awaitFor(duration)}
-    handles missing operations ${missingOperation must beFailure.awaitFor(duration)}
+    handles missing operations ${missingOperation must beFailure(contain("unknown command")).awaitFor(duration)}
     can load theories          ${loaded must beSuccess(()).awaitFor(duration)}
-    handles operation errors   ${operationError must beFailure.awaitFor(duration)}
+    handles operation errors   ${operationError must beFailure(contain("Invalid time")).awaitFor(duration)}
+    handles load errors        ${loadedFailing must beFailure(contain("Failed to finish proof")).awaitFor(duration)}
     can cancel requests        ${cancelled.failed must beAnInstanceOf[CancellationException].awaitFor(duration)}"""
 
 
@@ -51,7 +52,18 @@ abstract class LibisabelleSpec(val specs2Env: Env, flavour: String) extends Spec
 
   // Loading auxiliary files
 
-  val loaded = system.flatMap(_.invoke(Operation.UseThys)(List(resources.findTheory(Paths.get("tests/Sleepy.thy")).get)))
+  def load(name: String) = {
+    val thy = resources.findTheory(Paths.get(s"tests/$name.thy")).get
+    for {
+      s <- system
+      e <- isabelleEnv
+      res <- s.invoke(Operation.UseThys)(List(e.isabellePath(thy)))
+    }
+    yield res
+  }
+
+  val loaded = load("Sleepy")
+  val loadedFailing = load("Failing")
 
   val Sleepy = Operation.implicitly[BigInt, Unit]("sleepy")
 
