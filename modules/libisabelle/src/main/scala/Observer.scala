@@ -7,9 +7,8 @@ import info.hupel.isabelle.api.XML
 /**
  * Result from the prover.
  *
- * In the error case, a special
- * `[[info.hupel.isabelle.Operation.ProverException ProverException]]` will be
- * provided.
+ * The error case additionally provides the input and the operation that have
+ * been sent to the prover.
  *
  * @see [[info.hupel.isabelle.System#invoke]]
  */

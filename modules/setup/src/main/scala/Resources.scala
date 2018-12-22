@@ -59,8 +59,8 @@ object Resources {
    * directories. This is done by looking for `ROOT`, `ROOTS`, and
    * `etc/settings` in direct subdirectories that have been created below the
    * specified path. Components are added as subcomponents to the resources
-   * component (`$LIBISABELLE_RESOURCES_HOME/etc/components`) and session root
-   * directories to `$LIBISABELLE_RESOURCES_HOME/ROOTS`. Session roots that are
+   * component (`\$LIBISABELLE_RESOURCES_HOME/etc/components`) and session root
+   * directories to `\$LIBISABELLE_RESOURCES_HOME/ROOTS`. Session roots that are
    * also components are only added as components, because components are
    * automatically discovered as session roots.
    *
