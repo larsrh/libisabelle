@@ -30,7 +30,7 @@ abstract class LibisabelleSpec(val specs2Env: Env, flavour: String) extends Spec
     handles missing operations ${missingOperation must beFailure(contain("unknown command")).awaitFor(duration)}
     can load theories          ${loaded must beSuccess(()).awaitFor(duration)}
     handles operation errors   ${operationError must beFailure(contain("Invalid time")).awaitFor(duration)}
-    handles load errors        ${loadedFailing must beFailure(contain("Failed to finish proof")).awaitFor(duration)}
+    handles load errors        ${loadedFailing must beFailure(be =~ """.*((Failed to finish proof)|(EXCURSION_FAIL)).*""".r).awaitFor(duration)}
     can cancel requests        ${cancelled.failed must beAnInstanceOf[CancellationException].awaitFor(duration)}"""
 
 
