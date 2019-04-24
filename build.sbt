@@ -15,7 +15,7 @@ lazy val standardSettings = Seq(
   ),
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
-  resolvers += Resolver.sonatypeRepo("releases"),
+  resolvers += Resolver.sonatypeRepo("public"),
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (version.value.endsWith("SNAPSHOT"))
@@ -181,7 +181,7 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
       "org.typelevel" %% "cats-free" % "1.1.0",
       "com.lihaoyi" %% "scalatags" % "0.6.7",
       "org.apache.commons" % "commons-lang3" % "3.7",
-      "info.hupel" % "classy" % "0.2.1",
+      "info.hupel" % "classy" % "0.2.2",
       "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0"
     ),
     isabelleSessions in Compile := Seq(

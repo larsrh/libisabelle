@@ -1,5 +1,5 @@
 theory Common
-imports Pure
+imports Multi_Isabelle.Multi_Isabelle
 begin
 
 ML\<open>
@@ -12,6 +12,24 @@ ML\<open>
       val all = Thy_Info.get_names ()
       val qualified = find_first (fn name' => name = Long_Name.base_name name') all
     in Thy_Info.get_theory (the qualified) end
+\<close>
+
+ML_cond ("2017", "2018") \<open>
+  val ml_lex_read_source = ML_Lex.read_source false
+\<close>
+
+ML_cond ("2019*") \<open>
+  val ml_lex_read_source = ML_Lex.read_source
+\<close>
+
+ML\<open>
+(* implementation from Isabelle2018 *)
+fun ml_context_expression range name constraint body ants =
+  ML_Context.exec (fn () =>
+   ML_Context.eval ML_Compiler.flags (#1 range)
+    (ML_Lex.read "Context.put_generic_context (SOME (let val " @ ML_Lex.read_set_range range name @
+     ML_Lex.read (": " ^ constraint ^ " =") @ ants @
+     ML_Lex.read ("in " ^ body ^ " end (Context.the_generic_context ())));")));
 \<close>
 
 ML\<open>

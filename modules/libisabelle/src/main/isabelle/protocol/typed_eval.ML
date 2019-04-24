@@ -27,10 +27,10 @@ type T = Args.T
 val fulfill = Data.map o K o SOME
 
 fun eval source ctxt =
-  ML_Context.expression (Input.range_of source)
+  ml_context_expression (Input.range_of source)
     "typed_eval_result" Args.typ
     (Args.name ^ ".fulfill typed_eval_result")
-    (ML_Lex.read_source false source)
+    (ml_lex_read_source source)
     (Context.Proof ctxt)
   |> Data.get
   |> the

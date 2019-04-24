@@ -1,10 +1,12 @@
 session Protocol = Classy +
+  sessions
+    Spec_Check
   theories
     "protocol/Protocol"
     "protocol/Codec_Test"
     "Protocol_Pure"
 
-session "HOL-Protocol" = "HOL-Classy" +
+session "HOL-Protocol" = HOL +
   sessions
     Protocol
   theories

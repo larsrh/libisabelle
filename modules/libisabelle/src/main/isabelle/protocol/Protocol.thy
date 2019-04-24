@@ -12,14 +12,14 @@ val _ =
         fun eval enclose =
           ML_Context.eval_in (SOME ctxt) ML_Compiler.flags (Input.pos_of source)
             (ML_Lex.read ("Libisabelle_Protocol.add_operation " ^ ML_Syntax.print_string name ^ "(") @
-              enclose (ML_Lex.read_source false source) @
+              enclose (ml_lex_read_source source) @
               ML_Lex.read ")" @
               ML_Lex.read (print_flags flags))
       in
         if auto then
           let
             (* FIXME breaks antiquotations *)
-            val ML_Types.Fun (arg, res) = ML_Types.ml_type_of ctxt (Input.source_content source)
+            val ML_Types.Fun (arg, res) = ML_Types.ml_type_of ctxt (input_source_content source)
             val arg_codec = Classy.resolve @{ML.class codec} arg (Context.Proof ctxt)
             val res_codec = Classy.resolve @{ML.class codec} res (Context.Proof ctxt)
             fun enclose toks =
