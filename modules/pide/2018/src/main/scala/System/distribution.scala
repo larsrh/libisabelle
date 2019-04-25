@@ -11,5 +11,5 @@ object Distribution
 {
   val version = "Isabelle2018: August 2018"
   val is_identified = true
-  val is_official = false
+  val is_official = true
 }
