@@ -9,7 +9,7 @@ import info.hupel.isabelle.api
 import shapeless._
 import shapeless.tag._
 
-@api.Implementation(identifier = "2019-RC0")
+@api.Implementation(identifier = "2019-RC4")
 final class Environment private(context: api.Environment.Context) extends api.Environment(context) {
 
   isabelle.Standard_Thread.pool = context.executorService

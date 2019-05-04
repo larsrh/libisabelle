@@ -174,15 +174,19 @@ object Build_Fonts
   }
 
 
-  /* auto-hinting */
-  // see https://www.freetype.org/ttfautohint/doc/ttfautohint.html
+  /* hinting */
 
-  def auto_hint(source: Path, target: Path)
+  // see https://www.freetype.org/ttfautohint/doc/ttfautohint.html
+  private def auto_hint(source: Path, target: Path)
   {
     Isabelle_System.bash("ttfautohint -i " +
       File.bash_path(source) + " " + File.bash_path(target)).check
   }
 
+  private def hinted_path(hinted: Boolean): Path =
+    if (hinted) Path.basic("ttf-hinted") else Path.basic("ttf")
+
+  private val hinting = List(false, true)
 
 
   /* build fonts */
@@ -213,7 +217,7 @@ object Build_Fonts
     progress: Progress = No_Progress)
   {
     progress.echo("Directory " + target_dir)
-    Isabelle_System.mkdirs(target_dir)
+    hinting.foreach(hinted => Isabelle_System.mkdirs(target_dir + hinted_path(hinted)))
 
     val font_dirs = source_dirs ::: List(Path.explode("~~/Admin/isabelle_fonts"))
     for (dir <- font_dirs if !dir.is_dir) error("Bad source directory: " + dir)
@@ -230,34 +234,38 @@ object Build_Fonts
         val source_names = Fontforge.font_names(source_file)
 
         val target_names = source_names.update(prefix = target_prefix, version = target_version)
-        val target_file = target_dir + target_names.ttf
 
-        progress.echo("Font " + target_file.toString + " ...")
         Isabelle_System.with_tmp_file("font", "ttf")(tmp_file =>
         {
-          auto_hint(source_file, tmp_file)
+          for (hinted <- hinting) {
+            val target_file = target_dir + hinted_path(hinted) + target_names.ttf
+            progress.echo("Font " + target_file.toString + " ...")
 
-          Fontforge.execute(
-            Fontforge.commands(
-              Fontforge.open(isabelle_file),
-              Fontforge.select(Range.isabelle_font),
-              Fontforge.copy,
-              Fontforge.close,
+            if (hinted) auto_hint(source_file, tmp_file)
+            else File.copy(source_file, tmp_file)
 
-              Fontforge.open(tmp_file),
-              Fontforge.select(Range.base_font),
-              Fontforge.select_invert,
-              Fontforge.clear,
-              Fontforge.select(Range.isabelle_font),
-              Fontforge.paste,
+            Fontforge.execute(
+              Fontforge.commands(
+                Fontforge.open(isabelle_file),
+                Fontforge.select(Range.isabelle_font),
+                Fontforge.copy,
+                Fontforge.close,
 
-              target_names.set,
-              Fontforge.generate(target_file),
-              Fontforge.close)
-          ).check
+                Fontforge.open(tmp_file),
+                Fontforge.select(Range.base_font),
+                Fontforge.select_invert,
+                Fontforge.clear,
+                Fontforge.select(Range.isabelle_font),
+                Fontforge.paste,
+
+                target_names.set,
+                Fontforge.generate(target_file),
+                Fontforge.close)
+            ).check
+          }
         })
 
-        (target_file, index)
+        (target_names.ttf, index)
       }
 
 
@@ -267,13 +275,14 @@ object Build_Fonts
       val vacuous_file = find_file(font_dirs, Family.vacuous.get(0))
 
       val target_names = Fontforge.font_names(vacuous_file)
-      val target_file = target_dir + target_names.ttf
+      val target_file = target_dir + hinted_path(false) + target_names.ttf
 
       progress.echo("Font " + target_file.toString + " ...")
 
       val domain =
-        (for ((target_file, index) <- targets if index == 0)
-          yield Fontforge.font_domain(target_file)).flatten.toSet.toList.sorted
+        (for ((name, index) <- targets if index == 0)
+          yield Fontforge.font_domain(target_dir + hinted_path(false) + name))
+        .flatten.toSet.toList.sorted
 
       Fontforge.execute(
         Fontforge.commands(
@@ -298,13 +307,22 @@ object Build_Fonts
 
     val settings_path = Components.settings(target_dir)
     Isabelle_System.mkdirs(settings_path.dir)
-    File.write(settings_path,
-      "# -*- shell-script -*- :mode=shellscript:\n\nisabelle_fonts \\\n" +
-      (for ((path, _) <- targets)
-        yield """  "$COMPONENT/""" + path.file_name + "\"").mkString(" \\\n") +
-      """
 
-isabelle_fonts_hidden "$COMPONENT/Vacuous.ttf"
+    def fonts_settings(hinted: Boolean): String =
+      "\n  isabelle_fonts \\\n" +
+      (for ((target, _) <- targets) yield
+        """    "$COMPONENT/""" + hinted_path(hinted).file_name + "/" + target.file_name + "\"")
+      .mkString(" \\\n")
+
+    File.write(settings_path,
+      """# -*- shell-script -*- :mode=shellscript:
+
+if grep "isabelle_fonts_hinted.*=.*false" "$ISABELLE_HOME_USER/etc/preferences" >/dev/null 2>/dev/null
+then""" + fonts_settings(false) + """
+else""" + fonts_settings(true) + """
+fi
+
+isabelle_fonts_hidden "$COMPONENT/""" + hinted_path(false).file_name + """/Vacuous.ttf"
 """)
 
 
