@@ -180,7 +180,7 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
       "org.typelevel" %% "cats-core" % "1.1.0",
       "org.typelevel" %% "cats-free" % "1.1.0",
       "com.lihaoyi" %% "scalatags" % "0.6.7",
-      "org.apache.commons" % "commons-lang3" % "3.7",
+      "org.apache.commons" % "commons-lang3" % "3.9",
       "info.hupel" % "classy" % "0.2.2",
       "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0"
     ),
