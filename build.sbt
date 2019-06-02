@@ -157,7 +157,7 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.3",
       "io.monix" %% "monix-execution" % "3.0.0-RC1",
-      "org.log4s" %% "log4s" % "1.6.1",
+      "org.log4s" %% "log4s" % "1.8.0",
       // the dependencies below are not strictly necessary for pide-interface,
       // but all non-generic PIDE implementations require them
       "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1",
