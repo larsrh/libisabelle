@@ -201,7 +201,7 @@ lazy val setup = project.in(file("modules/setup"))
       "io.get-coursier" %% "coursier" % "1.0.3",
       "io.get-coursier" %% "coursier-cache" % "1.0.3",
       "org.apache.commons" % "commons-compress" % "1.17",
-      "org.eclipse.jgit" % "org.eclipse.jgit" % "5.0.1.201806211838-r",
+      "org.eclipse.jgit" % "org.eclipse.jgit" % "5.0.3.201809091024-r",
       "commons-io" % "commons-io" % "2.6"
     )
   )
