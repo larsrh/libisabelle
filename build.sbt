@@ -177,8 +177,8 @@ lazy val libisabelle = project.in(file("modules/libisabelle"))
   .settings(macroSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "1.6.0",
-      "org.typelevel" %% "cats-free" % "1.6.0",
+      "org.typelevel" %% "cats-core" % "1.6.1",
+      "org.typelevel" %% "cats-free" % "1.6.1",
       "com.lihaoyi" %% "scalatags" % "0.6.8",
       "org.apache.commons" % "commons-lang3" % "3.9",
       "info.hupel" % "classy" % "0.2.2",
