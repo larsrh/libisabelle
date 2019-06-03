@@ -162,7 +162,7 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
       // but all non-generic PIDE implementations require them
       "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1",
       "org.tukaani" % "xz" % "1.8",
-      "com.jcraft" % "jsch" % "0.1.54",
+      "com.jcraft" % "jsch" % "0.1.55",
       "com.jcraft" % "jzlib" % "1.1.3",
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
       "org.xerial" % "sqlite-jdbc" % "3.27.2.1"
