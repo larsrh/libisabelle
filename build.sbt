@@ -84,7 +84,7 @@ lazy val loggingSettings = Seq(
     // scalac requires this pseudo-transitive dependency of scalog to be present,
     // even though we don't use its functionality here
     // this seems to be an issue for Scala <= 2.11.x
-    "com.typesafe" % "config" % "1.3.3" % "provided"
+    "com.typesafe" % "config" % "1.3.4" % "provided"
   )
 )
 
@@ -138,7 +138,7 @@ lazy val docs = project.in(file("modules/docs"))
     siteMappings += ((baseDirectory in ThisBuild).value / "README.md", "_includes/README.md"),
     tutDirectory := "_tut",
     // this seems to be required for scalog
-    libraryDependencies += "com.typesafe" % "config" % "1.3.3"
+    libraryDependencies += "com.typesafe" % "config" % "1.3.4"
   )
   .settings(
     addMappingsToSiteDir(tut, tutDirectory)
