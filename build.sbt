@@ -317,7 +317,7 @@ lazy val cli = project.in(file("modules/cli"))
   .settings(macroSettings)
   .settings(loggingSettings)
   .settings(
-    libraryDependencies += "com.github.alexarchambault" %% "case-app" % "1.1.3",
+    libraryDependencies += "com.github.alexarchambault" %% "case-app" % "1.2.0",
     mainClass in Compile := Some("info.hupel.isabelle.cli.Main"),
     assemblyJarName in assembly := s"isabellectl-assembly-${version.value}",
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(
