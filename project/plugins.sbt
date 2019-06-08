@@ -8,7 +8,7 @@ addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.2")
 addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.11")
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "2.0")
 addSbtPlugin("com.typesafe.sbt" % "sbt-ghpages" % "0.6.3" exclude("org.jruby", "jruby-complete"))
-addSbtPlugin("org.tpolecat" % "tut-plugin" % "0.6.11")
+addSbtPlugin("org.tpolecat" % "tut-plugin" % "0.6.12")
 addSbtPlugin("info.hupel" % "sbt-api-mappings" % "3.0.1")
 addSbtPlugin("info.hupel" % "sbt-jython" % "0.1.1")
 
