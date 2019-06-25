@@ -165,7 +165,7 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
       "com.jcraft" % "jsch" % "0.1.55",
       "com.jcraft" % "jzlib" % "1.1.3",
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
-      "org.xerial" % "sqlite-jdbc" % "3.27.2.1"
+      "org.xerial" % "sqlite-jdbc" % "3.28.0"
     )
   )
 
