@@ -160,7 +160,7 @@ lazy val pideInterface = project.in(file("modules/pide-interface"))
       "org.log4s" %% "log4s" % "1.8.2",
       // the dependencies below are not strictly necessary for pide-interface,
       // but all non-generic PIDE implementations require them
-      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1",
+      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
       "org.tukaani" % "xz" % "1.8",
       "com.jcraft" % "jsch" % "0.1.55",
       "com.jcraft" % "jzlib" % "1.1.3",
