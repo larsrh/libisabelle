@@ -18,42 +18,42 @@ matrix:
       osx_image: xcode8.3
     - env: ISABELLE_VERSION=stable:2016-1 SCALA_VERSION=2.11.12 PROFILE=generic
       os: linux
-      jdk: oraclejdk8
+      jdk: openjdk10
       addons:
         apt:
           packages:
             - lib32stdc++6
     - env: ISABELLE_VERSION=stable:2017 SCALA_VERSION=2.12.6 PROFILE=slow
       os: linux
-      jdk: oraclejdk8
+      jdk: openjdk10
       addons:
         apt:
           packages:
             - lib32stdc++6
     - env: ISABELLE_VERSION=stable:2017 SCALA_VERSION=2.12.6 PROFILE=slow DEPLOY=1
       os: linux
-      jdk: oraclejdk9
+      jdk: openjdk10
       addons:
         apt:
           packages:
             - lib32stdc++6
     - env: ISABELLE_VERSION=stable:2018 SCALA_VERSION=2.12.6 PROFILE=slow
       os: linux
-      jdk: oraclejdk8
+      jdk: openjdk10
       addons:
         apt:
           packages:
             - lib32stdc++6
     - env: ISABELLE_VERSION=stable:2019-RC4 SCALA_VERSION=2.12.6 PROFILE=slow
       os: linux
-      jdk: oraclejdk8
+      jdk: openjdk10
       addons:
         apt:
           packages:
             - lib32stdc++6
     - env: ISABELLE_VERSION=devel:isabelle-mirror SCALA_VERSION=2.12.6 PROFILE=devel
       os: linux
-      jdk: oraclejdk8
+      jdk: openjdk10
       addons:
         apt:
           packages:
