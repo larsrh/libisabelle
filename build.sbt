@@ -280,7 +280,7 @@ lazy val offlineTest = project.in(file("tests/offline"))
   .settings(
     isabellePackage := "tests",
     parallelExecution in Test := false,
-    libraryDependencies += "org.specs2" %% "specs2-scalacheck" % "4.5.1"
+    libraryDependencies += "org.specs2" %% "specs2-scalacheck" % "4.6.0"
   )
 
 lazy val pureTest = project.in(file("tests/pure"))
